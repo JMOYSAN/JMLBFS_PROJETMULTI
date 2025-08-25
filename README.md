@@ -146,4 +146,3 @@ Avant de commencer le projet, vous devez remettre un **document de planification
 - Builds disponibles pour 3 OS.  
 - Pas d’éléments Electron par défaut (icône personnalisée).  
 - Tags & versions cohérents.  
-

@@ -1,13 +1,12 @@
 import { useState } from 'react';
 
-function Chat() {
+function Chat({ onSend }) {
     const [message, setMessage] = useState('');
 
     const handleSend = () => {
         if (message.trim() === '') return;
 
-        console.log('Sending message:', message);
-
+        onSend(message);
         setMessage('');
     };
 
@@ -22,7 +21,7 @@ function Chat() {
             <input
                 type="text"
                 id="chat-input"
-                placeholder="Type a message..."
+                placeholder="Tapez un message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}

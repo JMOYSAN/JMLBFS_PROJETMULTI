@@ -1,15 +1,20 @@
-
-import './Styles/App.css'
-import Chat from "./Messages/BarreChat.jsx"
+import { useState } from 'react';
+import Chat from './Messages/BarreChat';
+import FilsConversation from './Messages/FilsConversation';
 
 function App() {
+    const [messages, setMessages] = useState([]);
 
-  return (
-    <>
-          <Chat>
-          </Chat>
-    </>
-  )
+    const handleNewMessage = (newMsg) => {
+        setMessages(prev => [...prev, newMsg]);
+    };
+
+    return (
+        <>
+            <FilsConversation messages={messages} />
+            <Chat onSend={handleNewMessage} />
+        </>
+    );
 }
 
-export default App
+export default App;

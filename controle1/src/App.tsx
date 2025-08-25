@@ -1,18 +1,13 @@
 
-
-
-import './App.css'
-import Chat from './barre_chat.jsx'
+import './Styles/App.css'
+import Chat from "./Messages/BarreChat.jsx"
 
 function App() {
 
   return (
     <>
-
           <Chat>
-
           </Chat>
-
     </>
   )
 }

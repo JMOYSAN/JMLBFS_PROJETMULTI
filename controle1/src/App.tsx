@@ -5,14 +5,20 @@ import FilsConversation from './Messages/FilsConversation';
 function App() {
     const [messages, setMessages] = useState([]);
 
-    const handleNewMessage = (newMsg) => {
-        setMessages(prev => [...prev, newMsg]);
+    const [utilisateurs, setUtilisateurs] = useState([]);
+
+    const gererNouveauMessage = (nouveauMesssage) => {
+        setMessages(prev => [...prev, nouveauMesssage]);
+    };
+
+    const gererNouveauUtilisateur = (nouveauUtilisateur) => {
+        setUtilisateurs(prev => [...prev, nouveauUtilisateur]);
     };
 
     return (
         <>
             <FilsConversation messages={messages} />
-            <Chat onSend={handleNewMessage} />
+            <Chat onSend={gererNouveauMessage} />
         </>
     );
 }

@@ -3,7 +3,7 @@ import { useState } from 'react';
 function Chat({ onSend }) {
     const [message, setMessage] = useState('');
 
-    const handleSend = () => {
+    const gererEnvoie = () => {
         if (message.trim() === '') return;
 
         onSend(message);
@@ -12,7 +12,7 @@ function Chat({ onSend }) {
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
-            handleSend();
+            gererEnvoie();
         }
     };
 
@@ -26,7 +26,7 @@ function Chat({ onSend }) {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
             />
-            <button id="send-btn" onClick={handleSend}>
+            <button id="send-btn" onClick={gererEnvoie}>
                 Send
             </button>
         </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Chat from './Messages/BarreChat';
+import Chat  from './Messages/BarreChat';
 import FilsConversation from './Messages/FilsConversation';
 
 function App() {

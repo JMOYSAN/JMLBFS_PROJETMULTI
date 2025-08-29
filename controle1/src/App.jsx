@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import Chat from './Messages/BarreChat';
 import FilsConversation from './Messages/FilsConversation';
 import Login from './Users/Login';
+import Sidebar from "./Components/Sidebar.jsx";
 
 function App() {
     const [messages, setMessages] = useState([]);
@@ -35,6 +36,7 @@ function App() {
                     <>
                         <FilsConversation messages={messages}/>
                         <Chat onSend={gererNouveauMessage}/>
+                        <Sidebar onLogout={handleLogout} />
                     </>
                 ) : <Login onLogin={gererNouveauUtilisateur} />
             }

@@ -16,10 +16,22 @@ function App() {
         setUtilisateurs(prev => [...prev, nouveauUtilisateur]);
     };
 
+    const [isConnect, setIsConnect] = useState(false);
+
+    const handleLogin = () => {
+        setIsConnect(true);
+    }
+
     return (
         <>
-            <FilsConversation messages={messages} />
-            <Chat onSend={gererNouveauMessage} />
+            {
+                isConnect ? (
+                    <>
+                        <FilsConversation messages={messages}/>
+                        <Chat onSend={gererNouveauMessage}/>
+                    </>
+                ) : <Login onLogin={handleLogin}/>
+            }
         </>
     );
 }

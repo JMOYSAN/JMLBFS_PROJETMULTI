@@ -19,6 +19,11 @@ function App() {
         localStorage.setItem("user", JSON.stringify(nouveauUtilisateur));
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        setIsConnect(false);
+    };
+
     const [isConnect, setIsConnect] = useState(false);
 
     useEffect(() => {

@@ -1,10 +1,14 @@
+import {useState} from "react";
 
 function Login({ onLogin }) {
+
+    const [username, setUsername] = useState('');
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        // TODO logic authentification
-        onLogin();
-    }
+        if (username.trim() === "") return;
+        onLogin({ username }); // ✅ Pass user data to parent
+    };
 
 
     return (

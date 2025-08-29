@@ -13,7 +13,13 @@ function Login({ onLogin }) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <input type="text" placeholder="Nom d'utilisateur" required />
+            <input
+                type="text"
+                placeholder="Nom d'utilisateur"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+            />
             <button type="submit">Connection</button>
         </form>
     );

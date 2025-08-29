@@ -36,11 +36,17 @@ function createWindow() {
     })
     win?.setFullScreen(true);
 
-  win.setFullScreen(true);
-  // Test active push message to Renderer-process.
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
-  })
+    //win?.webContents.openDevTools();
+
+    // Test active push message to Renderer-process.
+    win.webContents.on('did-finish-load', () => {
+
+        win?.webContents.send('main-process-message', (new Date).toLocaleString())
+    })
+
+    win.once('ready-to-show', () => {
+        win?.show();
+    });
 
     if (VITE_DEV_SERVER_URL) {
         win.loadURL(VITE_DEV_SERVER_URL)

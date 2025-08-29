@@ -10,7 +10,7 @@ function App() {
     const [utilisateurs, setUtilisateurs] = useState([]);
 
     const gererNouveauMessage = (nouveauMesssage) => {
-        setMessages(prev => [...prev, nouveauMesssage]);
+        setMessages(prev => [...prev, {'message': nouveauMesssage, 'username':JSON.parse(localStorage.getItem('user')).username, 'timestamp': new Date().toLocaleTimeString()}]);
     };
 
     const gererNouveauUtilisateur = (nouveauUtilisateur) => {

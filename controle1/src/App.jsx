@@ -35,7 +35,7 @@ function App() {
     }, []);
 
     return (
-        <>
+        <div id='main'>
             {
                 isConnect ? (
                     <>
@@ -45,7 +45,7 @@ function App() {
                     </>
                 ) : <Login onLogin={gererNouveauUtilisateur} />
             }
-        </>
+        </div>
     );
 }
 

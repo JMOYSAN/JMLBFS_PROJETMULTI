@@ -1,12 +1,43 @@
-.bulle {
+#fil {
     display: flex;
+    flex-direction: column;
+    background-color: lightgray;
+    padding: 10px;
+    color: white;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+    background-color: #3b3b3b;
+}
+
+.containerMessage {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+.bulle {
+    display: inline-flex;
+    flex-direction: column;
+    align-self: flex-end;
+    margin: 8px 0;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background: lightskyblue;
+    width: fit-content;
+}
+
+.bulleAutre {
+    display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
     margin: 8px 0;
     padding: 10px 16px;
     border-radius: 16px;
     background: #f1f0f0;
-    max-width: 60%;
+    width: fit-content;
 }
 
 .username {
@@ -23,5 +54,5 @@
 .timestamp {
     font-size: 0.8em;
     color: #888;
-    align-self: flex-end;
+    align-self: center;
 }

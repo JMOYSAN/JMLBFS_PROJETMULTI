@@ -1,7 +1,29 @@
-function Sidebar({onLogout}) {
+import FormCreerGroupe from "../Form/FormCreerGroupe.jsx";
+import Groupe from "./Groupe.jsx";
+
+function Sidebar({ onLogout, showFormCreerGroupe, showForm, utilisateurs, onCLose, groupes, setCurrentGroupe, currentUser }) {
+    const groupesFiltrer = groupes.filter((g) => {g.participants.includes(currentUser)})
     return (
-        <div className="sidebar">
-                <button id="deconnexion" onClick={onLogout}>Déconnexion</button>
+        <div id="sidebar">
+            {showForm ? (
+                <FormCreerGroupe utilisateurs={utilisateurs} onClose={onCLose}/>
+            ) : (
+                <div>
+                    <div>
+                        <button id="deconnexion" onClick={onLogout}>
+                            Déconnexion
+                        </button>
+                        <button id="creerGroupe" onClick={showFormCreerGroupe}>
+                            Créer un nouveau groupe
+                        </button>
+                    </div>
+                    <div>
+                        {
+                            groupes.map((g) => <Groupe groupe={g} setCurrentGroupe={setCurrentGroupe}/>)
+                        }
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

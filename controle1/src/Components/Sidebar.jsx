@@ -6,7 +6,7 @@ function Sidebar({ onLogout, showFormCreerGroupe, showForm, utilisateurs, onCLos
     return (
         <div id="sidebar">
             {showForm ? (
-                <FormCreerGroupe utilisateurs={utilisateurs} onClose={onCLose}/>
+                <FormCreerGroupe utilisateurs={utilisateurs} onClose={onCLose} currentUser={currentUser}/>
             ) : (
                 <div>
                     <div>

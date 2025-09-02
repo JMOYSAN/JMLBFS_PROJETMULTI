@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function FormCreerGroupe({ utilisateurs, onClose }) {
+function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
     const [nomGroupe, setNomGroupe] = useState("");
     const [participant, setParticipant] = useState("");
     const [participantsAjoutes, setParticipantsAjoutes] = useState([]);
@@ -11,7 +11,7 @@ function FormCreerGroupe({ utilisateurs, onClose }) {
     console.log('utilisateur:', utilisateurs)
 
     const handleAddParticipant = (name) => {
-        if (name && !participantsAjoutes.includes(name) && utilisateurs.some(u => u === name)) {
+        if (name && !participantsAjoutes.includes(name) && utilisateurs.some(u => u === name) && name.toLowerCase() !== currentUser.toLowerCase()) {
             setParticipantsAjoutes([...participantsAjoutes, name]);
             setParticipant("");
             setSuggestions([]);
@@ -50,7 +50,7 @@ function FormCreerGroupe({ utilisateurs, onClose }) {
                             setSuggestions(utilisateurs.filter(
                                 (u) =>
                                     u.toLowerCase().includes(e.target.value.toLowerCase()) &&
-                                    !participantsAjoutes.includes(u)
+                                    !participantsAjoutes.includes(u) && u.toLowerCase() !== currentUser.toLowerCase()
                             ).slice(0, 5))
                         }}
                         onKeyDown={(e) => {

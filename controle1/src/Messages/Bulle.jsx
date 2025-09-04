@@ -1,4 +1,5 @@
-function Bulle({message}) {
+function Bulle({ message }) {
+    console.log(message)
 
     return (
         <div className='containerMessage'>

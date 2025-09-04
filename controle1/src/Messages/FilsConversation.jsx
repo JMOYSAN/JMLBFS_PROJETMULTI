@@ -1,13 +1,15 @@
 import Bulle from './Bulle';
 import BulleAutre from "./BulleAutre.jsx";
 
-function FilsConversation({ messages }) {
+function FilsConversation({ messages, currentUser, currentGroupe }) {
+    const messagesFiltrer = messages.filter(
+        (msg) =>
+            msg.groupe.nom === currentGroupe.nom &&
+            currentGroupe.participants.includes(currentUser)
+    );
     return (
-        <div
-            id="fil"
-        >
-            {messages.map((msg) => {
-                const currentUser = JSON.parse(localStorage.getItem('user')).username;
+        <div id="fil">
+            {messagesFiltrer.map((msg) => {
                 const isCurrentUser = msg.username === currentUser;
 
                 return isCurrentUser ? (

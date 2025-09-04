@@ -7,7 +7,7 @@ function Login({ onLogin }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (username.trim() === "") return;
-        onLogin({ username }); // ✅ Pass user data to parent
+        onLogin(username);
     };
 
 

@@ -5,6 +5,11 @@ import Login from './Users/Login';
 import Sidebar from "./Components/Sidebar.jsx";
 import FormCreerGroupe from "./Form/FormCreerGroupe.jsx";
 import genererUtilisateurs from "./Mock/MockUtilisateurs.js";
+import Utilisateurs from "./Users/Utilisateurs.jsx";
+
+
+
+
 function App() {
     const [messages, setMessages] = useState([]);
 
@@ -69,9 +74,13 @@ function App() {
                 isConnect ? (
                     <>
                         <div id='chat-container'>
+                            <Utilisateurs onLogout={handleLogout} showFormCreerGroupe={showFormCreerGroupe} showForm={showForm}
+                                     utilisateurs={utilisateurs} onCLose={creerNouveauGroupe} setCurrentGroupe={setCurrentGroupe}
+                                     groupes={groupes} currentUser={currentUser}/>
                             <Sidebar onLogout={handleLogout} showFormCreerGroupe={showFormCreerGroupe} showForm={showForm}
                                      utilisateurs={utilisateurs} onCLose={creerNouveauGroupe} setCurrentGroupe={setCurrentGroupe}
                                      groupes={groupes} currentUser={currentUser}/>
+
                             <FilsConversation messages={messages} currentUser={currentUser} currentGroupe={currentGroupe}/>
                         </div>
                         <Chat onSend={gererNouveauMessage}/>

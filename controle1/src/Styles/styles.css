@@ -7,8 +7,9 @@
 
 #chat-bar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
 }
+
 
 #sidebar {
     display: flex;
@@ -29,7 +30,7 @@
 
 body {
     height: 100%;
-    width: 100%;
+    width: 99%;
     background-color: #3b3b3b;
 }
 
@@ -86,3 +87,33 @@ body {
     align-self: center;
 }
 
+#sidebar_Utilisateurs { padding: 8px; }
+
+.utilisateur-ligne {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: default;
+}
+
+.utilisateur-ligne:hover { background: #f2f3f5;
+}
+
+.utilisateur-ligne.moi { background: #e8f0fe;
+
+}
+
+.statut { width: 8px; height: 8px; border-radius: 50%; background: #9aa0a6; }
+.statut.en-ligne { background: #23a55a; }
+.statut.hors-ligne { background: #9aa0a6; }
+.statut.absent { background: #fbbc04; }
+.statut.occupe { background: #ea4335; }
+
+.avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center; background: #ddd; font-size: 12px;
+}
+
+.nom { font-size: 14px; }

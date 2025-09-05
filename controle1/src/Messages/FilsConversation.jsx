@@ -10,7 +10,7 @@ function FilsConversation({
   onSend,
 }) {
   const messagesFiltres = messages.filter(
-    (message) => message.groupe?.nom === currentGroupe.nom
+    (message) => message.groupe?.nom === currentGroupe?.nom
   )
 
   return (

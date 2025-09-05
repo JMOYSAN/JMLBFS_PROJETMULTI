@@ -8,7 +8,7 @@ function Topbar({ currentGroupe, currentUser }) {
             <>
               {currentGroupe.participants ? (
                   <>
-                    <div>Bienvenue dans le groupe {currentGroupe.nom}</div>
+                    <div>Bienvenue dans le groupe {currentGroupe.groupeVisibility} {currentGroupe.nom}</div>
                     <div>
                       Les membres du groupe sont :
                       <ul>
@@ -27,6 +27,7 @@ function Topbar({ currentGroupe, currentUser }) {
         )}
 
         <div>Vous êtes {currentUser}</div>
+
       </>
   );
 }

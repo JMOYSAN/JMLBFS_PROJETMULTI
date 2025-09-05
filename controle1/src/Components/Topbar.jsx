@@ -11,7 +11,7 @@ function Topbar({ currentGroupe, currentUser }) {
             Les membres du groupe sont :
             <ul>
               {currentGroupe.participants.map((participant) => (
-                <li>{participant}</li>
+                <li>{participant.nom}</li>
               ))}
             </ul>
           </div>

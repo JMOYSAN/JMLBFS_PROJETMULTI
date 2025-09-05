@@ -8,6 +8,7 @@ function FilsConversation({
   messages = [],
   currentUser,
   currentGroupe,
+  setCurrentGroupe,
   onSend,
 }) {
   const messagesFiltres = messages.filter(
@@ -16,6 +17,23 @@ function FilsConversation({
     const participantsTyping = currentGroupe?.participants?.filter(
         (p) => p.isTyping && p.nom !== currentUser
     ) || [];
+
+  const changeTyping = (bool) => {
+      setCurrentGroupe((prevGroupe) => {
+          const updatedParticipants = prevGroupe.participants.map((p) => {
+              if (p.nom === currentUser.nom) {
+                  return { ...p, isTyping: bool };
+              }
+              return p;
+          });
+
+          return {
+              ...prevGroupe,
+              participants: updatedParticipants,
+          };
+      });
+      console.log(currentGroupe)
+  }
 
   return (
     <div id="fil">
@@ -36,7 +54,7 @@ function FilsConversation({
           ))}
       </div>
       <div>
-        <Chat onSend={onSend} />
+        <Chat onSend={onSend} changeTyping={changeTyping}/>
       </div>
     </div>
   )

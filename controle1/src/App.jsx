@@ -104,6 +104,7 @@ function App() {
               currentUser={currentUser}
               currentGroupe={currentGroupe}
               onSend={gererNouveauMessage}
+              setCurrentGroupe={setCurrentGroupe}
             />
           </div>
         </>

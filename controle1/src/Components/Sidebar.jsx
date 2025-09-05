@@ -14,14 +14,18 @@ function Sidebar({
   currentUser,
 }) {
   const groupesFiltrer = groupes.filter((g) =>
-    g.participants.includes(currentUser)
-  )
+      g.participants.some(p => p.nom === currentUser)
+  );
+
+  const groupesSansUser = groupes.filter((g) =>
+      !g.participants.some(p => p.nom === currentUser)
+  );
+
 
   const groupesSansUser = groupes.filter(
     (g) => !g.participants.includes(currentUser) && g.groupeVisibility === "public")
 
   console.log(groupesFiltrer);
-
 
   return (
     <div id="sidebar">

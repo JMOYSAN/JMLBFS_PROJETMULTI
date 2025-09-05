@@ -2,35 +2,56 @@ function genererGroupes() {
   return [
     {
       nom: 'Groupe 1',
-      participants: ['Alice', 'Bob', 'Charlie'],
-      groupeVisibility: "public",
+      participants: [
+        { nom: 'Alice', isTyping: false },
+        { nom: 'Bob', isTyping: false },
+        { nom: 'Charlie', isTyping: false },
+      ],
     },
     {
       nom: 'Groupe 2',
-      participants: ['Diana', 'Eve', 'Frank', 'Grace'],
-      groupeVisibility: "public",
+      participants: [
+        { nom: 'Diana', isTyping: false },
+        { nom: 'Eve', isTyping: true },
+        { nom: 'Frank', isTyping: false },
+        { nom: 'Grace', isTyping: false },
+      ],
     },
     {
       nom: 'Groupe 3',
-      participants: ['William', 'Ivan', 'Judy', 'Karl'],
-      groupeVisibility: "public",
+      participants: [
+        { nom: 'William', isTyping: true },
+        { nom: 'Ivan', isTyping: false },
+        { nom: 'Judy', isTyping: true },
+        { nom: 'Karl', isTyping: false },
+      ],
     },
     {
       nom: 'Groupe 4',
-      participants: ['Laura', 'Oliver Fortin', 'Lyam'],
-      groupeVisibility: "public",
+      participants: [
+        { nom: 'Laura', isTyping: false },
+        { nom: 'Oliver Fortin', isTyping: false },
+        { nom: 'Lyam', isTyping: false },
+      ],
     },
     {
       nom: 'Groupe 5',
-      participants: ['Olivia', 'Simon', 'Quentin'],
-      groupeVisibility: "public",
+      participants: [
+        { nom: 'Olivia', isTyping: false },
+        { nom: 'Simon', isTyping: false },
+        { nom: 'Quentin', isTyping: false },
+      ],
     },
     {
       nom: 'Groupe 6',
-      participants: ['Rupert', 'Mathurin', 'Joaquim'],
-      groupeVisibility: "public",
+      participants: [
+        { nom: 'Rupert', isTyping: false },
+        { nom: 'Mathurin', isTyping: false },
+        { nom: 'Joaquim', isTyping: false },
+      ],
     },
-  ]
+  ];
 }
+
 
 export default genererGroupes

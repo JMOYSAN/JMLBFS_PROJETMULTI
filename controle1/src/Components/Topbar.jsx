@@ -13,7 +13,7 @@ function Topbar({ currentGroupe, currentUser }) {
                       Les membres du groupe sont :
                       <ul>
                         {currentGroupe.participants.map((participant, index) => (
-                            <li key={index}>{participant}</li>
+                            <li key={index}>{participant.nom}</li>
                           ))}
                       </ul>
                     </div>
@@ -25,7 +25,6 @@ function Topbar({ currentGroupe, currentUser }) {
         ) : (
             <div>Aucun groupe sélectionné</div>
         )}
-
         <div>Vous êtes {currentUser}</div>
 
       </>

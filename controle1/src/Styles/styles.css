@@ -41,6 +41,14 @@ html, body, #root {
   color: #DCD7C9;
 }
 
+.typing{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  height: 30px;
+}
+
 .containerMessage {
   display: flex;
   flex-direction: column;

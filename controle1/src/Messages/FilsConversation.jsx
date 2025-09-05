@@ -1,26 +1,34 @@
-import Bulle from './Bulle';
-import BulleAutre from "./BulleAutre.jsx";
+import Bulle from './Bulle'
+import BulleAutre from './BulleAutre.jsx'
+import Chat from './BarreChat.jsx'
 
-function FilsConversation({ messages, currentUser, currentGroupe }) {
-    const messagesFiltrer = messages.filter(
-        (msg) =>
-            msg.groupe.nom === currentGroupe.nom &&
-            currentGroupe.participants.includes(currentUser)
-    );
-    return (
-        <div id="fil">
-            {messagesFiltrer.map((msg) => {
-                const isCurrentUser = msg.username === currentUser;
+function FilsConversation({
+  messages = [],
+  currentUser,
+  currentGroupe,
+  onSend,
+}) {
+  const messagesFiltres = messages.filter(
+    (message) => message.groupe?.nom === currentGroupe.nom
+  )
 
-                return isCurrentUser ? (
-                    <Bulle message={msg}/>
-                ) : (
-                    <BulleAutre message={msg}/>
-                );
-            })}
-        </div>
-    );
+  return (
+    <div id="fil">
+      <div id="messages-zone">
+        {messagesFiltres.map((message, index) => {
+          const estMoi = message.username === currentUser
+          return estMoi ? (
+            <Bulle key={message.id ?? index} message={message} />
+          ) : (
+            <BulleAutre key={message.id ?? index} message={message} />
+          )
+        })}
+      </div>
+      <div>
+        <Chat onSend={onSend} />
+      </div>
+    </div>
+  )
 }
 
-
-export default FilsConversation;
+export default FilsConversation

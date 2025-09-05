@@ -1,5 +1,3 @@
-import Groupe from './Groupe.jsx'
-
 function Topbar({ currentGroupe, currentUser }) {
   console.log('currentGroupe')
   console.log(currentGroupe)

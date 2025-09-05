@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import Chat from './Messages/BarreChat';
+
 import FilsConversation from './Messages/FilsConversation';
 import Login from './Users/Login';
 import Sidebar from "./Components/Sidebar.jsx";
@@ -19,13 +19,7 @@ function App() {
     const [currentUser, setCurrentUser] = useState();
     const [groupes, setGroupes] = useState([]);
     const [currentGroupe, setCurrentGroupe] = useState();
-    const gererNouveauMessage = (nouveauMesssage) => {
-        if (currentGroupe){
-            setMessages(prev => [...prev, {'message': nouveauMesssage,'username': currentUser,
-                'timestamp': new Date().toLocaleTimeString(), 'groupe': currentGroupe}]);
 
-        }
-    };
     console.log("messages:", JSON.stringify(messages, null, 2));
     console.log("currentGroupe:", JSON.stringify(currentGroupe, null, 2));
     console.log("currentUser:", JSON.stringify(currentUser, null, 2));
@@ -38,6 +32,20 @@ function App() {
         setCurrentUser(nouveauUtilisateur);
         setIsConnect(true);
         localStorage.setItem("user", JSON.stringify(nouveauUtilisateur));
+    };
+
+    const gererNouveauMessage = (texte) => {
+        if (!currentGroupe || !currentUser) return;
+        setMessages(prev => [
+            ...prev,
+            {
+                id: crypto.randomUUID?.() ?? Date.now(),
+                message: texte,
+                username: currentUser,
+                timestamp: new Date().toLocaleTimeString(),
+                groupe: currentGroupe,
+            }
+        ]);
     };
 
     const handleLogout = () => {
@@ -81,9 +89,9 @@ function App() {
                                      utilisateurs={utilisateurs} onCLose={creerNouveauGroupe} setCurrentGroupe={setCurrentGroupe}
                                      groupes={groupes} currentUser={currentUser}/>
 
-                            <FilsConversation messages={messages} currentUser={currentUser} currentGroupe={currentGroupe}/>
+                            <FilsConversation messages={messages} currentUser={currentUser} currentGroupe={currentGroupe} onSend={gererNouveauMessage}/>
                         </div>
-                        <Chat onSend={gererNouveauMessage}/>
+
 
                     </>
                 ) : <Login onLogin={gererNouveauUtilisateur} />

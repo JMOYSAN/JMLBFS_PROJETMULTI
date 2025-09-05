@@ -1,20 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
-
     const [nomGroupe, setNomGroupe] = useState("");
     const [participant, setParticipant] = useState("");
     const [participantsAjoutes, setParticipantsAjoutes] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
 
-    console.log("Participant:", participant);
-    console.log("Suggestions:", suggestions);
-    console.log("ParticipantAjoutee:", participantsAjoutes);
-    console.log('utilisateur:', utilisateurs)
+    const getNom = (u) => (typeof u === "string" ? u : u.nom);
+    const listeNoms = Array.isArray(utilisateurs) ? utilisateurs.map(getNom) : [];
 
-    const handleAddParticipant = (name) => {
-        if (name && !participantsAjoutes.includes(name) && utilisateurs.some(u => u === name) && name.toLowerCase() !== currentUser.toLowerCase()) {
-            setParticipantsAjoutes([...participantsAjoutes, name]);
+    const handleAddParticipant = (nom) => {
+        const cible = (nom || "").trim();
+        if (!cible) return;
+        const existe = listeNoms.some((n) => n.toLowerCase() === cible.toLowerCase());
+        const dejaAjoute = participantsAjoutes.some((n) => n.toLowerCase() === cible.toLowerCase());
+        const estMoi = currentUser && cible.toLowerCase() === currentUser.toLowerCase();
+
+        if (existe && !dejaAjoute && !estMoi) {
+            setParticipantsAjoutes((prev) => [...prev, cible]);
             setParticipant("");
             setSuggestions([]);
         }
@@ -22,16 +25,25 @@ function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Nom du groupe:", nomGroupe);
-        console.log("Participants:", participantsAjoutes);
+        if (!nomGroupe.trim()) return;
+        if (onClose) onClose(nomGroupe.trim(), participantsAjoutes);
+    };
 
-        if (onClose) onClose(nomGroupe,participantsAjoutes);
+    const mettreAJourSuggestions = (val) => {
+        const v = val.toLowerCase();
+        const res = listeNoms
+            .filter((n) => n.toLowerCase().includes(v))
+            .filter((n) => !participantsAjoutes.some((p) => p.toLowerCase() === n.toLowerCase()))
+            .filter((n) => !(currentUser && n.toLowerCase() === currentUser.toLowerCase()))
+            .slice(0, 5);
+        setSuggestions(res);
     };
 
     return (
         <div className="form-popup">
             <form onSubmit={handleSubmit}>
                 <h2>Créer un nouveau groupe</h2>
+
                 <label>
                     Nom du groupe:
                     <input
@@ -41,19 +53,17 @@ function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
                         required
                     />
                 </label>
+
                 <br />
+
                 <label>
                     Ajouter un participant:
                     <input
                         type="text"
                         value={participant}
                         onChange={(e) => {
-                            setParticipant(e.target.value)
-                            setSuggestions(utilisateurs.filter(
-                                (u) =>
-                                    u.toLowerCase().includes(e.target.value.toLowerCase()) &&
-                                    !participantsAjoutes.includes(u) && u.toLowerCase() !== currentUser.toLowerCase()
-                            ).slice(0, 5))
+                            setParticipant(e.target.value);
+                            mettreAJourSuggestions(e.target.value);
                         }}
                         onKeyDown={(e) => {
                             if (e.key === "Enter") {
@@ -61,32 +71,34 @@ function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
                                 handleAddParticipant(participant);
                             }
                         }}
+                        placeholder="Nom d'utilisateur"
                     />
                 </label>
+
                 {suggestions.length > 0 && (
                     <div>
                         <h3>Suggestions</h3>
                         <ul className="suggestions">
-                            {suggestions.map((u) => (
-                                <li key={u} onClick={() => handleAddParticipant(u)}>
-                                    {u}
+                            {suggestions.map((nom) => (
+                                <li key={nom} onClick={() => handleAddParticipant(nom)}>
+                                    {nom}
                                 </li>
                             ))}
                         </ul>
                     </div>
-
                 )}
 
                 {participantsAjoutes.length > 0 && (
                     <div>
                         <strong>Participants ajoutés :</strong>
                         <ul>
-                            {participantsAjoutes.map((p) => (
-                                <li key={p}>{p}</li>
+                            {participantsAjoutes.map((nom) => (
+                                <li key={nom}>{nom}</li>
                             ))}
                         </ul>
                     </div>
                 )}
+
                 <button type="submit">Créer le groupe</button>
             </form>
         </div>

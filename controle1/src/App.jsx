@@ -4,11 +4,13 @@ import FilsConversation from './Messages/FilsConversation';
 import Login from './Users/Login';
 import Sidebar from "./Components/Sidebar.jsx";
 import FormCreerGroupe from "./Form/FormCreerGroupe.jsx";
-
+import genererUtilisateurs from "./Mock/MockUtilisateurs.js";
 function App() {
     const [messages, setMessages] = useState([]);
 
-    const [utilisateurs, setUtilisateurs] = useState([]);
+    const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs());
+
+
     const [currentUser, setCurrentUser] = useState();
     const [groupes, setGroupes] = useState([]);
     const [currentGroupe, setCurrentGroupe] = useState();

@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 
 function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
+
     const [nomGroupe, setNomGroupe] = useState("");
     const [participant, setParticipant] = useState("");
     const [participantsAjoutes, setParticipantsAjoutes] = useState([]);
     const [suggestions, setSuggestions] = useState([]);
+
     console.log("Participant:", participant);
     console.log("Suggestions:", suggestions);
     console.log("ParticipantAjoutee:", participantsAjoutes);

@@ -15,7 +15,7 @@ function FilsConversation({
 
   return (
     <div id="fil">
-      <Topbar currentGroupe={currentGroupe}></Topbar>
+      <Topbar currentGroupe={currentGroupe} currentUser={currentUser}></Topbar>
       <div id="messages-zone">
         {messagesFiltres.map((message, index) => {
           const estMoi = message.username === currentUser

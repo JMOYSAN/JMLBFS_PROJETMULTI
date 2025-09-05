@@ -46,18 +46,23 @@ function App() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('user')
+    localStorage.clear();
+    setCurrentUser(null)
+    setCurrentGroupe(null)
     setIsConnect(false)
   }
   const [showForm, setShowForm] = useState(false)
+
+
   const showFormCreerGroupe = () => {
     setShowForm(true)
   }
 
-  const creerNouveauGroupe = (nomGroupe, participantsAjoutes) => {
+  const creerNouveauGroupe = (nomGroupe, participantsAjoutes, groupeVisibility) => {
     const groupe = {
       nom: nomGroupe,
       participants: [...participantsAjoutes, currentUser],
+      groupeVisibility: groupeVisibility,
     }
     setGroupes((prev) => [...prev, groupe])
     setShowForm(false)
@@ -83,7 +88,7 @@ function App() {
               showFormCreerGroupe={showFormCreerGroupe}
               showForm={showForm}
               utilisateurs={utilisateurs}
-              onCLose={creerNouveauGroupe}
+              onClose={creerNouveauGroupe}
               setCurrentGroupe={setCurrentGroupe}
               groupes={groupes}
               currentUser={currentUser}
@@ -93,7 +98,7 @@ function App() {
               showFormCreerGroupe={showFormCreerGroupe}
               showForm={showForm}
               utilisateurs={utilisateurs}
-              onCLose={creerNouveauGroupe}
+              onClose={creerNouveauGroupe}
               setCurrentGroupe={setCurrentGroupe}
               groupes={groupes}
               currentUser={currentUser}

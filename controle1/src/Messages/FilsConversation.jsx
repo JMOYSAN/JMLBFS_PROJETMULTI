@@ -11,7 +11,7 @@ function FilsConversation({
   onSend,
 }) {
   const messagesFiltres = messages.filter(
-    (message) => message.groupe?.nom === currentGroupe.nom
+    (message) => message.groupe?.nom === currentGroupe?.nom
   )
     const participantsTyping = currentGroupe?.participants?.filter(
         (p) => p.isTyping && p.nom !== currentUser

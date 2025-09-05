@@ -8,7 +8,7 @@ function Sidebar({
   showFormCreerGroupe,
   showForm,
   utilisateurs,
-  onCLose,
+  onClose,
   groupes,
   setCurrentGroupe,
   currentUser,
@@ -22,13 +22,17 @@ function Sidebar({
   );
 
 
-  console.log(groupes)
+  const groupesSansUser = groupes.filter(
+    (g) => !g.participants.includes(currentUser) && g.groupeVisibility === "public")
+
+  console.log(groupesFiltrer);
+
   return (
     <div id="sidebar">
       {showForm ? (
         <FormCreerGroupe
           utilisateurs={utilisateurs}
-          onClose={onCLose}
+          onClose={onClose}
           currentUser={currentUser}
         />
       ) : (

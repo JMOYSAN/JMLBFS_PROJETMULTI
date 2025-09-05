@@ -38,7 +38,7 @@ const StyledWrapper = styled.div`
 const Button = ({showFormCreerGroupe}) => {
     return (
         <StyledWrapper>
-            <button className="c-button">
+            <button className="c-button" onClick={showFormCreerGroupe}>
         <span className="c-main">
           Créer un groupe
         </span>

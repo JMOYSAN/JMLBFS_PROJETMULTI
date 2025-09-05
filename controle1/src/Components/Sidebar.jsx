@@ -33,7 +33,7 @@ function Sidebar({
             </button>
           </div>
           <div>
-            {groupesFiltrer.map((g) => (
+            {groupes.map((g) => (
               <Groupe groupe={g} setCurrentGroupe={setCurrentGroupe} />
             ))}
           </div>

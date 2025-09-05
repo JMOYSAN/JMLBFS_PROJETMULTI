@@ -1,5 +1,5 @@
 export function notifier(message) {
-  window.notify('titre', message)
+  window.notify('Notification', message)
 }
 
 export default notifier

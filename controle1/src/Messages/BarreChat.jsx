@@ -26,6 +26,7 @@ function Chat({ onSend }) {
         onChange={(e) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
       />
+
       <button id="send-btn" onClick={gererEnvoie}>
         Send
       </button>

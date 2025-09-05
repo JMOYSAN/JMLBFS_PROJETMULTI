@@ -11,9 +11,10 @@ function Sidebar({
   setCurrentGroupe,
   currentUser,
 }) {
+  /**
   const groupesFiltrer = groupes.filter((g) => {
     g.participants.includes(currentUser)
-  })
+  })**/
   return (
     <div id="sidebar">
       {showForm ? (
@@ -33,7 +34,7 @@ function Sidebar({
             </button>
           </div>
           <div>
-            {groupesFiltrer.map((g) => (
+            {groupes.map((g) => (
               <Groupe groupe={g} setCurrentGroupe={setCurrentGroupe} />
             ))}
           </div>

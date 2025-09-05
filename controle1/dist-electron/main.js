@@ -23,7 +23,7 @@ function createWindow() {
   else win.loadFile(path.join(RENDERER_DIST, "index.html"));
 }
 app.whenReady().then(() => {
-  app.setAppUserModelId("com.example.myapp");
+  app.setAppUserModelId("Rogue Rats Chat");
   process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
   createWindow();
   ipcMain.handle("notify", (_e, { title, body }) => {

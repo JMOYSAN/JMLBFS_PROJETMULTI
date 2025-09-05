@@ -1,5 +1,7 @@
 import FormCreerGroupe from '../Form/FormCreerGroupe.jsx'
 import Groupe from './Groupe.jsx'
+import Logout from "./Logout.jsx";
+import AddGroup from "./AddGroup.jsx";
 
 function Sidebar({
   onLogout,
@@ -31,12 +33,8 @@ function Sidebar({
       ) : (
         <div>
           <div>
-            <button id="deconnexion" onClick={onLogout}>
-              Déconnexion
-            </button>
-            <button id="creerGroupe" onClick={showFormCreerGroupe}>
-              Créer un nouveau groupe
-            </button>
+            <AddGroup showFormCreerGroupe={showFormCreerGroupe} />
+            <Logout onLogout={onLogout} />
           </div>
           <div>
             Vos Groupes

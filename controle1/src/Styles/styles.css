@@ -10,25 +10,22 @@
   justify-content: center;
 }
 
-#chat-input {
-  width: 50%;
-}
-
 #fil {
   display: flex;
   flex-direction: column;
-  flex: 0 0 79%;
-  background-color: lightgray;
+  flex: 5;
+  background-color: #2C3639;
+  color: #DCD7C9;
   padding: 10px;
-  color: white;
 }
-html,
-body,
-#root {
-  height: 100%;
-  width: 97%;
+html, body, #root {
   margin: 0;
   padding: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #2C3639;
+  color: #DCD7C9;
+  overflow: hidden;
 }
 
 #messages-zone {
@@ -36,25 +33,12 @@ body,
   overflow-y: auto;
 }
 
-#chat-bar {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  padding: 8px;
-  background: #d3d3d3;
-}
-
 #sidebar {
   display: flex;
   flex-direction: column;
-  flex: 0 0 20%;
-  background-color: #888;
-}
-
-body {
-  height: 100%;
-  width: 99%;
-  background-color: #3b3b3b;
+  flex: 1;
+  background-color: #3F4E4F;
+  color: #DCD7C9;
 }
 
 .containerMessage {
@@ -63,14 +47,15 @@ body {
   height: 15%;
   width: 100%;
 }
+
 .bulle {
   display: inline-flex;
   flex-direction: column;
   align-self: flex-end;
-  margin: 8px 0;
   padding: 10px 16px;
   border-radius: 16px;
-  background: lightskyblue;
+  background-color: #A27B5C;
+  color: #2C3639;
   width: fit-content;
 }
 
@@ -81,16 +66,27 @@ body {
   margin: 8px 0;
   padding: 10px 16px;
   border-radius: 16px;
-  background: #f1f0f0;
+  background-color: #465554;
+  color: #D9D6CE;
   width: fit-content;
 }
 
+.bulleAutre .username {
+  color: #E3E0D8;
+  font-weight: 600;
+}
+
 .groupe {
-  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  padding: 1px 14px;
+  border-radius: 10px;
+  cursor: pointer;
 }
 
 .groupe:hover {
-  background-color: #777;
+  background-color: #f2f3f5;;
 }
 
 .username {
@@ -110,8 +106,21 @@ body {
   align-self: center;
 }
 
+#sidebar .groupe:hover {
+  background-color: #A27B5C;
+  color: #2C3639;
+}
+
+#sidebar_Utilisateurs .utilisateur-ligne:hover {
+  background-color: #39514E;
+  color: #DCD7C9;
+}
+
 #sidebar_Utilisateurs {
   padding: 8px;
+  background-color: #1E2425;
+  color: #DCD7C9;
+  flex: 1;
 }
 
 .utilisateur-ligne {
@@ -120,7 +129,7 @@ body {
   gap: 8px;
   padding: 6px 10px;
   border-radius: 10px;
-  cursor: default;
+  cursor: pointer;
 }
 
 .utilisateur-ligne:hover {

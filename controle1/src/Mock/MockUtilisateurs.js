@@ -1,47 +1,16 @@
-function genererUtilisateurs(nombre = 10) {
-  const tousLesNoms = [
-    'Alice',
-    'Bob',
-    'Charlie',
-    'Diana',
-    'Eve',
-    'Frank',
-    'Grace',
-    'William',
-    'Ivan',
-    'Judy',
-    'Karl',
-    'Laura',
-    'Oliver Fortin',
-    'Lyam',
-    'Olivia',
-    'Simon',
-    'Quentin',
-    'Rupert',
-    'Mathurin',
-    'Joaquim',
+function genererUtilisateurs() {
+  return [
+    { id: 1, nom: 'Frank', statut: 'en-ligne' },
+    { id: 2, nom: 'Bob', statut: 'hors-ligne' },
+    { id: 3, nom: 'WillTheMaster', statut: 'absent' },
+    { id: 4, nom: 'CubeSquare', statut: 'en-ligne' },
+    { id: 5, nom: 'Danibal', statut: 'en-ligne' },
+    { id: 6, nom: 'Felty8', statut: 'en-ligne' },
+    { id: 7, nom: 'Grace', statut: 'occupe' },
+    { id: 8, nom: 'William', statut: 'absent' },
+    { id: 9, nom: 'Krisp', statut: 'en-ligne' },
+    { id: 10, nom: 'gtsthilaire', statut: 'hors-ligne' },
   ]
-
-  const tousLesStatuts = ['en-ligne', 'hors-ligne', 'absent', 'occupe']
-
-  const utilisateurs = []
-
-  for (let i = 0; i < nombre; i++) {
-    const nomAleatoire =
-      tousLesNoms[Math.floor(Math.random() * tousLesNoms.length)]
-    const statutAleatoire =
-      tousLesStatuts[Math.floor(Math.random() * tousLesStatuts.length)]
-
-    const utilisateur = {
-      id: i + 1,
-      nom: nomAleatoire,
-      statut: statutAleatoire,
-    }
-
-    utilisateurs.push(utilisateur)
-  }
-
-  return utilisateurs
 }
 
 export default genererUtilisateurs

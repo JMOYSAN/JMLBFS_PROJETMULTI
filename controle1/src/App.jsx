@@ -5,6 +5,7 @@ import Login from './Users/Login'
 import Sidebar from './Components/Sidebar.jsx'
 import genererUtilisateurs from './Mock/MockUtilisateurs.js'
 import Utilisateurs from './Users/Utilisateurs.jsx'
+import genererGroupes from './Mock/MockGroupe.js'
 
 function App() {
   const [messages, setMessages] = useState([])
@@ -12,8 +13,10 @@ function App() {
   const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs())
 
   const [currentUser, setCurrentUser] = useState()
-  const [groupes, setGroupes] = useState([])
-  const [currentGroupe, setCurrentGroupe] = useState()
+
+  const [groupes, setGroupes] = useState(genererGroupes())
+
+  const [currentGroupe, setCurrentGroupe] = useState([])
 
   console.log('messages:', JSON.stringify(messages, null, 2))
   console.log('currentGroupe:', JSON.stringify(currentGroupe, null, 2))

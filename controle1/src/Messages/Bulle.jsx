@@ -1,9 +1,6 @@
-import { notifier } from '../Notifications/notifier.js'
-
-function Bulle({ window, message }) {
+function Bulle({ message }) {
   console.log(message)
 
-  notifier(window, message)
   return (
     <div className="containerMessage">
       <div className="timestamp">{message.timestamp}</div>

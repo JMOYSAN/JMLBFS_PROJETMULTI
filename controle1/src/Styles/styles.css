@@ -27,7 +27,7 @@ html, body, #root {
   display: flex;
   flex-direction: column;
   flex: 1;
-  height: 100%;
+  height: 100vh;
   background-color: #3F4E4F;
   color: #DCD7C9;
 }
@@ -35,7 +35,8 @@ html, body, #root {
 .sidebar-content {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
 }
 
 .sidebar-header {
@@ -50,8 +51,8 @@ html, body, #root {
 .sidebar-groups {
   flex-grow: 1;
   overflow-y: auto;
-  height: 100%;
   padding-right: 5px;
+  min-height: 0;
 }
 
 /* ===== Group Sections ===== */

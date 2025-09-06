@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Bulle from './Bulle'
 import BulleAutre from './BulleAutre.jsx'
 import Chat from './BarreChat.jsx'
@@ -7,8 +7,10 @@ import Typing from './Typing'
 
 function FilsConversation({ currentUser, currentGroupe, onSend }) {
   const messagesZoneRef = useRef(null)
+  const [visibleCount, setVisibleCount] = useState(10)
 
   const messagesFiltres = currentGroupe?.messages || []
+  const totalMessages = messagesFiltres.length
 
   const participantsTyping =
     currentGroupe?.participants?.filter(
@@ -21,12 +23,32 @@ function FilsConversation({ currentUser, currentGroupe, onSend }) {
     }
   }, [messagesFiltres])
 
+  useEffect(() => {
+    const container = messagesZoneRef.current
+    if (!container) return
+
+    const onScroll = () => {
+      if (container.scrollTop === 0 && visibleCount < totalMessages) {
+        const previousScrollHeight = container.scrollHeight
+        setVisibleCount((prev) => Math.min(prev + 10, totalMessages))
+        setTimeout(() => {
+          container.scrollTop = container.scrollHeight - previousScrollHeight
+        }, 0)
+      }
+    }
+
+    container.addEventListener('scroll', onScroll)
+    return () => container.removeEventListener('scroll', onScroll)
+  }, [visibleCount, totalMessages])
+
+  const messagesAffiches = messagesFiltres.slice(-visibleCount)
+
   return (
     <div id="fil">
       <Topbar currentGroupe={currentGroupe} currentUser={currentUser} />
 
       <div id="messages-zone" ref={messagesZoneRef}>
-        {messagesFiltres.map((message, index) => {
+        {messagesAffiches.map((message, index) => {
           const estMoi = message.auteur === currentUser
           return estMoi ? (
             <Bulle key={message.id ?? index} message={message} />

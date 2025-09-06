@@ -8,8 +8,6 @@ import Utilisateurs from './Users/Utilisateurs.jsx'
 import genererGroupes from './Mock/MockGroupe.js'
 
 function App() {
-  const [messages, setMessages] = useState([])
-
   const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs())
 
   const [currentUser, setCurrentUser] = useState()
@@ -18,50 +16,84 @@ function App() {
 
   const [currentGroupe, setCurrentGroupe] = useState([])
 
-  console.log('messages:', JSON.stringify(messages, null, 2))
-  console.log('currentGroupe:', JSON.stringify(currentGroupe, null, 2))
-  console.log('currentUser:', JSON.stringify(currentUser, null, 2))
   const gererNouveauUtilisateur = (nouveauUtilisateur) => {
-    if (!utilisateurs.some((u) => u === nouveauUtilisateur)) {
+    const utilisateurExistant = utilisateurs.find(
+      (u) => u.nom === nouveauUtilisateur.nom
+    )
+
+    if (!utilisateurExistant) {
       setUtilisateurs((prev) => [...prev, nouveauUtilisateur])
+      setCurrentUser(nouveauUtilisateur)
+      localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
+    } else {
+      setCurrentUser(utilisateurExistant)
+      localStorage.setItem('user', JSON.stringify(utilisateurExistant))
     }
-    console.log('nouveauUser:', JSON.stringify(nouveauUtilisateur, null, 2))
-    setCurrentUser(nouveauUtilisateur)
+
+    console.log(
+      'currentUser:',
+      JSON.stringify(utilisateurExistant || nouveauUtilisateur, null, 2)
+    )
     setIsConnect(true)
-    localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
   }
 
   const gererNouveauMessage = (texte) => {
-    if (!currentGroupe || !currentUser) return
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID?.() ?? Date.now(),
-        message: texte,
-        username: currentUser,
-        timestamp: new Date().toLocaleTimeString(),
-        groupe: currentGroupe,
-      },
-    ])
+    if (!currentGroupe || !currentUser || !texte.trim()) return
+
+    const nouveauMessage = {
+      id: (crypto.randomUUID && crypto.randomUUID()) || `${Date.now()}`,
+      texte: texte,
+      auteur: currentUser,
+      date: new Date().toLocaleString([], {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    }
+
+    setGroupes((prevGroupes) => {
+      const nouveauxGroupes = prevGroupes.map((groupe) =>
+        groupe.nom === currentGroupe.nom
+          ? {
+              ...groupe,
+              messages: [...(groupe.messages || []), nouveauMessage],
+            }
+          : groupe
+      )
+
+      // Mettre à jour currentGroupe pour que le chat se rafraîchisse
+      const groupeMisAJour = nouveauxGroupes.find(
+        (g) => g.nom === currentGroupe.nom
+      )
+      setCurrentGroupe(groupeMisAJour)
+
+      return nouveauxGroupes
+    })
   }
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.clear()
     setCurrentUser(null)
     setCurrentGroupe(null)
     setIsConnect(false)
   }
   const [showForm, setShowForm] = useState(false)
 
-
   const showFormCreerGroupe = () => {
     setShowForm(true)
   }
 
-  const creerNouveauGroupe = (nomGroupe, participantsAjoutes, groupeVisibility) => {
+  const creerNouveauGroupe = (
+    nomGroupe,
+    participantsAjoutes,
+    groupeVisibility
+  ) => {
     const groupe = {
       nom: nomGroupe,
       participants: [...participantsAjoutes, currentUser],
+      messages: [],
       groupeVisibility: groupeVisibility,
     }
     setGroupes((prev) => [...prev, groupe])
@@ -77,7 +109,6 @@ function App() {
       setIsConnect(true)
     }
   }, [])
-  console.log(groupes)
   return (
     <>
       {isConnect ? (
@@ -105,7 +136,6 @@ function App() {
             />
 
             <FilsConversation
-              messages={messages}
               currentUser={currentUser}
               currentGroupe={currentGroupe}
               onSend={gererNouveauMessage}

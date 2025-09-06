@@ -7,6 +7,8 @@ function genererGroupes() {
         { nom: 'Bob', isTyping: false },
         { nom: 'Charlie', isTyping: false },
       ],
+      groupeVisibility: 'public',
+      messages: [],
     },
     {
       nom: 'Groupe 2',
@@ -16,6 +18,8 @@ function genererGroupes() {
         { nom: 'Frank', isTyping: false },
         { nom: 'Grace', isTyping: false },
       ],
+      groupeVisibility: 'private',
+      messages: [],
     },
     {
       nom: 'Groupe 3',
@@ -25,6 +29,8 @@ function genererGroupes() {
         { nom: 'Judy', isTyping: true },
         { nom: 'Karl', isTyping: false },
       ],
+      groupeVisibility: 'private',
+      messages: [],
     },
     {
       nom: 'Groupe 4',
@@ -33,6 +39,8 @@ function genererGroupes() {
         { nom: 'Oliver Fortin', isTyping: false },
         { nom: 'Lyam', isTyping: false },
       ],
+      groupeVisibility: 'private',
+      messages: [],
     },
     {
       nom: 'Groupe 5',
@@ -41,17 +49,20 @@ function genererGroupes() {
         { nom: 'Simon', isTyping: false },
         { nom: 'Quentin', isTyping: false },
       ],
+      groupeVisibility: 'public',
+      messages: [],
     },
-    {
-      nom: 'Groupe 6',
+    ...Array.from({ length: 25 }, (_, i) => ({
+      nom: `Groupe ${i + 6}`,
       participants: [
         { nom: 'Rupert', isTyping: false },
         { nom: 'Mathurin', isTyping: false },
         { nom: 'Joaquim', isTyping: false },
       ],
-    },
-  ];
+      groupeVisibility: 'public',
+      messages: [],
+    })),
+  ]
 }
-
 
 export default genererGroupes

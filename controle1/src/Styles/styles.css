@@ -1,3 +1,15 @@
+/* ===== Global ===== */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #2C3639;
+  color: #DCD7C9;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
 #chat-container {
   display: flex;
   flex-direction: row;
@@ -10,6 +22,126 @@
   justify-content: center;
 }
 
+/* ===== Sidebar ===== */
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  background-color: #3F4E4F;
+  color: #DCD7C9;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidebar-header {
+  flex-shrink: 0;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+}
+
+.sidebar-groups {
+  flex-grow: 1;
+  overflow-y: auto;
+  height: 100%;
+  padding-right: 5px;
+}
+
+/* ===== Group Sections ===== */
+.group-section {
+  margin-bottom: 20px;
+}
+
+.group-section h3 {
+  font-size: 1rem;
+  margin-bottom: 5px;
+}
+
+.groupe {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.groupe:hover {
+  background-color: #A27B5C;
+  color: #2C3639;
+}
+
+/* ===== Users Sidebar ===== */
+#sidebar_Utilisateurs {
+  flex: 1;
+  padding: 8px;
+  background-color: #1E2425;
+  overflow-y: auto;
+  color: #DCD7C9;
+}
+
+.utilisateur-ligne {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.utilisateur-ligne:hover {
+  background-color: #39514E;
+}
+
+.utilisateur-ligne.moi {
+  background-color: #2C3E50;
+}
+
+/* ===== Status Indicators ===== */
+.statut {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9aa0a6;
+}
+
+.statut.en-ligne {
+  background: #23a55a;
+}
+
+.statut.hors-ligne {
+  background: #9aa0a6;
+}
+
+.statut.absent {
+  background: #fbbc04;
+}
+
+.statut.occupe {
+  background: #ea4335;
+}
+
+/* ===== Avatars ===== */
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #ddd;
+  font-size: 12px;
+}
+
+/* ===== Messages ===== */
 #fil {
   display: flex;
   flex-direction: column;
@@ -18,35 +150,10 @@
   color: #DCD7C9;
   padding: 10px;
 }
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  background-color: #2C3639;
-  color: #DCD7C9;
-  overflow: hidden;
-}
 
 #messages-zone {
   flex: 1;
   overflow-y: auto;
-}
-
-#sidebar {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  background-color: #3F4E4F;
-  color: #DCD7C9;
-}
-
-.typing{
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  height: 30px;
 }
 
 .containerMessage {
@@ -65,6 +172,7 @@ html, body, #root {
   background-color: #A27B5C;
   color: #2C3639;
   width: fit-content;
+  margin-bottom: 6px;
 }
 
 .bulleAutre {
@@ -84,19 +192,6 @@ html, body, #root {
   font-weight: 600;
 }
 
-.groupe {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-  padding: 1px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.groupe:hover {
-  background-color: #f2f3f5;;
-}
-
 .username {
   font-weight: bold;
   margin-bottom: 4px;
@@ -114,69 +209,44 @@ html, body, #root {
   align-self: center;
 }
 
-#sidebar .groupe:hover {
-  background-color: #A27B5C;
-  color: #2C3639;
-}
-
-#sidebar_Utilisateurs .utilisateur-ligne:hover {
-  background-color: #39514E;
-  color: #DCD7C9;
-}
-
-#sidebar_Utilisateurs {
-  padding: 8px;
-  background-color: #1E2425;
-  color: #DCD7C9;
-  flex: 1;
-}
-
-.utilisateur-ligne {
+/* ===== Typing Indicator ===== */
+.typing {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  cursor: pointer;
+  gap: 10px;
+  height: 30px;
 }
 
-.utilisateur-ligne:hover {
-  background: #f2f3f5;
+/* ===== Scrollbars ===== */
+.sidebar-groups,
+#sidebar_Utilisateurs,
+#messages-zone {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 200, 200, 0.3) transparent;
 }
 
-.utilisateur-ligne.moi {
-  background: #e8f0fe;
+.sidebar-groups::-webkit-scrollbar,
+#sidebar_Utilisateurs::-webkit-scrollbar,
+#messages-zone::-webkit-scrollbar {
+  width: 6px;
 }
 
-.statut {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #9aa0a6;
-}
-.statut.en-ligne {
-  background: #23a55a;
-}
-.statut.hors-ligne {
-  background: #9aa0a6;
-}
-.statut.absent {
-  background: #fbbc04;
-}
-.statut.occupe {
-  background: #ea4335;
+.sidebar-groups::-webkit-scrollbar-track,
+#sidebar_Utilisateurs::-webkit-scrollbar-track,
+#messages-zone::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: #ddd;
-  font-size: 12px;
+.sidebar-groups::-webkit-scrollbar-thumb,
+#sidebar_Utilisateurs::-webkit-scrollbar-thumb,
+#messages-zone::-webkit-scrollbar-thumb {
+  background-color: rgba(200, 200, 200, 0.3);
+  border-radius: 3px;
 }
 
-.nom {
-  font-size: 14px;
+.sidebar-groups::-webkit-scrollbar-thumb:hover,
+#sidebar_Utilisateurs::-webkit-scrollbar-thumb:hover,
+#messages-zone::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(200, 200, 200, 0.5);
 }

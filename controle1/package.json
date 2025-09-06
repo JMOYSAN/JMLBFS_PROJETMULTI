@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "vite",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "test": "jest",
     "build": "tsc && vite build && electron-builder",
     "start": "electron-forge start",

@@ -6,13 +6,18 @@
   "author": "Joaquim Moysa, Lyam Bathalon, François Santerre",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+
+    "build": "tsc && vite build && electron-builder",
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "publish": "electron-forge publish"
+    "publish": "electron-forge publish",
+
+    "build:win": "npm run make -- --platform win32",
+    "build:linux": "npm run make -- --platform linux",
+    "build:mac": "npm run make -- --platform darwin"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1",

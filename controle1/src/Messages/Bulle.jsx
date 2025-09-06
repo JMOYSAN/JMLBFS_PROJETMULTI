@@ -5,10 +5,10 @@ function Bulle({ message }) {
   envoyerMessageAuto(0)
   return (
     <div className="containerMessage">
-      <div className="timestamp">{message.timestamp}</div>
+      <div className="timestamp">{message.date}</div>
       <div className="bulle">
-        <div className="username">{message.username}</div>
-        <div className="message">{message.message}</div>
+        <div className="username">{message.auteur}</div>
+        <div className="message">{message.texte}</div>
       </div>
     </div>
   )

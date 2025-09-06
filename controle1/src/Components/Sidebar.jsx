@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react'
 import FormCreerGroupe from '../Form/FormCreerGroupe.jsx'
 import Groupe from './Groupe.jsx'
 import Logout from './Logout.jsx'
@@ -23,6 +24,26 @@ function Sidebar({
       g.groupeVisibility === 'public'
   )
 
+  const [visibleCount, setVisibleCount] = useState(17)
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const onScroll = () => {
+      if (
+        container.scrollTop + container.clientHeight >=
+        container.scrollHeight - 5
+      ) {
+        setVisibleCount((prev) => prev + 5)
+      }
+    }
+
+    container.addEventListener('scroll', onScroll)
+    return () => container.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
     <div id="sidebar">
       {showForm ? (
@@ -38,10 +59,10 @@ function Sidebar({
             <Logout onLogout={onLogout} />
           </div>
 
-          <div className="sidebar-groups">
+          <div className="sidebar-groups" ref={containerRef}>
             <div className="group-section">
               <h3>Vos Groupes</h3>
-              {groupesFiltrer.map((g) => (
+              {groupesFiltrer.slice(0, visibleCount).map((g) => (
                 <Groupe
                   key={g.id}
                   groupe={g}
@@ -52,7 +73,7 @@ function Sidebar({
 
             <div className="group-section">
               <h3>Groupes disponibles</h3>
-              {groupesSansUser.map((g) => (
+              {groupesSansUser.slice(0, visibleCount).map((g) => (
                 <Groupe
                   key={g.id}
                   groupe={g}

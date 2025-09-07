@@ -131,6 +131,156 @@ html, body, #root {
   background: #ea4335;
 }
 
+/* ===== Overlay du Formulaire ===== */
+.form-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* ===== Boîte du Formulaire ===== */
+.form-popup form {
+  background: #3F4E4F;
+  padding: 30px 40px;
+  border-radius: 16px;
+  width: 420px;
+  max-width: 90%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  color: #DCD7C9;
+  font-family: Arial, sans-serif;
+  animation: slideUp 0.3s ease;
+}
+
+.form-popup h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 1.6rem;
+  color: #fff;
+}
+
+/* ===== Labels & Inputs ===== */
+.form-popup label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95rem;
+  font-weight: bold;
+  gap: 6px;
+}
+
+.form-popup input[type="text"] {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background: #2C3639;
+  color: #fff;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-popup input[type="text"]:focus {
+  border-color: #A27B5C;
+  box-shadow: 0 0 5px rgba(162, 123, 92, 0.5);
+}
+
+/* ===== Radios Alignés ===== */
+.radio-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: normal;
+  color: #ddd;
+}
+
+.form-popup input[type="radio"] {
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* ===== Suggestions ===== */
+.suggestions {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  background: #2C3639;
+  border-radius: 8px;
+  border: 1px solid #555;
+  overflow: hidden;
+}
+
+.suggestions li {
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.suggestions li:hover {
+  background: #A27B5C;
+  color: #2C3639;
+}
+
+/* ===== Participants List ===== */
+.participants-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.participants-list li {
+  background: #465554;
+  margin: 5px 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* ===== Bouton de Soumission ===== */
+.form-popup button[type="submit"] {
+  padding: 12px;
+  background: #A27B5C;
+  color: #2C3639;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.form-popup button[type="submit"]:hover {
+  background: #c08d67;
+  transform: scale(1.03);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 /* ===== Avatars ===== */
 .avatar {
   width: 28px;

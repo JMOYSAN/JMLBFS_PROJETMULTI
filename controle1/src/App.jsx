@@ -95,14 +95,24 @@ function App() {
     participantsAjoutes,
     groupeVisibility
   ) => {
+    const formaterParticipant = (nom) => ({
+      nom: nom,
+      isTyping: false,
+    })
+
     const groupe = {
       nom: nomGroupe,
-      participants: [...participantsAjoutes, currentUser],
+      participants: [
+        ...participantsAjoutes.map(formaterParticipant),
+        formaterParticipant(currentUser),
+      ],
       messages: [],
       groupeVisibility: groupeVisibility,
     }
+
     setGroupes((prev) => [...prev, groupe])
     setShowForm(false)
+    console.log('groupeCreerGroupe:', groupe)
   }
 
   useEffect(() => {

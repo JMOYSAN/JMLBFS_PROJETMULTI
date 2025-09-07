@@ -24,8 +24,8 @@ function App() {
       setCurrentUser(nouveauUtilisateur)
       localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
     } else {
-      setCurrentUser(utilisateurExistant)
-      localStorage.setItem('user', JSON.stringify(utilisateurExistant))
+      setCurrentUser(utilisateurExistant.nom)
+      localStorage.setItem('user', JSON.stringify(utilisateurExistant.nom))
     }
 
     console.log(

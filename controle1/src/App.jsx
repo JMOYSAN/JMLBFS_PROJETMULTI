@@ -17,9 +17,8 @@ function App() {
 
   const gererNouveauUtilisateur = (nouveauUtilisateur) => {
     const utilisateurExistant = utilisateurs.find(
-      (u) => u.nom === nouveauUtilisateur.nom
+      (u) => u.nom === nouveauUtilisateur
     )
-
     if (!utilisateurExistant) {
       setUtilisateurs((prev) => [...prev, nouveauUtilisateur])
       setCurrentUser(nouveauUtilisateur)
@@ -111,7 +110,7 @@ function App() {
       setCurrentUser(JSON.parse(storedUser))
       setIsConnect(true)
     }
-  }, [])
+  })
 
   return (
     <>

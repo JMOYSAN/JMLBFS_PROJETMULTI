@@ -9,12 +9,11 @@ import genererGroupes from './Mock/MockGroupe.js'
 
 function App() {
   const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs())
-
   const [currentUser, setCurrentUser] = useState()
-
   const [groupes, setGroupes] = useState(genererGroupes())
-
   const [currentGroupe, setCurrentGroupe] = useState([])
+  const [showForm, setShowForm] = useState(false)
+  const [isConnect, setIsConnect] = useState(false)
 
   const gererNouveauUtilisateur = (nouveauUtilisateur) => {
     const utilisateurExistant = utilisateurs.find(
@@ -37,12 +36,18 @@ function App() {
     setIsConnect(true)
   }
 
-  const gererNouveauMessage = (texte) => {
-    if (!currentGroupe || !currentUser || !texte.trim()) return
+  const gererNouveauMessageFichier = (contenu) => {
+    if (
+      !currentGroupe ||
+      !currentUser ||
+      (!contenu.message?.trim() && !contenu.fichier)
+    )
+      return
 
     const nouveauMessage = {
-      id: (crypto.randomUUID && crypto.randomUUID()) || `${Date.now()}`,
-      texte: texte,
+      id: crypto.randomUUID?.() || `${Date.now()}`,
+      texte: contenu.message || '',
+      fichier: contenu.fichier || null,
       auteur: currentUser,
       date: new Date().toLocaleString([], {
         day: '2-digit',
@@ -52,6 +57,8 @@ function App() {
         minute: '2-digit',
       }),
     }
+
+    console.log(nouveauMessage)
 
     setGroupes((prevGroupes) => {
       const nouveauxGroupes = prevGroupes.map((groupe) =>
@@ -63,7 +70,6 @@ function App() {
           : groupe
       )
 
-      // Mettre à jour currentGroupe pour que le chat se rafraîchisse
       const groupeMisAJour = nouveauxGroupes.find(
         (g) => g.nom === currentGroupe.nom
       )
@@ -79,7 +85,6 @@ function App() {
     setCurrentGroupe(null)
     setIsConnect(false)
   }
-  const [showForm, setShowForm] = useState(false)
 
   const showFormCreerGroupe = () => {
     setShowForm(true)
@@ -100,8 +105,6 @@ function App() {
     setShowForm(false)
   }
 
-  const [isConnect, setIsConnect] = useState(false)
-
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
@@ -109,39 +112,37 @@ function App() {
       setIsConnect(true)
     }
   }, [])
+
   return (
     <>
       {isConnect ? (
-        <>
-          <div id="chat-container">
-            <Utilisateurs
-              onLogout={handleLogout}
-              showFormCreerGroupe={showFormCreerGroupe}
-              showForm={showForm}
-              utilisateurs={utilisateurs}
-              onClose={creerNouveauGroupe}
-              setCurrentGroupe={setCurrentGroupe}
-              groupes={groupes}
-              currentUser={currentUser}
-            />
-            <Sidebar
-              onLogout={handleLogout}
-              showFormCreerGroupe={showFormCreerGroupe}
-              showForm={showForm}
-              utilisateurs={utilisateurs}
-              onClose={creerNouveauGroupe}
-              setCurrentGroupe={setCurrentGroupe}
-              groupes={groupes}
-              currentUser={currentUser}
-            />
-
-            <FilsConversation
-              currentUser={currentUser}
-              currentGroupe={currentGroupe}
-              onSend={gererNouveauMessage}
-            />
-          </div>
-        </>
+        <div id="chat-container">
+          <Utilisateurs
+            onLogout={handleLogout}
+            showFormCreerGroupe={showFormCreerGroupe}
+            showForm={showForm}
+            utilisateurs={utilisateurs}
+            onClose={creerNouveauGroupe}
+            setCurrentGroupe={setCurrentGroupe}
+            groupes={groupes}
+            currentUser={currentUser}
+          />
+          <Sidebar
+            onLogout={handleLogout}
+            showFormCreerGroupe={showFormCreerGroupe}
+            showForm={showForm}
+            utilisateurs={utilisateurs}
+            onClose={creerNouveauGroupe}
+            setCurrentGroupe={setCurrentGroupe}
+            groupes={groupes}
+            currentUser={currentUser}
+          />
+          <FilsConversation
+            currentUser={currentUser}
+            currentGroupe={currentGroupe}
+            onSend={gererNouveauMessageFichier}
+          />
+        </div>
       ) : (
         <Login onLogin={gererNouveauUtilisateur} />
       )}

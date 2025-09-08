@@ -1,50 +1,48 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from 'react'
+import styled from 'styled-components'
 
 const StyledWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  padding: 8px;
+
+  button {
+    max-width: 160px;
+    width: 100%;
+    border: none;
+    background-color: #a27b5c;
+    color: #dcd7c9;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 4px;
     display: flex;
-    justify-content: flex-start;
-    padding: 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
 
-    button {
-        max-width: 160px;
-        width: 100%;
-        border: none;
-        background-color: #A27B5C;
-        color: #DCD7C9;
-        font-size: 13px;
-        font-weight: 500;
-        padding: 6px 12px;
-        border-radius: 4px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-        transition: background-color 0.2s ease;
-        cursor: pointer;
-        white-space: nowrap;
-    }
+  button:hover {
+    background-color: #916a4e;
+    color: #fff;
+  }
 
-    button:hover {
-        background-color: #916a4e;
-        color: #fff;
-    }
-    
-    .c-main {
-        text-align: center;
-    }
-`;
+  .c-main {
+    text-align: center;
+  }
+`
 
-const Button = ({showFormCreerGroupe}) => {
-    return (
-        <StyledWrapper>
-            <button className="c-button" onClick={showFormCreerGroupe}>
-        <span className="c-main">
-          Créer un groupe
-        </span>
-            </button>
-        </StyledWrapper>
-    );
+const Button = ({ showFormCreerGroupe }) => {
+  return (
+    <StyledWrapper>
+      <button className="c-button" onClick={showFormCreerGroupe}>
+        <span className="c-main">Créer un groupe</span>
+      </button>
+    </StyledWrapper>
+  )
 }
 
-export default Button;
+export default Button

@@ -145,6 +145,7 @@ function App() {
             setCurrentGroupe={setCurrentGroupe}
             groupes={groupes}
             currentUser={currentUser}
+            currentGroupe={currentGroupe}
           />
           <FilsConversation
             currentUser={currentUser}

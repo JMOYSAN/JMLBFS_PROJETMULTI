@@ -62,6 +62,8 @@ body,
   margin-bottom: 20px;
 }
 
+
+
 .group-section h3 {
   font-size: 1rem;
   margin-bottom: 5px;
@@ -421,4 +423,59 @@ body,
 #sidebar_Utilisateurs::-webkit-scrollbar-thumb:hover,
 #messages-zone::-webkit-scrollbar-thumb:hover {
   background-color: rgba(200, 200, 200, 0.5);
+}
+
+.confirm-join {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.confirm-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+}
+
+.confirm-box p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.btn-yes {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.btn-no {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
+}
+
+.btn-yes:hover {
+  background-color: #45a049;
+}
+
+.btn-no:hover {
+  background-color: #d32f2f;
 }

@@ -1,3 +1,5 @@
+// Les mocks ont été écrits par ChatGPT
+
 import notifier from '../Notifications/notifier.js'
 
 function envoyerMessageAuto(nombre) {

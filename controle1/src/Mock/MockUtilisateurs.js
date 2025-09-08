@@ -1,3 +1,5 @@
+// Les mocks ont été écrits par ChatGPT
+
 function genererUtilisateurs() {
   return [
     { id: 1, nom: 'Frank', statut: 'en-ligne' },

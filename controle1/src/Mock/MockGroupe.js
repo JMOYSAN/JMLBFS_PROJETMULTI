@@ -1,3 +1,5 @@
+// Les mocks ont été écrits par ChatGPT
+
 const currentUser = 'Frank'
 
 function genererGroupes() {

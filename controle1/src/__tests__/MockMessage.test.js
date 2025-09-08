@@ -1,3 +1,5 @@
+// Les tests on été écrits par ChatGPT
+
 import envoyerMessageAuto from '../Mock/MockMessage.js'
 import * as notifierModule from '../Notifications/notifier.js'
 

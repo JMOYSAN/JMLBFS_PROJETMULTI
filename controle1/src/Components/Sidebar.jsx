@@ -13,11 +13,11 @@ function Sidebar({
   groupes,
   setCurrentGroupe,
   currentUser,
+  currentGroupe,
 }) {
   const groupesFiltrer = groupes.filter((g) =>
     g.participants.some((p) => p.nom === currentUser)
   )
-  console.log('groupesFiltre:', groupesFiltrer)
 
   const groupesSansUser = groupes.filter(
     (g) =>
@@ -66,6 +66,7 @@ function Sidebar({
               {groupesFiltrer.slice(0, visibleCount).map((g) => (
                 <Groupe
                   key={g.id}
+                  currentUser={currentUser}
                   groupe={g}
                   setCurrentGroupe={setCurrentGroupe}
                 />
@@ -77,6 +78,7 @@ function Sidebar({
               {groupesSansUser.slice(0, visibleCount).map((g) => (
                 <Groupe
                   key={g.id}
+                  currentUser={currentUser}
                   groupe={g}
                   setCurrentGroupe={setCurrentGroupe}
                 />

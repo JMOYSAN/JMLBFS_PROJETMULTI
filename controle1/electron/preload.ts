@@ -18,7 +18,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
-
-  // You can expose other APTs you need here.
-  // ...
 })
+
+contextBridge.exposeInMainWorld(
+  'notify',
+  (title: string, body: string, options = {}) =>
+    ipcRenderer.invoke('notify', { title, body, ...options })
+)

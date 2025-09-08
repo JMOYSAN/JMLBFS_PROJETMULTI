@@ -1,0 +1,87 @@
+import { useState } from 'react'
+import styled from 'styled-components'
+
+const LoginWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #2c3639, #3f4e4f);
+  font-family: 'Arial', sans-serif;
+`
+
+const LoginCard = styled.div`
+  background: #dcd7c9;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  width: 350px;
+  text-align: center;
+`
+
+const Title = styled.h1`
+  margin-bottom: 20px;
+  font-size: 28px;
+  color: #2c3639;
+`
+
+const Input = styled.input`
+  width: 90%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #a27b5c;
+  border-radius: 10px;
+  font-size: 16px;
+  background: #fff;
+  outline: none;
+  transition: 0.3s;
+  &:focus {
+    border-color: #3f4e4f;
+    box-shadow: 0 0 5px rgba(63, 78, 79, 0.5);
+  }
+`
+
+const Button = styled.button`
+  width: 100%;
+  padding: 12px 15px;
+  background: #3f4e4f;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+  &:hover {
+    background: #2c3639;
+  }
+`
+
+function Login({ onLogin }) {
+  const [username, setUsername] = useState('')
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (username.trim() === '') return
+    onLogin(username)
+  }
+
+  return (
+    <LoginWrapper>
+      <LoginCard>
+        <Title>Connexion</Title>
+        <form onSubmit={handleSubmit}>
+          <Input
+            type="text"
+            placeholder="Nom d'utilisateur"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            required
+          />
+          <Button type="submit">Se connecter</Button>
+        </form>
+      </LoginCard>
+    </LoginWrapper>
+  )
+}
+
+export default Login

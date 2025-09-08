@@ -5,6 +5,9 @@ function FormAjouter({
   currentGroupe,
   currentUser,
   onClose,
+  setShowForm,
+  setCurrentGroupe,
+  setGroupes,
 }) {
   const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
   const moi = getNom(currentUser)
@@ -81,9 +84,17 @@ function FormAjouter({
 
     const groupeMisAJour = { ...currentGroupe, participants: fusion }
 
-    onClose?.(groupeMisAJour)
+    console.log('groupeMisAJour:', groupeMisAJour.participants)
+
+    setCurrentGroupe(groupeMisAJour)
+    onClose?.(groupeMisAJour.participants)
+
+    setGroupes?.((prev) =>
+      prev.map((g) => (g.nom === currentGroupe.nom ? groupeMisAJour : g))
+    )
+    setCurrentGroupe?.(groupeMisAJour)
+    setShowForm?.(false)
   }
-  console.log('sugesstiom:', suggestions)
 
   return (
     <div className="form-popup">

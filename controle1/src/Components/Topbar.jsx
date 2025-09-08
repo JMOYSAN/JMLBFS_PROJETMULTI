@@ -2,12 +2,19 @@ import AjouterDansGroupe from '../Groupes/AjouterDansGroupe.jsx'
 import AddGroup from '../Groupes/AddGroup.jsx'
 import { useState } from 'react'
 
-function Topbar({ utilisateurs = [], currentGroupe, currentUser, onClose }) {
+function Topbar({
+  utilisateurs = [],
+  currentGroupe,
+  currentUser,
+  onClose,
+  setCurrentGroupe,
+  setGroupes,
+}) {
   const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
   const moi = getNom(currentUser)
 
   const setShowAjouter = () => {
-    setshowAjouterDansGroupe(true)
+    setshowAjouterDansGroupe(!showAjouterDansGroupe)
   }
   const [showAjouterDansGroupe, setshowAjouterDansGroupe] = useState(false)
   return (
@@ -39,9 +46,13 @@ function Topbar({ utilisateurs = [], currentGroupe, currentUser, onClose }) {
           utilisateurs={utilisateurs}
           onClose={onClose}
           currentUser={currentUser}
+          currentGroupe={currentGroupe}
+          setShowForm={setShowAjouter}
+          setCurrentGroupe={setCurrentGroupe}
+          setGroupes={setGroupes}
         ></AjouterDansGroupe>
       ) : (
-        <AddGroup showFormCreerGroupe={setShowAjouter} />
+        <AddGroup modifer={false} showFormCreerGroupe={setShowAjouter} />
       )}
     </>
   )

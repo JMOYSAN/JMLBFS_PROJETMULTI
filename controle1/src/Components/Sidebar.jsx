@@ -13,7 +13,6 @@ function Sidebar({
   groupes,
   setCurrentGroupe,
   currentUser,
-  currentGroupe,
 }) {
   const groupesFiltrer = groupes.filter((g) =>
     g.participants.some((p) => p.nom === currentUser)
@@ -52,6 +51,7 @@ function Sidebar({
           utilisateurs={utilisateurs}
           onClose={onClose}
           currentUser={currentUser}
+          showFormCreerGroupe={showFormCreerGroupe}
         />
       ) : (
         <div className="sidebar-content">

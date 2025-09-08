@@ -8,7 +8,7 @@ function Groupe({ currentUser, groupe, setCurrentGroupe }) {
 
   const handleClick = () => {
     if (estMembre) {
-      setCurrentGroupe(groupe) // same group
+      setCurrentGroupe(groupe)
       return
     }
     if (!window.confirm(`Voulez-vous rejoindre le groupe "${groupe.nom}" ?`))

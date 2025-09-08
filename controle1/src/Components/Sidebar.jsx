@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import FormCreerGroupe from '../Form/FormCreerGroupe.jsx'
-import Groupe from './Groupe.jsx'
+import Groupe from '../Groupes/Groupe.jsx'
 import Logout from './Logout.jsx'
-import AddGroup from './AddGroup.jsx'
+import AddGroup from '../Groupes/AddGroup.jsx'
 
 function Sidebar({
   onLogout,
@@ -13,7 +13,6 @@ function Sidebar({
   groupes,
   setCurrentGroupe,
   currentUser,
-  currentGroupe,
 }) {
   const groupesFiltrer = groupes.filter((g) =>
     g.participants.some((p) => p.nom === currentUser)
@@ -52,6 +51,7 @@ function Sidebar({
           utilisateurs={utilisateurs}
           onClose={onClose}
           currentUser={currentUser}
+          showFormCreerGroupe={showFormCreerGroupe}
         />
       ) : (
         <div className="sidebar-content">

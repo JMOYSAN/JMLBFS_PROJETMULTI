@@ -5,7 +5,15 @@ import Chat from './BarreChat.jsx'
 import Topbar from '../Components/Topbar.jsx'
 import Typing from './Typing'
 
-function FilsConversation({ currentUser, currentGroupe, onSend }) {
+function FilsConversation({
+  currentUser,
+  currentGroupe,
+  onSend,
+  utilisateurs,
+  OnClose,
+  setCurrentGroupe,
+  setGroupes,
+}) {
   const messagesZoneRef = useRef(null)
   const [visibleCount, setVisibleCount] = useState(10)
 
@@ -45,7 +53,14 @@ function FilsConversation({ currentUser, currentGroupe, onSend }) {
 
   return (
     <div id="fil">
-      <Topbar currentGroupe={currentGroupe} currentUser={currentUser} />
+      <Topbar
+        utilisateurs={utilisateurs}
+        currentGroupe={currentGroupe}
+        currentUser={currentUser}
+        OnClose={OnClose}
+        setCurrentGroupe={setCurrentGroupe}
+        setGroupes={setGroupes}
+      />
 
       <div id="messages-zone" ref={messagesZoneRef}>
         {messagesAffiches.map((message, index) => {

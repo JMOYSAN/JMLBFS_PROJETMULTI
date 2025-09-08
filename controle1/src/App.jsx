@@ -114,6 +114,33 @@ function App() {
     console.log('groupeCreerGroupe:', groupe)
   }
 
+  const modifierGroupe = (listeParticipants = []) => {
+    const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
+    const normalise = (nom) => ({ nom, isTyping: false })
+
+    setGroupes((prev) =>
+      prev.map((g) => {
+        if (g.nom !== currentGroupe?.nom) return g
+
+        const existants = new Set(
+          (g.participants || []).map((p) => getNom(p).toLowerCase())
+        )
+        const ajouts = (listeParticipants || [])
+          .map(getNom)
+          .filter(Boolean)
+          .filter((n) => !existants.has(n.toLowerCase()))
+          .map(normalise)
+
+        const maj = {
+          ...g,
+          participants: [...(g.participants || []), ...ajouts],
+        }
+        setCurrentGroupe(maj)
+        return maj
+      })
+    )
+  }
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
@@ -151,6 +178,10 @@ function App() {
             currentUser={currentUser}
             currentGroupe={currentGroupe}
             onSend={gererNouveauMessageFichier}
+            utilisateurs={utilisateurs}
+            onClose={modifierGroupe}
+            setGroupes={setGroupes}
+            setCurrentGroupe={setCurrentGroupe}
           />
         </div>
       ) : (

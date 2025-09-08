@@ -35,12 +35,18 @@ const StyledWrapper = styled.div`
   }
 `
 
-const Button = ({ showFormCreerGroupe }) => {
+const Button = ({ modifer = true, showFormCreerGroupe }) => {
   return (
     <StyledWrapper>
-      <button className="c-button" onClick={showFormCreerGroupe}>
-        <span className="c-main">Créer un groupe</span>
-      </button>
+      {modifer ? (
+        <button className="c-button" onClick={showFormCreerGroupe}>
+          <span className="c-main">Créer un groupe</span>
+        </button>
+      ) : (
+        <button className="c-button" onClick={showFormCreerGroupe}>
+          <span className="c-main">Ajouter des membres</span>
+        </button>
+      )}
     </StyledWrapper>
   )
 }

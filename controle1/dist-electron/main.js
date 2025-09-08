@@ -1,4 +1,4 @@
-import { app, ipcMain, Notification, BrowserWindow } from "electron";
+import { Menu, app, ipcMain, Notification, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -6,6 +6,27 @@ process.env.APP_ROOT = path.join(__dirname, "..");
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
 const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+const template = [
+  {
+    label: "Application",
+    submenu: [
+      { role: "quit" },
+      { type: "separator" },
+      {
+        label: "Open DevTools",
+        click: () => {
+          if (win == null ? void 0 : win.webContents.isDevToolsOpened()) {
+            win.webContents.closeDevTools();
+          } else {
+            win == null ? void 0 : win.webContents.openDevTools();
+          }
+        }
+      }
+    ]
+  }
+];
+const menu = Menu.buildFromTemplate(template);
+Menu.setApplicationMenu(menu);
 let win = null;
 function createWindow() {
   win = new BrowserWindow({
@@ -14,7 +35,6 @@ function createWindow() {
     show: false
   });
   win.setFullScreen(true);
-  win.webContents.openDevTools();
   win.webContents.on("did-finish-load", () => {
     win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
   });

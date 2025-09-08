@@ -9,7 +9,7 @@ export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
-import { app, Menu } from 'electron'
+import { Menu } from 'electron'
 
 const template = [
   {

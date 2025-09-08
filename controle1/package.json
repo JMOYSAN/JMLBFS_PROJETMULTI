@@ -15,6 +15,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
+
     "build:win": "npm run make -- --platform win32",
     "build:linux": "npm run make -- --platform linux",
     "build:mac": "npm run make -- --platform darwin"

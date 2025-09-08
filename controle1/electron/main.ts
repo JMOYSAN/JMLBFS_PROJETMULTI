@@ -9,6 +9,31 @@ export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
+import { app, Menu } from 'electron'
+
+const template = [
+  {
+    label: 'Application',
+    submenu: [
+      { role: 'quit' },
+      { type: 'separator' },
+      {
+        label: 'Open DevTools',
+        click: () => {
+          if (win?.webContents.isDevToolsOpened()) {
+            win.webContents.closeDevTools()
+          } else {
+            win?.webContents.openDevTools()
+          }
+        },
+      },
+    ],
+  },
+]
+
+const menu = Menu.buildFromTemplate(template)
+Menu.setApplicationMenu(menu)
+
 let win: BrowserWindow | null = null
 
 function createWindow() {
@@ -18,7 +43,7 @@ function createWindow() {
     show: false,
   })
   win.setFullScreen(true)
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
   })

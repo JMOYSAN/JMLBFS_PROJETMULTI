@@ -1,7 +1,12 @@
-import Loader from "./Loader";
+import Loader from './Loader'
 
-function Typing({nom}) {
-    return <div className="typing"><span>{nom}</span><Loader/></div>;
+function Typing({ nom }) {
+  return (
+    <div className="typing">
+      <span>{nom}</span>
+      <Loader />
+    </div>
+  )
 }
 
-export default Typing;
+export default Typing

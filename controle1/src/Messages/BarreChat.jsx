@@ -121,8 +121,6 @@ const Input = ({ onSend }) => {
   const [fichier, setFichier] = useState(null)
 
   const gererEnvoie = () => {
-    console.log('message:', message)
-    console.log('fichier:', fichier)
     if (!message.trim() && !fichier) return
     const contenu = { message, fichier }
     onSend(contenu)

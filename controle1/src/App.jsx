@@ -28,10 +28,6 @@ function App() {
       localStorage.setItem('user', JSON.stringify(utilisateurExistant.nom))
     }
 
-    console.log(
-      'currentUser:',
-      JSON.stringify(utilisateurExistant || nouveauUtilisateur, null, 2)
-    )
     setIsConnect(true)
   }
 
@@ -56,8 +52,6 @@ function App() {
         minute: '2-digit',
       }),
     }
-
-    console.log(nouveauMessage)
 
     setGroupes((prevGroupes) => {
       const nouveauxGroupes = prevGroupes.map((groupe) =>
@@ -111,7 +105,6 @@ function App() {
 
     setGroupes((prev) => [...prev, groupe])
     setShowForm(false)
-    console.log('groupeCreerGroupe:', groupe)
   }
 
   const modifierGroupe = (listeParticipants = []) => {

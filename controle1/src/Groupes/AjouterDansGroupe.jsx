@@ -45,12 +45,10 @@ function FormAjouter({
       ...participantsAjoutes.map((n) => n.toLowerCase()),
       moi.toLowerCase(),
     ])
-    console.log('listenom', listeNoms)
     const res = listeNoms
       .filter((n) => n.toLowerCase().includes(q))
       .filter((n) => !exclu.has(n.toLowerCase()))
       .slice(0, 5)
-    console.log('res', res)
     setSuggestions(res)
   }
 
@@ -83,8 +81,6 @@ function FormAjouter({
       )
 
     const groupeMisAJour = { ...currentGroupe, participants: fusion }
-
-    console.log('groupeMisAJour:', groupeMisAJour.participants)
 
     setCurrentGroupe(groupeMisAJour)
     onClose?.(groupeMisAJour.participants)

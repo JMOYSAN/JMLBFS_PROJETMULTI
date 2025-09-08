@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import FormCreerGroupe from '../Form/FormCreerGroupe.jsx'
-import Groupe from './Groupe.jsx'
+import Groupe from '../Groupes/Groupe.jsx'
 import Logout from './Logout.jsx'
-import AddGroup from './AddGroup.jsx'
+import AddGroup from '../Groupes/AddGroup.jsx'
 
 function Sidebar({
   onLogout,

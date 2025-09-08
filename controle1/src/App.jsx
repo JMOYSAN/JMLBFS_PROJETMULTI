@@ -151,6 +151,7 @@ function App() {
             currentUser={currentUser}
             currentGroupe={currentGroupe}
             onSend={gererNouveauMessageFichier}
+            utilisateurs={utilisateurs}
           />
         </div>
       ) : (

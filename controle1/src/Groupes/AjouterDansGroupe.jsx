@@ -12,6 +12,7 @@ function FormAjouter({
     () => (currentGroupe?.participants ?? []).map(getNom).filter(Boolean),
     [currentGroupe]
   )
+
   const listeNoms = useMemo(
     () => utilisateurs.map(getNom).filter(Boolean),
     [utilisateurs]
@@ -41,10 +42,12 @@ function FormAjouter({
       ...participantsAjoutes.map((n) => n.toLowerCase()),
       moi.toLowerCase(),
     ])
+    console.log('listenom', listeNoms)
     const res = listeNoms
       .filter((n) => n.toLowerCase().includes(q))
       .filter((n) => !exclu.has(n.toLowerCase()))
       .slice(0, 5)
+    console.log('res', res)
     setSuggestions(res)
   }
 
@@ -80,6 +83,7 @@ function FormAjouter({
 
     onClose?.(groupeMisAJour)
   }
+  console.log('sugesstiom:', suggestions)
 
   return (
     <div className="form-popup">

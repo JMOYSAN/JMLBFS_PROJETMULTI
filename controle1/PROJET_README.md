@@ -85,19 +85,19 @@ npm run dev
 ## Build par OS
 - **Windows** :  
   ```bash
-  npm run make
+  npm run build:win
   ```
   → Résultats disponibles dans `/out/controle1-win32-x64/controle1.exe`
 
 - **Linux** :  
   ```bash
-  npm run make
+  npm run build:linux
   ```
   → Résultats disponibles dans `/out/controle1-linux-x64/` (AppImage, deb ou rpm selon config).
 
 - **macOS** :  
   ```bash
-  npm run make
+  npm run build:mac
   ```
   → Résultats disponibles dans `/out/controle1-darwin-x64/controle1.app`
 
@@ -130,8 +130,7 @@ npm run test
 - Branches :
   - `main` → version stable  
   - `develop` → intégration  
-- PR obligatoires (pas de push direct).  
-- Tags sémantiques (`v1.0.0`, `v1.1.0`, …).  
+- PR obligatoires (pas de push direct).
 - `package.json` maintenu à jour.  
 ### Builds
 

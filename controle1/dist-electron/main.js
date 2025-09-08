@@ -1,1 +1,47 @@
-"use strict";Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"});const n=require("electron"),d=require("node:url"),o=require("node:path");var s=typeof document<"u"?document.currentScript:null;const i=o.dirname(d.fileURLToPath(typeof document>"u"?require("url").pathToFileURL(__filename).href:s&&s.tagName.toUpperCase()==="SCRIPT"&&s.src||new URL("main.js",document.baseURI).href));process.env.APP_ROOT=o.join(i,"..");const t=process.env.VITE_DEV_SERVER_URL,p=o.join(process.env.APP_ROOT,"dist-electron"),r=o.join(process.env.APP_ROOT,"dist");let e=null;function a(){e=new n.BrowserWindow({icon:o.join(process.env.VITE_PUBLIC,"RogueRatIcone.png"),webPreferences:{preload:o.join(i,"preload.mjs")},show:!1}),e.setFullScreen(!0),e.webContents.openDevTools(),e.webContents.on("did-finish-load",()=>{e==null||e.webContents.send("main-process-message",new Date().toLocaleString())}),e.once("ready-to-show",()=>e==null?void 0:e.show()),t?e.loadURL(t):e.loadFile(o.join(r,"index.html"))}n.app.whenReady().then(()=>{n.app.setAppUserModelId("Rogue Rats Chat"),process.env.VITE_PUBLIC=t?o.join(process.env.APP_ROOT,"public"):r,a(),n.ipcMain.handle("notify",(R,{title:c,body:l})=>{new n.Notification({title:c,body:l}).show()})});n.app.on("activate",()=>{n.BrowserWindow.getAllWindows().length===0&&a()});n.app.on("window-all-closed",()=>{process.platform!=="darwin"&&(n.app.quit(),e=null)});exports.MAIN_DIST=p;exports.RENDERER_DIST=r;exports.VITE_DEV_SERVER_URL=t;
+import { app, ipcMain, Notification, BrowserWindow } from "electron";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+process.env.APP_ROOT = path.join(__dirname, "..");
+const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
+const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
+const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
+let win = null;
+function createWindow() {
+  win = new BrowserWindow({
+    icon: path.join(process.env.VITE_PUBLIC, "RogueRatIcone.png"),
+    webPreferences: { preload: path.join(__dirname, "preload.mjs") },
+    show: false
+  });
+  win.setFullScreen(true);
+  win.webContents.openDevTools();
+  win.webContents.on("did-finish-load", () => {
+    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  });
+  win.once("ready-to-show", () => win == null ? void 0 : win.show());
+  if (VITE_DEV_SERVER_URL) win.loadURL(VITE_DEV_SERVER_URL);
+  else win.loadFile(path.join(RENDERER_DIST, "index.html"));
+}
+app.whenReady().then(() => {
+  app.setAppUserModelId("Rogue Rats Chat");
+  process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
+  createWindow();
+  ipcMain.handle("notify", (_e, { title, body }) => {
+    const n = new Notification({ title, body });
+    n.show();
+  });
+});
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+});
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+    win = null;
+  }
+});
+export {
+  MAIN_DIST,
+  RENDERER_DIST,
+  VITE_DEV_SERVER_URL
+};

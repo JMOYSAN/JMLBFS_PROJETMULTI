@@ -83,7 +83,6 @@ function genererGroupes() {
       }),
     })
   }
-  console.log('groupe', groupes)
   return groupes
 }
 

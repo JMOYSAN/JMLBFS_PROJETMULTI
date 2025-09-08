@@ -62,7 +62,6 @@ function Login({ onLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (username.trim() === '') return
-    console.log('username:', username)
     onLogin(username)
   }
 

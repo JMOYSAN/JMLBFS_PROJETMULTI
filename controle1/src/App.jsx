@@ -27,11 +27,6 @@ function App() {
       setCurrentUser(utilisateurExistant.nom)
       localStorage.setItem('user', JSON.stringify(utilisateurExistant.nom))
     }
-
-    console.log(
-      'currentUser:',
-      JSON.stringify(utilisateurExistant || nouveauUtilisateur, null, 2)
-    )
     setIsConnect(true)
   }
 
@@ -56,9 +51,6 @@ function App() {
         minute: '2-digit',
       }),
     }
-
-    console.log(nouveauMessage)
-
     setGroupes((prevGroupes) => {
       const nouveauxGroupes = prevGroupes.map((groupe) =>
         groupe.nom === currentGroupe.nom
@@ -111,7 +103,6 @@ function App() {
 
     setGroupes((prev) => [...prev, groupe])
     setShowForm(false)
-    console.log('groupeCreerGroupe:', groupe)
   }
 
   useEffect(() => {

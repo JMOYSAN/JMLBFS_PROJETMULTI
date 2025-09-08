@@ -17,7 +17,6 @@ function Sidebar({
   const groupesFiltrer = groupes.filter((g) =>
     g.participants.some((p) => p.nom === currentUser)
   )
-  console.log('groupesFiltre:', groupesFiltrer)
 
   const groupesSansUser = groupes.filter(
     (g) =>

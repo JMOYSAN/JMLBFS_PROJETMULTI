@@ -142,6 +142,25 @@ function App() {
     }
   })
 
+  const [lightmode, setLightMode] = useState(false)
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('lightMode')
+    if (savedTheme === 'true') {
+      setLightMode(true)
+      document.body.classList.add('light')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (lightmode) {
+      document.body.classList.add('light')
+      localStorage.setItem('lightMode', 'true')
+    } else {
+      document.body.classList.remove('light')
+      localStorage.setItem('lightMode', 'false')
+    }
+  }, [lightmode])
+
   return (
     <>
       {isConnect ? (
@@ -175,6 +194,8 @@ function App() {
             onClose={modifierGroupe}
             setGroupes={setGroupes}
             setCurrentGroupe={setCurrentGroupe}
+            setLightMode={setLightMode}
+            lightmode={lightmode}
           />
         </div>
       ) : (

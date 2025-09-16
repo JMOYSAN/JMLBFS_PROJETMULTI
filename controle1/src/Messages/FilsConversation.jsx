@@ -13,6 +13,8 @@ function FilsConversation({
   OnClose,
   setCurrentGroupe,
   setGroupes,
+  setLightMode,
+  lightmode,
 }) {
   const messagesZoneRef = useRef(null)
   const [visibleCount, setVisibleCount] = useState(10)
@@ -60,6 +62,8 @@ function FilsConversation({
         OnClose={OnClose}
         setCurrentGroupe={setCurrentGroupe}
         setGroupes={setGroupes}
+        setLightMode={setLightMode}
+        lightmode={lightmode}
       />
 
       <div id="messages-zone" ref={messagesZoneRef}>

@@ -9,6 +9,8 @@ function Topbar({
   onClose,
   setCurrentGroupe,
   setGroupes,
+  setLightMode,
+  lightmode,
 }) {
   const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
   const moi = getNom(currentUser)
@@ -33,6 +35,16 @@ function Topbar({
                 return <li key={nom}>{nom}</li>
               })}
             </ul>
+          </div>
+          <div
+            onClick={() => setLightMode(!lightmode)}
+            className="color-mode-switch"
+          >
+            {lightmode ? (
+              <i className="fa-solid fa-moon"></i>
+            ) : (
+              <i className="fa-solid fa-sun icon-light"></i>
+            )}
           </div>
         </>
       ) : (

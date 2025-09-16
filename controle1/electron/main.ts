@@ -43,7 +43,7 @@ function createWindow() {
     show: false,
   })
   win.setFullScreen(true)
-  //win.webContents.openDevTools()
+  win.webContents.openDevTools()
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
   })

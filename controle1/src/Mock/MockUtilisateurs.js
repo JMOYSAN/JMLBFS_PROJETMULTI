@@ -1,38 +1,32 @@
-// Les mocks ont été écrits par ChatGPT
 
-function genererUtilisateurs() {
-  return [
-    { id: 1, nom: 'Frank', statut: 'en-ligne' },
-    { id: 2, nom: 'Bob', statut: 'hors-ligne' },
-    { id: 3, nom: 'WillTheMaster', statut: 'absent' },
-    { id: 4, nom: 'CubeSquare', statut: 'en-ligne' },
-    { id: 5, nom: 'Danibal', statut: 'en-ligne' },
-    { id: 6, nom: 'Felty8', statut: 'en-ligne' },
-    { id: 7, nom: 'Grace', statut: 'occupe' },
-    { id: 8, nom: 'William', statut: 'absent' },
-    { id: 9, nom: 'Krisp', statut: 'en-ligne' },
-    { id: 10, nom: 'gtsthilaire', statut: 'hors-ligne' },
-    { id: 11, nom: 'Alex', statut: 'en-ligne' },
-    { id: 12, nom: 'Sophie', statut: 'hors-ligne' },
-    { id: 13, nom: 'Marc', statut: 'occupe' },
-    { id: 14, nom: 'Julia', statut: 'en-ligne' },
-    { id: 15, nom: 'Nathan', statut: 'absent' },
-    { id: 16, nom: 'Chloe', statut: 'hors-ligne' },
-    { id: 17, nom: 'Liam', statut: 'occupe' },
-    { id: 18, nom: 'Emma', statut: 'en-ligne' },
-    { id: 19, nom: 'Noah', statut: 'absent' },
-    { id: 20, nom: 'Mia', statut: 'en-ligne' },
-    { id: 21, nom: 'Lucas', statut: 'hors-ligne' },
-    { id: 22, nom: 'Sasha', statut: 'en-ligne' },
-    { id: 23, nom: 'Ethan', statut: 'occupe' },
-    { id: 24, nom: 'Olivia', statut: 'absent' },
-    { id: 25, nom: 'Isabella', statut: 'en-ligne' },
-    { id: 26, nom: 'James', statut: 'hors-ligne' },
-    { id: 27, nom: 'Benjamin', statut: 'en-ligne' },
-    { id: 28, nom: 'Sophia', statut: 'occupe' },
-    { id: 29, nom: 'Henry', statut: 'absent' },
-    { id: 30, nom: 'Amelia', statut: 'en-ligne' },
-  ]
+
+async function genererUtilisateurs() {
+  try {
+    const response = await fetch(`http://localhost:3000/users`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const users = await response.json();
+    return users;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    return null;
+  }
 }
 
-export default genererUtilisateurs
+export async function getUtilisateursLazy(id) {
+  try {
+    const response = await fetch(`http://localhost:3000/users/next/${id}`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const users = await response.json();
+    return users;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des utilisateurs :", error);
+    return null;
+  }
+}
+
+
+export default genererUtilisateurs;

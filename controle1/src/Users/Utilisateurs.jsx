@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-
+import {getUtilisateursLazy} from "../Mock/MockUtilisateurs.js";
 function normaliserUtilisateur(utilisateur, index) {
   if (typeof utilisateur === 'string') {
     return { id: index, nom: utilisateur, statut: 'hors-ligne', avatar: null }
@@ -29,14 +29,13 @@ function LigneUtilisateur({ utilisateur, estUtilisateurActuel }) {
   )
 }
 
-function Utilisateurs({ utilisateurs, utilisateurActuel }) {
+function Utilisateurs({ utilisateurs, setUtilisateur, utilisateurActuel }) {
   const listeUtilisateurs = Array.isArray(utilisateurs)
     ? utilisateurs.map((utilisateur, index) =>
         normaliserUtilisateur(utilisateur, index)
       )
     : []
 
-  const [visibleCount, setVisibleCount] = useState(25)
   const containerRef = useRef(null)
 
   useEffect(() => {
@@ -48,7 +47,7 @@ function Utilisateurs({ utilisateurs, utilisateurActuel }) {
         container.scrollTop + container.clientHeight >=
         container.scrollHeight - 5
       ) {
-        setVisibleCount((prev) => prev + 5)
+        setUtilisateur((prev) => [...prev, getUtilisateursLazy(utilisateurs[utilisateurs.length - 1].id)])
       }
     }
 
@@ -58,7 +57,7 @@ function Utilisateurs({ utilisateurs, utilisateurActuel }) {
 
   return (
     <div id="sidebar_Utilisateurs" ref={containerRef}>
-      {listeUtilisateurs.slice(0, visibleCount).map((utilisateur) => (
+      {listeUtilisateurs.map((utilisateur) => (
         <LigneUtilisateur
           key={utilisateur.id}
           utilisateur={utilisateur}

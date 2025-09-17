@@ -8,7 +8,7 @@ import Utilisateurs from './Users/Utilisateurs.jsx'
 import genererGroupes from './Mock/MockGroupe.js'
 
 function App() {
-  const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs())
+  const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs(0))
   const [currentUser, setCurrentUser] = useState()
   const [groupes, setGroupes] = useState(genererGroupes())
   const [currentGroupe, setCurrentGroupe] = useState([])

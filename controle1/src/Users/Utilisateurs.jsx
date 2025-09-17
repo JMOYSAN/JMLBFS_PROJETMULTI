@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import {getUtilisateursLazy} from "../Mock/MockUtilisateurs.js";
+import { getUtilisateursLazy } from '../Mock/MockUtilisateurs.js'
 function normaliserUtilisateur(utilisateur, index) {
   if (typeof utilisateur === 'string') {
     return { id: index, nom: utilisateur, statut: 'hors-ligne', avatar: null }
@@ -29,7 +29,7 @@ function LigneUtilisateur({ utilisateur, estUtilisateurActuel }) {
   )
 }
 
-function Utilisateurs({ utilisateurs, setUtilisateur, utilisateurActuel }) {
+function Utilisateurs({ utilisateurs, setUtilisateurs, utilisateurActuel }) {
   const listeUtilisateurs = Array.isArray(utilisateurs)
     ? utilisateurs.map((utilisateur, index) =>
         normaliserUtilisateur(utilisateur, index)
@@ -47,7 +47,16 @@ function Utilisateurs({ utilisateurs, setUtilisateur, utilisateurActuel }) {
         container.scrollTop + container.clientHeight >=
         container.scrollHeight - 5
       ) {
-        setUtilisateur((prev) => [...prev, getUtilisateursLazy(utilisateurs[utilisateurs.length - 1].id)])
+        fetch(
+          `http://localhost:3000/users/next/${utilisateurs[utilisateurs.length - 1].id}`
+        )
+          .then((res) => res.json())
+          .then((result) =>
+            setUtilisateurs(
+              setUtilisateurs((prev) => [...prev, result]),
+              (error) => console.log(error)
+            )
+          )
       }
     }
 

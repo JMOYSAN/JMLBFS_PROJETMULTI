@@ -6,26 +6,38 @@ import Sidebar from './Components/Sidebar.jsx'
 import genererUtilisateurs from './Mock/MockUtilisateurs.js'
 import Utilisateurs from './Users/Utilisateurs.jsx'
 import genererGroupes from './Mock/MockGroupe.js'
+import error from 'eslint-plugin-react/lib/util/error.js'
 
 function App() {
-  const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs(0))
+  const [utilisateurs, setUtilisateurs] = useState([])
   const [currentUser, setCurrentUser] = useState()
   const [groupes, setGroupes] = useState(genererGroupes())
   const [currentGroupe, setCurrentGroupe] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [isConnect, setIsConnect] = useState(false)
 
+  useEffect(() => {
+    fetch(`http://localhost:3000/users`)
+      .then((res) => res.json())
+      .then(
+        (result) => setUtilisateurs(result),
+        (error) => console.log(error)
+      )
+  })
   const gererNouveauUtilisateur = (nouveauUtilisateur) => {
+    console.log('utilisateurs', utilisateurs)
     const utilisateurExistant = utilisateurs.find(
-      (u) => u.nom === nouveauUtilisateur
+      (u) => u.username === nouveauUtilisateur
     )
+    console.log('utilisateurExistant', utilisateurExistant)
+
     if (!utilisateurExistant) {
       setUtilisateurs((prev) => [...prev, nouveauUtilisateur])
       setCurrentUser(nouveauUtilisateur)
       localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
     } else {
-      setCurrentUser(utilisateurExistant.nom)
-      localStorage.setItem('user', JSON.stringify(utilisateurExistant.nom))
+      setCurrentUser(utilisateurExistant.username)
+      localStorage.setItem('user', JSON.stringify(utilisateurExistant.username))
     }
 
     setIsConnect(true)

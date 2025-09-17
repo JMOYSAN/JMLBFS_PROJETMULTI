@@ -1,17 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
-import { getUtilisateursLazy } from '../Mock/MockUtilisateurs.js'
+import { useState, useEffect, useRef, useMemo } from 'react'
+
+// Normalisation d'un utilisateur
 function normaliserUtilisateur(utilisateur, index) {
-  if (typeof utilisateur === 'string') {
-    return { id: index, nom: utilisateur, statut: 'hors-ligne', avatar: null }
-  }
   return {
     id: utilisateur.id ?? index,
-    nom: utilisateur.username ?? utilisateur.nom ?? 'Utilisateur',
-    statut: utilisateur.statut ?? 'hors-ligne',
+    nom: utilisateur.username ?? `Utilisateur${index}`,
+    statut: utilisateur.online_status ?? 'offline',
     avatar: utilisateur.avatar ?? null,
   }
 }
 
+// Ligne d'utilisateur
 function LigneUtilisateur({ utilisateur, estUtilisateurActuel }) {
   const { nom, statut, avatar } = utilisateur
   const initiale = nom?.[0]?.toUpperCase() ?? '?'
@@ -30,47 +29,73 @@ function LigneUtilisateur({ utilisateur, estUtilisateurActuel }) {
 }
 
 function Utilisateurs({ utilisateurs, setUtilisateurs, utilisateurActuel }) {
-  const listeUtilisateurs = Array.isArray(utilisateurs)
-    ? utilisateurs.map((utilisateur, index) =>
-        normaliserUtilisateur(utilisateur, index)
-      )
-    : []
-
   const containerRef = useRef(null)
 
+  // Ref pour garder les derniers utilisateurs à jour dans le scroll listener
+  const utilisateursRef = useRef(utilisateurs)
+  utilisateursRef.current = utilisateurs
+
+  const isFetchingRef = useRef(false) // Pour éviter les fetchs simultanés
+  const dernierFetchIdRef = useRef(
+    utilisateurs.length > 0 ? utilisateurs[utilisateurs.length - 1].id : null
+  )
+
+  // Scroll listener
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
+    const fetchNextUsers = async (lastId) => {
+      if (isFetchingRef.current || dernierFetchIdRef.current === lastId) return
+
+      isFetchingRef.current = true
+      dernierFetchIdRef.current = lastId
+
+      try {
+        const res = await fetch(`http://localhost:3000/users/next/${lastId}`)
+        if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`)
+        const result = await res.json()
+        if (result.length > 0) {
+          setUtilisateurs((prev) => [...prev, ...result])
+        }
+      } catch (err) {
+        console.error('Erreur fetch users:', err)
+      } finally {
+        isFetchingRef.current = false
+      }
+    }
+
     const onScroll = () => {
+      const lastUtilisateur =
+        utilisateursRef.current[utilisateursRef.current.length - 1]
+      if (!lastUtilisateur) return
+
       if (
         container.scrollTop + container.clientHeight >=
         container.scrollHeight - 5
       ) {
-        fetch(
-          `http://localhost:3000/users/next/${utilisateurs[utilisateurs.length - 1].id}`
-        )
-          .then((res) => res.json())
-          .then((result) =>
-            setUtilisateurs(
-              setUtilisateurs((prev) => [...prev, result]),
-              (error) => console.log(error)
-            )
-          )
+        fetchNextUsers(lastUtilisateur.id)
       }
     }
 
     container.addEventListener('scroll', onScroll)
     return () => container.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [setUtilisateurs])
+
+  // Normalisation mémorisée
+  const listeUtilisateurs = useMemo(() => {
+    return Array.isArray(utilisateurs)
+      ? utilisateurs.map(normaliserUtilisateur)
+      : []
+  }, [utilisateurs])
 
   return (
     <div id="sidebar_Utilisateurs" ref={containerRef}>
-      {listeUtilisateurs.map((utilisateur) => (
+      {listeUtilisateurs.map((u) => (
         <LigneUtilisateur
-          key={utilisateur.id}
-          utilisateur={utilisateur}
-          estUtilisateurActuel={utilisateur.nom === utilisateurActuel}
+          key={u.id}
+          utilisateur={u}
+          estUtilisateurActuel={u.nom === utilisateurActuel}
         />
       ))}
     </div>

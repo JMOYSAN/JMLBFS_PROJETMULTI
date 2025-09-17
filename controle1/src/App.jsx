@@ -23,22 +23,10 @@ function App() {
         (result) => setUtilisateurs(result),
         (error) => console.log(error)
       )
-  })
+  }, [])
   const gererNouveauUtilisateur = (nouveauUtilisateur) => {
-    console.log('utilisateurs', utilisateurs)
-    const utilisateurExistant = utilisateurs.find(
-      (u) => u.username === nouveauUtilisateur
-    )
-    console.log('utilisateurExistant', utilisateurExistant)
-
-    if (!utilisateurExistant) {
-      setUtilisateurs((prev) => [...prev, nouveauUtilisateur])
-      setCurrentUser(nouveauUtilisateur)
-      localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
-    } else {
-      setCurrentUser(utilisateurExistant.username)
-      localStorage.setItem('user', JSON.stringify(utilisateurExistant.username))
-    }
+    setCurrentUser(nouveauUtilisateur)
+    localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
 
     setIsConnect(true)
   }
@@ -120,7 +108,7 @@ function App() {
   }
 
   const modifierGroupe = (listeParticipants = []) => {
-    const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
+    const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
     const normalise = (nom) => ({ nom, isTyping: false })
 
     setGroupes((prev) =>
@@ -152,7 +140,7 @@ function App() {
       setCurrentUser(JSON.parse(storedUser))
       setIsConnect(true)
     }
-  })
+  }, [])
 
   const [lightmode, setLightMode] = useState(false)
   useEffect(() => {
@@ -182,6 +170,7 @@ function App() {
             showFormCreerGroupe={showFormCreerGroupe}
             showForm={showForm}
             utilisateurs={utilisateurs}
+            setUtilisateurs={setUtilisateurs}
             onClose={creerNouveauGroupe}
             setCurrentGroupe={setCurrentGroupe}
             groupes={groupes}

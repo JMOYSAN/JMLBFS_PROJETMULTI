@@ -58,11 +58,34 @@ const Button = styled.button`
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (username.trim() === '') return
-    onLogin(username)
+    setError('')
+
+    if (!username.trim() || !password.trim()) return
+
+    fetch('http://localhost:3000/users/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    })
+      .then((res) =>
+        res.json().then((data) => ({ status: res.status, body: data }))
+      )
+      .then(({ status, body }) => {
+        if (status !== 200) {
+          setError(body.error || 'Erreur inconnue')
+        } else {
+          onLogin(body)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+        setError('Erreur serveur')
+      })
   }
 
   return (
@@ -77,6 +100,14 @@ function Login({ onLogin }) {
             onChange={(e) => setUsername(e.target.value)}
             required
           />
+          <Input
+            type="password"
+            placeholder="Mot de passe"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {error && <p style={{ color: 'red' }}>{error}</p>}
           <Button type="submit">Se connecter</Button>
         </form>
       </LoginCard>

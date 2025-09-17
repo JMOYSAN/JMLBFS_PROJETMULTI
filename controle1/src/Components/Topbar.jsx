@@ -12,7 +12,7 @@ function Topbar({
   setLightMode,
   lightmode,
 }) {
-  const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
+  const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
   const moi = getNom(currentUser)
 
   const setShowAjouter = () => {

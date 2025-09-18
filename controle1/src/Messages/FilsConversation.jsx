@@ -7,14 +7,13 @@ import Typing from './Typing'
 
 function FilsConversation({
   currentUser,
+  setCurrentUser,
   currentGroupe,
   onSend,
   utilisateurs,
   OnClose,
   setCurrentGroupe,
   setGroupes,
-  setLightMode,
-  lightmode,
 }) {
   const messagesZoneRef = useRef(null)
   const [visibleCount, setVisibleCount] = useState(10)
@@ -59,11 +58,10 @@ function FilsConversation({
         utilisateurs={utilisateurs}
         currentGroupe={currentGroupe}
         currentUser={currentUser}
+        setCurrentUser={setCurrentUser}
         OnClose={OnClose}
         setCurrentGroupe={setCurrentGroupe}
         setGroupes={setGroupes}
-        setLightMode={setLightMode}
-        lightmode={lightmode}
       />
 
       <div id="messages-zone" ref={messagesZoneRef}>

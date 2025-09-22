@@ -123,11 +123,11 @@ body,
   background: #9aa0a6;
 }
 
-.statut.en-ligne {
+.statut.online {
   background: #23a55a;
 }
 
-.statut.hors-ligne {
+.statut.offline {
   background: #9aa0a6;
 }
 

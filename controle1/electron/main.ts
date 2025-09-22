@@ -44,6 +44,12 @@ function createWindow() {
   })
   win.setFullScreen(true)
   win.webContents.openDevTools()
+  win.webContents.on('before-input-event', (event, input) => {
+    if (input.type === 'keyDown' && input.key === 'F11') {
+      if (win) win.setFullScreen(!win.isFullScreen())
+      event.preventDefault()
+    }
+  })
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
   })

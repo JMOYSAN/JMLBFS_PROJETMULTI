@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styled from 'styled-components'
 
-const LoginWrapper = styled.div`
+const RegisterWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -10,7 +10,7 @@ const LoginWrapper = styled.div`
   font-family: 'Arial', sans-serif;
 `
 
-const LoginCard = styled.div`
+const RegisterCard = styled.div`
   background: #dcd7c9;
   padding: 40px 30px;
   border-radius: 20px;
@@ -56,18 +56,25 @@ const Button = styled.button`
   }
 `
 
-function Login({ onLogin, setPage }) {
+function Register({ onRegister, setPage }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
 
     if (!username.trim() || !password.trim()) return
+    if (password !== confirmPassword) {
+      setError('Les mots de passe ne correspondent pas')
+      return
+    }
 
-    fetch('http://localhost:3000/users/login', {
+    fetch('http://localhost:3000/users/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
@@ -76,22 +83,23 @@ function Login({ onLogin, setPage }) {
         res.json().then((data) => ({ status: res.status, body: data }))
       )
       .then(({ status, body }) => {
-        if (status !== 200) {
-          setError(body.error || 'Erreur inconnue')
+        if (status !== 201) {
+          setError(body.error || 'Erreur lors de l’inscription')
         } else {
-          onLogin(body)
+          setSuccess('Compte créé avec succès !')
+          if (onRegister) onRegister(body)
         }
       })
       .catch((err) => {
         console.error(err)
-        setError('Erreur serveur')
+        setError(`Erreur serveur`)
       })
   }
 
   return (
-    <LoginWrapper>
-      <LoginCard>
-        <Title>Connexion</Title>
+    <RegisterWrapper>
+      <RegisterCard>
+        <Title>Inscription</Title>
         <form onSubmit={handleSubmit}>
           <Input
             type="text"
@@ -107,20 +115,28 @@ function Login({ onLogin, setPage }) {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <Input
+            type="password"
+            placeholder="Confirmer le mot de passe"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
           {error && <p style={{ color: 'red' }}>{error}</p>}
-          <Button type="submit">Se connecter</Button>
+          {success && <p style={{ color: 'green' }}>{success}</p>}
+          <Button type="submit">S'inscrire</Button>
         </form>
         <p style={{ textAlign: 'center', color: 'black' }}>
           <button
+            onClick={() => setPage('login')}
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-            onClick={() => setPage('register')}
           >
-            Pas encore de compte ? Créer un compte
+            Déjà inscrit ? Se connecter
           </button>
         </p>
-      </LoginCard>
-    </LoginWrapper>
+      </RegisterCard>
+    </RegisterWrapper>
   )
 }
 
-export default Login
+export default Register

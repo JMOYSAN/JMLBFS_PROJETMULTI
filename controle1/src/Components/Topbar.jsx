@@ -6,17 +6,43 @@ function Topbar({
   utilisateurs = [],
   currentGroupe,
   currentUser,
+  setCurrentUser,
   onClose,
   setCurrentGroupe,
   setGroupes,
-  setLightMode,
-  lightmode,
 }) {
-  const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
+  const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
   const moi = getNom(currentUser)
 
   const setShowAjouter = () => {
     setshowAjouterDansGroupe(!showAjouterDansGroupe)
+  }
+
+  const modifierTheme = () => {
+    fetch(`http://localhost:3000/users/${currentUser.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        theme: currentUser.theme === 'dark' ? 'light' : 'dark',
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Erreur lors de la mise à jour')
+        }
+        return response.json()
+      })
+      .then((data) => {
+        console.log('Utilisateur mis à jour :', data)
+        setCurrentUser(data)
+        localStorage.setItem('user', JSON.stringify(data))
+      })
+      .catch((error) => {
+        console.error('Erreur :', error)
+        alert('La mise à jour a échoué')
+      })
   }
   const [showAjouterDansGroupe, setshowAjouterDansGroupe] = useState(false)
   return (
@@ -36,11 +62,8 @@ function Topbar({
               })}
             </ul>
           </div>
-          <div
-            onClick={() => setLightMode(!lightmode)}
-            className="color-mode-switch"
-          >
-            {lightmode ? (
+          <div onClick={() => modifierTheme()} className="color-mode-switch">
+            {currentUser.theme === 'light' ? (
               <i className="fa-solid fa-moon"></i>
             ) : (
               <i className="fa-solid fa-sun icon-light"></i>

@@ -4,7 +4,6 @@ import FilsConversation from './Messages/FilsConversation'
 import Login from './Users/Login'
 import Register from './Users/Register.jsx' // 👈 ajout
 import Sidebar from './Components/Sidebar.jsx'
-import genererUtilisateurs from './Mock/MockUtilisateurs.js'
 import Utilisateurs from './Users/Utilisateurs.jsx'
 import genererGroupes from './Mock/MockGroupe.js'
 

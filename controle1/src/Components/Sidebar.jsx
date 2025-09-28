@@ -10,38 +10,48 @@ function Sidebar({
   showForm,
   utilisateurs,
   onClose,
-  groupes,
+  groupesUser,
+  groupesPublic,
   setCurrentGroupe,
   currentUser,
 }) {
-  const groupesFiltrer = groupes.filter((g) =>
-    g.participants.some((p) => p.nom === currentUser)
-  )
-
-  const groupesSansUser = groupes.filter(
-    (g) =>
-      !g.participants.some((p) => p.nom === currentUser) &&
-      g.groupeVisibility === 'public'
-  )
-
-  const [visibleCount, setVisibleCount] = useState(17)
-  const containerRef = useRef(null)
+  const [visibleUserCount, setVisibleUserCount] = useState(17)
+  const [visiblePublicCount, setVisiblePublicCount] = useState(17)
+  const userContainerRef = useRef(null)
+  const publicContainerRef = useRef(null)
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const userContainer = userContainerRef.current
+    if (!userContainer) return
 
-    const onScroll = () => {
+    const onUserScroll = () => {
       if (
-        container.scrollTop + container.clientHeight >=
-        container.scrollHeight - 5
+        userContainer.scrollTop + userContainer.clientHeight >=
+        userContainer.scrollHeight - 5
       ) {
-        setVisibleCount((prev) => prev + 5)
+        setVisibleUserCount((prev) => prev + 5)
       }
     }
 
-    container.addEventListener('scroll', onScroll)
-    return () => container.removeEventListener('scroll', onScroll)
+    userContainer.addEventListener('scroll', onUserScroll)
+    return () => userContainer.removeEventListener('scroll', onUserScroll)
+  }, [])
+
+  useEffect(() => {
+    const publicContainer = publicContainerRef.current
+    if (!publicContainer) return
+
+    const onPublicScroll = () => {
+      if (
+        publicContainer.scrollTop + publicContainer.clientHeight >=
+        publicContainer.scrollHeight - 5
+      ) {
+        setVisiblePublicCount((prev) => prev + 5)
+      }
+    }
+
+    publicContainer.addEventListener('scroll', onPublicScroll)
+    return () => publicContainer.removeEventListener('scroll', onPublicScroll)
   }, [])
 
   return (
@@ -60,10 +70,14 @@ function Sidebar({
             <Logout onLogout={onLogout} />
           </div>
 
-          <div className="sidebar-groups" ref={containerRef}>
-            <div className="group-section">
+          <div className="sidebar-groups">
+            <div
+              className="group-section"
+              ref={userContainerRef}
+              style={{ maxHeight: '300px', overflowY: 'auto' }}
+            >
               <h3>Vos Groupes</h3>
-              {groupesFiltrer.slice(0, visibleCount).map((g) => (
+              {groupesUser.slice(0, visibleUserCount).map((g) => (
                 <Groupe
                   key={g.id}
                   currentUser={currentUser}
@@ -73,9 +87,13 @@ function Sidebar({
               ))}
             </div>
 
-            <div className="group-section">
+            <div
+              className="group-section"
+              ref={publicContainerRef}
+              style={{ maxHeight: '300px', overflowY: 'auto' }}
+            >
               <h3>Groupes disponibles</h3>
-              {groupesSansUser.slice(0, visibleCount).map((g) => (
+              {groupesPublic.slice(0, visiblePublicCount).map((g) => (
                 <Groupe
                   key={g.id}
                   currentUser={currentUser}

@@ -1,12 +1,9 @@
-import { Menu, app, ipcMain, Notification, BrowserWindow } from "electron";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname, "..");
-const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL;
-const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
-const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
-const template = [
+import { Menu as i, app as n, ipcMain as R, Notification as f, BrowserWindow as r } from "electron";
+import { fileURLToPath as m, pathToFileURL as u } from "node:url";
+import o from "node:path";
+const a = o.dirname(m(import.meta.url));
+process.env.APP_ROOT = o.join(a, "..");
+const s = process.env.VITE_DEV_SERVER_URL, D = o.join(process.env.APP_ROOT, "dist-electron"), p = o.join(process.env.APP_ROOT, "dist"), T = [
   {
     label: "Application",
     submenu: [
@@ -15,60 +12,38 @@ const template = [
       {
         label: "Open DevTools",
         click: () => {
-          if (win == null ? void 0 : win.webContents.isDevToolsOpened()) {
-            win.webContents.closeDevTools();
-          } else {
-            win == null ? void 0 : win.webContents.openDevTools();
-          }
+          e != null && e.webContents.isDevToolsOpened() ? e.webContents.closeDevTools() : e == null || e.webContents.openDevTools();
         }
       }
     ]
   }
-];
-const menu = Menu.buildFromTemplate(template);
-Menu.setApplicationMenu(menu);
-let win = null;
-function createWindow() {
-  win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, "RogueRatIcone.png"),
-    webPreferences: { preload: path.join(__dirname, "preload.mjs") },
-    show: false
-  });
-  win.setFullScreen(true);
-  win.webContents.openDevTools();
-  win.webContents.on("before-input-event", (event, input) => {
-    if (input.type === "keyDown" && input.key === "F11") {
-      if (win) win.setFullScreen(!win.isFullScreen());
-      event.preventDefault();
-    }
-  });
-  win.webContents.on("did-finish-load", () => {
-    win == null ? void 0 : win.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
-  });
-  win.once("ready-to-show", () => win == null ? void 0 : win.show());
-  if (VITE_DEV_SERVER_URL) win.loadURL(VITE_DEV_SERVER_URL);
-  else win.loadFile(path.join(RENDERER_DIST, "index.html"));
+], w = i.buildFromTemplate(T);
+i.setApplicationMenu(w);
+let e = null;
+function c() {
+  e = new r({
+    icon: o.join(process.env.VITE_PUBLIC, "RogueRatIcone.png"),
+    webPreferences: { preload: o.join(a, "preload.mjs") },
+    show: !1
+  }), e.setFullScreen(!0), e.webContents.openDevTools(), e.webContents.on("before-input-event", (l, t) => {
+    t.type === "keyDown" && t.key === "F11" && (e && e.setFullScreen(!e.isFullScreen()), l.preventDefault());
+  }), e.webContents.on("did-finish-load", () => {
+    e == null || e.webContents.send("main-process-message", (/* @__PURE__ */ new Date()).toLocaleString());
+  }), e.once("ready-to-show", () => e == null ? void 0 : e.show()), s ? e.loadURL(s) : e.loadURL(u(o.join(p, "index.html")).href);
 }
-app.whenReady().then(() => {
-  app.setAppUserModelId("Rogue Rats Chat");
-  process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-  createWindow();
-  ipcMain.handle("notify", (_e, { title, body }) => {
-    const n = new Notification({ title, body });
-    n.show();
+n.whenReady().then(() => {
+  n.setAppUserModelId("Rogue Rats Chat"), process.env.VITE_PUBLIC = s ? o.join(process.env.APP_ROOT, "public") : p, c(), R.handle("notify", (l, { title: t, body: d }) => {
+    new f({ title: t, body: d }).show();
   });
 });
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+n.on("activate", () => {
+  r.getAllWindows().length === 0 && c();
 });
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
-    win = null;
-  }
+n.on("window-all-closed", () => {
+  process.platform !== "darwin" && (n.quit(), e = null);
 });
 export {
-  MAIN_DIST,
-  RENDERER_DIST,
-  VITE_DEV_SERVER_URL
+  D as MAIN_DIST,
+  p as RENDERER_DIST,
+  s as VITE_DEV_SERVER_URL
 };

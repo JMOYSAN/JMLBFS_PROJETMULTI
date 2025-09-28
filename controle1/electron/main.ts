@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-
+import { pathToFileURL } from 'node:url'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 process.env.APP_ROOT = path.join(__dirname, '..')
 
@@ -55,7 +55,7 @@ function createWindow() {
   })
   win.once('ready-to-show', () => win?.show())
   if (VITE_DEV_SERVER_URL) win.loadURL(VITE_DEV_SERVER_URL)
-  else win.loadFile(path.join(RENDERER_DIST, 'index.html'))
+  else win.loadURL(pathToFileURL(path.join(RENDERER_DIST, 'index.html')).href)
 }
 
 app.whenReady().then(() => {

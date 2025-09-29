@@ -11,7 +11,8 @@ export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
 import { Menu } from 'electron'
 
-const template = [
+// @ts-ignore
+const template: Electron.MenuItemConstructorOptions = [
   {
     label: 'Application',
     submenu: [
@@ -31,6 +32,7 @@ const template = [
   },
 ]
 
+// @ts-ignore
 const menu = Menu.buildFromTemplate(template)
 Menu.setApplicationMenu(menu)
 
@@ -42,8 +44,8 @@ function createWindow() {
     webPreferences: { preload: path.join(__dirname, 'preload.mjs') },
     show: false,
   })
-  win.setFullScreen(true)
-  //win.webContents.openDevTools()
+
+  win.webContents.openDevTools()
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', new Date().toLocaleString())
   })

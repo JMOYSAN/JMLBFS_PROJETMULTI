@@ -2,35 +2,47 @@ import { useEffect, useState } from 'react'
 
 import FilsConversation from './Messages/FilsConversation'
 import Login from './Users/Login'
+//import Register from './Users/Register.jsx'
 import Sidebar from './Components/Sidebar.jsx'
-import genererUtilisateurs from './Mock/MockUtilisateurs.js'
 import Utilisateurs from './Users/Utilisateurs.jsx'
 import genererGroupes from './Mock/MockGroupe.js'
 
 function App() {
-  const [utilisateurs, setUtilisateurs] = useState(genererUtilisateurs())
+  const [utilisateurs, setUtilisateurs] = useState([])
   const [currentUser, setCurrentUser] = useState()
   const [groupes, setGroupes] = useState(genererGroupes())
   const [currentGroupe, setCurrentGroupe] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [isConnect, setIsConnect] = useState(false)
+  const [page, setPage] = useState('login')
 
+  // Charger les utilisateurs depuis l’API
+  useEffect(() => {
+    fetch(`http://localhost:3000/users`)
+      .then((res) => res.json())
+      .then(
+        (result) => setUtilisateurs(result),
+        (error) => console.log(error)
+      )
+  }, [])
+
+  // Connexion réussie
   const gererNouveauUtilisateur = (nouveauUtilisateur) => {
-    const utilisateurExistant = utilisateurs.find(
-      (u) => u.nom === nouveauUtilisateur
-    )
-    if (!utilisateurExistant) {
-      setUtilisateurs((prev) => [...prev, nouveauUtilisateur])
-      setCurrentUser(nouveauUtilisateur)
-      localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
-    } else {
-      setCurrentUser(utilisateurExistant.nom)
-      localStorage.setItem('user', JSON.stringify(utilisateurExistant.nom))
-    }
-
+    setCurrentUser(nouveauUtilisateur)
+    localStorage.setItem('user', JSON.stringify(nouveauUtilisateur))
     setIsConnect(true)
   }
 
+  // Déconnexion
+  const handleLogout = () => {
+    localStorage.clear()
+    setCurrentUser(null)
+    setCurrentGroupe(null)
+    setIsConnect(false)
+    setPage('login')
+  }
+
+  // Nouveau message
   const gererNouveauMessageFichier = (contenu) => {
     if (
       !currentGroupe ||
@@ -72,17 +84,7 @@ function App() {
     })
   }
 
-  const handleLogout = () => {
-    localStorage.clear()
-    setCurrentUser(null)
-    setCurrentGroupe(null)
-    setIsConnect(false)
-  }
-
-  const showFormCreerGroupe = () => {
-    setShowForm(true)
-  }
-
+  // Créer un nouveau groupe
   const creerNouveauGroupe = (
     nomGroupe,
     participantsAjoutes,
@@ -107,8 +109,9 @@ function App() {
     setShowForm(false)
   }
 
+  // Modifier un groupe
   const modifierGroupe = (listeParticipants = []) => {
-    const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
+    const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
     const normalise = (nom) => ({ nom, isTyping: false })
 
     setGroupes((prev) =>
@@ -134,23 +137,35 @@ function App() {
     )
   }
 
+  // Restaurer utilisateur en mémoire
   useEffect(() => {
     const storedUser = localStorage.getItem('user')
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser))
       setIsConnect(true)
     }
-  })
+  }, [])
 
+  // Gestion thème clair/sombre
+  useEffect(() => {
+    if (currentUser?.theme === 'light') {
+      document.body.classList.add('light')
+    } else {
+      document.body.classList.remove('light')
+    }
+  }, [currentUser])
+  console.log('Page actuelle:', page, 'isConnect:', isConnect)
   return (
     <>
       {isConnect ? (
+        // ✅ Partie chat
         <div id="chat-container">
           <Utilisateurs
             onLogout={handleLogout}
-            showFormCreerGroupe={showFormCreerGroupe}
+            showFormCreerGroupe={() => setShowForm(true)}
             showForm={showForm}
             utilisateurs={utilisateurs}
+            setUtilisateurs={setUtilisateurs}
             onClose={creerNouveauGroupe}
             setCurrentGroupe={setCurrentGroupe}
             groupes={groupes}
@@ -158,7 +173,7 @@ function App() {
           />
           <Sidebar
             onLogout={handleLogout}
-            showFormCreerGroupe={showFormCreerGroupe}
+            showFormCreerGroupe={() => setShowForm(true)}
             showForm={showForm}
             utilisateurs={utilisateurs}
             onClose={creerNouveauGroupe}
@@ -169,6 +184,7 @@ function App() {
           />
           <FilsConversation
             currentUser={currentUser}
+            setCurrentUser={setCurrentUser}
             currentGroupe={currentGroupe}
             onSend={gererNouveauMessageFichier}
             utilisateurs={utilisateurs}
@@ -177,8 +193,16 @@ function App() {
             setCurrentGroupe={setCurrentGroupe}
           />
         </div>
+      ) : page === 'login' ? (
+        // ✅ Page login
+        <>
+          <Login onLogin={gererNouveauUtilisateur} setPage={setPage} />
+        </>
       ) : (
-        <Login onLogin={gererNouveauUtilisateur} />
+        // ✅ Page register
+        <>
+          <Register onRegister={() => setPage('login')} setPage={setPage} />
+        </>
       )}
     </>
   )

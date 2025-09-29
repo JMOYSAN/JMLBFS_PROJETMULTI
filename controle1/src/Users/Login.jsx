@@ -67,10 +67,13 @@ function Login({ onLogin, setPage }) {
 
     if (!username.trim() || !password.trim()) return
 
+    console.log('DATHLIAMUS', username)
+    console.log('password', password)
     fetch('http://localhost:3000/users/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username, password }), //username, password }),
+
     })
       .then((res) =>
         res.json().then((data) => ({ status: res.status, body: data }))

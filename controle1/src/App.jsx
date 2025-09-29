@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 
 import FilsConversation from './Messages/FilsConversation'
 import Login from './Users/Login'
+
 //import Register from './Users/Register.jsx'
+
 import Sidebar from './Components/Sidebar.jsx'
 import Utilisateurs from './Users/Utilisateurs.jsx'
 import genererGroupes from './Mock/MockGroupe.js'
@@ -14,7 +16,9 @@ function App() {
   const [currentGroupe, setCurrentGroupe] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [isConnect, setIsConnect] = useState(false)
+
   const [page, setPage] = useState('login')
+
 
   // Charger les utilisateurs depuis l’API
   useEffect(() => {

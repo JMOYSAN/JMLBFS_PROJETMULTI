@@ -1,7 +1,5 @@
 /* ===== Global ===== */
-html,
-body,
-#root {
+html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -50,21 +48,29 @@ body,
   padding: 8px;
 }
 
+/* ===== Group Sections (lazy loading séparé) ===== */
 .sidebar-groups {
   flex-grow: 1;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   padding-right: 5px;
   min-height: 0;
 }
 
-/* ===== Group Sections ===== */
 .group-section {
-  margin-bottom: 20px;
+  max-height: 300px; /* scroll séparé */
+  overflow-y: auto;
 }
 
 .group-section h3 {
   font-size: 1rem;
   margin-bottom: 5px;
+  position: sticky;
+  top: 0;
+  background-color: #3f4e4f;
+  z-index: 1;
+  padding: 5px 0;
 }
 
 .groupe {
@@ -74,14 +80,35 @@ body,
   padding: 6px 12px;
   border-radius: 10px;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .groupe:hover {
   background-color: #a27b5c;
   color: #2c3639;
+}
+
+/* Scrollbars pour les sections de groupes */
+.group-section::-webkit-scrollbar {
+  width: 6px;
+}
+
+.group-section::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.group-section::-webkit-scrollbar-thumb {
+  background-color: rgba(200, 200, 200, 0.3);
+  border-radius: 3px;
+}
+
+.group-section::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(200, 200, 200, 0.5);
+}
+
+.group-section {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 200, 200, 0.3) transparent;
 }
 
 /* ===== Users Sidebar ===== */
@@ -100,9 +127,7 @@ body,
   padding: 6px 10px;
   border-radius: 10px;
   cursor: pointer;
-  transition:
-    background 0.2s,
-    color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .utilisateur-ligne:hover {
@@ -121,11 +146,11 @@ body,
   background: #9aa0a6;
 }
 
-.statut.en-ligne {
+.statut.online {
   background: #23a55a;
 }
 
-.statut.hors-ligne {
+.statut.offline {
   background: #9aa0a6;
 }
 
@@ -137,7 +162,7 @@ body,
   background: #ea4335;
 }
 
-/* ===== Overlay du Formulaire ===== */
+/* ===== Overlay Formulaire ===== */
 .form-popup {
   position: fixed;
   top: 0;
@@ -152,7 +177,6 @@ body,
   animation: fadeIn 0.3s ease-in-out;
 }
 
-/* ===== Boîte du Formulaire ===== */
 .form-popup form {
   background: #3f4e4f;
   padding: 30px 40px;
@@ -175,7 +199,6 @@ body,
   color: #fff;
 }
 
-/* ===== Labels & Inputs ===== */
 .form-popup label {
   display: flex;
   flex-direction: column;
@@ -192,9 +215,7 @@ body,
   color: #fff;
   font-size: 1rem;
   outline: none;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .form-popup input[type='text']:focus {
@@ -202,7 +223,6 @@ body,
   box-shadow: 0 0 5px rgba(162, 123, 92, 0.5);
 }
 
-/* ===== Radios Alignés ===== */
 .radio-group {
   display: flex;
   gap: 15px;
@@ -223,7 +243,6 @@ body,
   vertical-align: middle;
 }
 
-/* ===== Suggestions ===== */
 .suggestions {
   list-style: none;
   margin: 10px 0 0;
@@ -245,7 +264,6 @@ body,
   color: #2c3639;
 }
 
-/* ===== Participants List ===== */
 .participants-list {
   list-style: none;
   padding: 0;
@@ -260,7 +278,6 @@ body,
   font-size: 0.9rem;
 }
 
-/* ===== Bouton de Soumission ===== */
 .form-popup button[type='submit'] {
   padding: 12px;
   background: #a27b5c;
@@ -270,9 +287,7 @@ body,
   font-weight: bold;
   cursor: pointer;
   font-size: 1rem;
-  transition:
-    background 0.2s,
-    transform 0.1s;
+  transition: background 0.2s, transform 0.1s;
 }
 
 .form-popup button[type='submit']:hover {
@@ -280,25 +295,14 @@ body,
   transform: scale(1.03);
 }
 
-/* ===== Animations ===== */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 /* ===== Avatars ===== */
@@ -343,7 +347,6 @@ body,
   background-color: #a27b5c;
   color: #2c3639;
   width: fit-content;
-  height: fit-content;
   margin-bottom: 6px;
 }
 
@@ -381,7 +384,6 @@ body,
   align-self: center;
 }
 
-/* ===== Typing Indicator ===== */
 .typing {
   display: flex;
   flex-direction: row;
@@ -391,9 +393,7 @@ body,
 }
 
 /* ===== Scrollbars ===== */
-.sidebar-groups,
-#sidebar_Utilisateurs,
-#messages-zone {
+.sidebar-groups, #sidebar_Utilisateurs, #messages-zone {
   scrollbar-width: thin;
   scrollbar-color: rgba(200, 200, 200, 0.3) transparent;
 }
@@ -423,57 +423,58 @@ body,
   background-color: rgba(200, 200, 200, 0.5);
 }
 
+/* ===== Confirm Box ===== */
 .confirm-join {
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .confirm-box {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    text-align: center;
-    max-width: 300px;
-    width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
 }
 
 .confirm-box p {
-    margin: 0 0 12px;
-    font-size: 14px;
-    color: #333;
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #333;
 }
 
 .actions {
-    display: flex;
-    justify-content: center;
-    gap: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 }
 
 .btn-yes {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 14px;
-    cursor: pointer;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
 }
 
 .btn-no {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 6px 14px;
-    cursor: pointer;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 14px;
+  cursor: pointer;
 }
 
 .btn-yes:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
 
 .btn-no:hover {
-    background-color: #d32f2f;
+  background-color: #d32f2f;
 }

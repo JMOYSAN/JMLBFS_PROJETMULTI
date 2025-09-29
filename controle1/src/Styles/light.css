@@ -1,0 +1,291 @@
+/* ===== Global ===== */
+html .light,
+body .light,
+#root .light{
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #F3EEEA;
+    color: black;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+
+/* ===== Sidebar ===== */
+.light #sidebar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100vh;
+    background-color: #EBE3D5;
+    color: black;
+}
+
+/* ===== Group Sections ===== */
+
+.light .groupe:hover {
+    background-color: #B0A695;
+    color: #2c3639;
+}
+
+/* ===== Users Sidebar ===== */
+.light #sidebar_Utilisateurs {
+    flex: 1;
+    padding: 8px;
+    background-color: #B0A695;
+    overflow-y: auto;
+    color: black;
+}
+.light .utilisateur-ligne:hover {
+    background-color: #776B5D;
+}
+
+.light .utilisateur-ligne {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition:
+            background 0.2s,
+            color 0.2s;
+}
+
+/* ===== Status Indicators ===== */
+
+/* ===== Overlay du Formulaire ===== */
+
+
+/* ===== Boîte du Formulaire ===== */
+.light .form-popup form {
+    background: #EBE3D5;
+    padding: 30px 40px;
+    border-radius: 16px;
+    width: 420px;
+    max-width: 90%;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: black;
+    font-family: Arial, sans-serif;
+    animation: slideUp 0.3s ease;
+}
+
+.light .form-popup h2 {
+    margin: 0;
+    text-align: center;
+    font-size: 1.6rem;
+    color: black;
+}
+
+/* ===== Labels & Inputs ===== */
+
+
+.light .form-popup input[type='text'] {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #F3EEEA;
+    color: black;
+    font-size: 1rem;
+    outline: none;
+    transition:
+            border-color 0.2s,
+            box-shadow 0.2s;
+}
+
+.light .form-popup input[type='text']:focus {
+    border-color: #B0A695;
+    box-shadow: 0 0 5px rgba(162, 123, 92, 0.5);
+}
+
+/* ===== Radios Alignés ===== */
+
+.light .radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: normal;
+    color: black;
+}
+
+/* ===== Suggestions ===== */
+.light .suggestions {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    background: #F3EEEA;
+    border-radius: 8px;
+    border: 1px solid #555;
+    overflow: hidden;
+}
+
+.light .suggestions li:hover {
+    background: #B0A695;
+    color: black;
+}
+
+/* ===== Participants List ===== */
+
+.light .participants-list li {
+    background: #EBE3D5;
+    margin: 5px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+/* ===== Bouton de Soumission ===== */
+.light .form-popup button[type='submit'] {
+    padding: 12px;
+    background: #B0A695;
+    color: black;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition:
+            background 0.2s,
+            transform 0.1s;
+}
+
+.light .form-popup button[type='submit']:hover {
+    background: #B0A695;
+    transform: scale(1.03);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ===== Avatars ===== */
+.light .avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: gray;
+    font-size: 12px;
+}
+
+/* ===== Messages ===== */
+.light #fil {
+    display: flex;
+    flex-direction: column;
+    flex: 5;
+    background-color: #F3EEEA;
+    color: black;
+    padding: 10px;
+}
+
+
+
+.light .bulle {
+    display: inline-flex;
+    flex-direction: column;
+    align-self: flex-end;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background-color: #B0A695;
+    color: black;
+    width: fit-content;
+    height: fit-content;
+    margin-bottom: 6px;
+}
+
+.light .bulleAutre {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 8px 0;
+    padding: 10px 16px;
+    border-radius: 16px;
+    background-color: #EBE3D5;
+    color: black;
+    width: fit-content;
+}
+
+.light .bulleAutre .username {
+    color: black;
+    font-weight: 600;
+}
+
+.light .username {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: black;
+}
+
+.light .message {
+    margin-bottom: 6px;
+    color: black;
+}
+
+.light .timestamp {
+    font-size: 0.8em;
+    color: black;
+    align-self: center;
+}
+
+/* ===== Typing Indicator ===== */
+
+/* ===== Scrollbars ===== */
+
+/*Logout*/
+
+.light .Btn {
+    background-color: #B0A695;
+}
+
+/*AddGroupe*/
+.light .c-button {
+    max-width: 160px;
+    width: 100%;
+    border: none;
+    background-color: #B0A695;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.light .c-button:hover {
+    background-color: #B0A695;
+    color: #fff;
+}
+
+.light .c-main {
+    text-align: center;
+}
+

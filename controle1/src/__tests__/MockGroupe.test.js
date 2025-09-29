@@ -1,3 +1,5 @@
+// Les tests on été écrits par ChatGPT
+
 import genererGroupes from '../Mock/MockGroupe.js'
 
 const data = genererGroupes()

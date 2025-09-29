@@ -7,6 +7,7 @@ import Typing from './Typing'
 
 function FilsConversation({
   currentUser,
+  setCurrentUser,
   currentGroupe,
   onSend,
   utilisateurs,
@@ -57,6 +58,7 @@ function FilsConversation({
         utilisateurs={utilisateurs}
         currentGroupe={currentGroupe}
         currentUser={currentUser}
+        setCurrentUser={setCurrentUser}
         OnClose={OnClose}
         setCurrentGroupe={setCurrentGroupe}
         setGroupes={setGroupes}

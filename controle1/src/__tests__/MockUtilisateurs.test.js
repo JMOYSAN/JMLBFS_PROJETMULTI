@@ -1,3 +1,5 @@
+// Les tests on été écrits par ChatGPT
+
 import genererUtilisateurs from '../Mock/MockUtilisateurs.js'
 
 const data = genererUtilisateurs()

@@ -3,22 +3,20 @@ import { useEffect, useState } from 'react'
 import FilsConversation from './Messages/FilsConversation'
 import Login from './Users/Login'
 
-//import Register from './Users/Register.jsx'
-
 import Sidebar from './Components/Sidebar.jsx'
 import Utilisateurs from './Users/Utilisateurs.jsx'
-import genererGroupes from './Mock/MockGroupe.js'
+import getGroupes from './Mock/MockGroupe.js'
+import Register from './Users/Register.jsx'
 
 function App() {
   const [utilisateurs, setUtilisateurs] = useState([])
   const [currentUser, setCurrentUser] = useState()
-  const [groupes, setGroupes] = useState(genererGroupes())
+  const [groupes, setGroupes] = useState(getGroupes())
   const [currentGroupe, setCurrentGroupe] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [isConnect, setIsConnect] = useState(false)
 
   const [page, setPage] = useState('login')
-
 
   // Charger les utilisateurs depuis l’API
   useEffect(() => {
@@ -159,6 +157,7 @@ function App() {
     }
   }, [currentUser])
   console.log('Page actuelle:', page, 'isConnect:', isConnect)
+  console.log('PGrggrrgr:', groupes)
   return (
     <>
       {isConnect ? (

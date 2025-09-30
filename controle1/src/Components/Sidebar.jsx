@@ -14,6 +14,7 @@ function Sidebar({
   groupes,
   setGroups,
   currentUser,
+  setShowForm,
 }) {
   return (
     <div id="sidebar">
@@ -22,12 +23,13 @@ function Sidebar({
           utilisateurs={utilisateurs}
           onClose={onClose}
           currentUser={currentUser}
+          setShowForm={setShowForm}
           showFormCreerGroupe={showFormCreerGroupe}
         />
       ) : (
         <div className="sidebar-content">
           <div className="sidebar-header">
-            <AddGroup showFormCreerGroupe={showFormCreerGroupe} />
+            <AddGroup showFormCreerGroupe={setShowForm} />
             <Logout onLogout={onLogout} />
           </div>
 

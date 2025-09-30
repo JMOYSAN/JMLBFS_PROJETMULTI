@@ -165,7 +165,7 @@ function App() {
         <div id="chat-container">
           <Utilisateurs
             onLogout={handleLogout}
-            showFormCreerGroupe={() => setShowForm(true)}
+            showFormCreerGroupe={setShowForm}
             showForm={showForm}
             utilisateurs={utilisateurs}
             setUtilisateurs={setUtilisateurs}
@@ -177,7 +177,7 @@ function App() {
           <Sidebar
             setCurrentGroupe={setCurrentGroupe}
             onLogout={handleLogout}
-            showFormCreerGroupe={() => setShowForm(true)}
+            setShowForm={setShowForm}
             showForm={showForm}
             utilisateurs={utilisateurs}
             onClose={creerNouveauGroupe}

@@ -14,7 +14,6 @@ function Sidebar({
   setGroups,
   currentUser,
 }) {
-  console.log('PGrggrrgr:', groupes)
   return (
     <div id="sidebar">
       {showForm ? (
@@ -31,7 +30,11 @@ function Sidebar({
             <Logout onLogout={onLogout} />
           </div>
 
-          <GroupesSidebar groupes={groupes} setGroupes={setGroups} />
+          <GroupesSidebar
+            groupes={groupes}
+            setGroupes={setGroups}
+            currentUser={currentUser}
+          />
         </div>
       )}
     </div>

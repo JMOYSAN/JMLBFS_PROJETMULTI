@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import Groupe from '../Groupes/Groupe.jsx'
 
 // Normalisation d’un groupe
 function normaliserGroupe(groupe, index) {
@@ -20,7 +21,14 @@ function LigneGroupe({ groupe }) {
 }
 
 // Composant générique pour une section de groupes (lazy loading)
-function SectionGroupes({ titre, type, groupes, setGroupes }) {
+function SectionGroupes({
+  titre,
+  type,
+  groupes,
+  setGroupes,
+  currentGroupe,
+  currentUser,
+}) {
   const containerRef = useRef(null)
   const groupesRef = useRef(groupes)
   groupesRef.current = groupes
@@ -85,13 +93,17 @@ function SectionGroupes({ titre, type, groupes, setGroupes }) {
     <div className="group-section" ref={containerRef}>
       <h3>{titre}</h3>
       {listeGroupes.map((g) => (
-        <LigneGroupe key={g.id} groupe={g} />
+        <Groupe
+          groupe={g}
+          currentUser={currentUser}
+          setGroupes={setGroupes}
+        ></Groupe>
       ))}
     </div>
   )
 }
 
-function GroupesSidebar() {
+function GroupesSidebar(currentUser) {
   const [groupes, setGroupes] = useState({ public: [], private: [] })
 
   useEffect(() => {
@@ -117,12 +129,14 @@ function GroupesSidebar() {
         type="public"
         groupes={groupes.public}
         setGroupes={setGroupes}
+        currentUser={currentUser}
       />
       <SectionGroupes
         titre="Groupes privés"
         type="private"
         groupes={groupes.private}
         setGroupes={setGroupes}
+        currentUser={currentUser}
       />
     </div>
   )

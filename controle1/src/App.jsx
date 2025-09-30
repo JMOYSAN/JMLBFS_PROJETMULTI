@@ -13,6 +13,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState()
   const [groupes, setGroupes] = useState(getGroupes())
   const [currentGroupe, setCurrentGroupe] = useState([])
+  console.log(currentGroupe)
   const [showForm, setShowForm] = useState(false)
   const [isConnect, setIsConnect] = useState(false)
 
@@ -157,11 +158,10 @@ function App() {
     }
   }, [currentUser])
   console.log('Page actuelle:', page, 'isConnect:', isConnect)
-  console.log('PGrggrrgr:', groupes)
+
   return (
     <>
       {isConnect ? (
-        // ✅ Partie chat
         <div id="chat-container">
           <Utilisateurs
             onLogout={handleLogout}
@@ -175,12 +175,12 @@ function App() {
             currentUser={currentUser}
           />
           <Sidebar
+            setCurrentGroupe={setCurrentGroupe}
             onLogout={handleLogout}
             showFormCreerGroupe={() => setShowForm(true)}
             showForm={showForm}
             utilisateurs={utilisateurs}
             onClose={creerNouveauGroupe}
-            setCurrentGroupe={setCurrentGroupe}
             groupes={groupes}
             currentUser={currentUser}
             currentGroupe={currentGroupe}
@@ -197,12 +197,10 @@ function App() {
           />
         </div>
       ) : page === 'login' ? (
-        // ✅ Page login
         <>
           <Login onLogin={gererNouveauUtilisateur} setPage={setPage} />
         </>
       ) : (
-        // ✅ Page register
         <>
           <Register onRegister={() => setPage('login')} setPage={setPage} />
         </>

@@ -28,6 +28,7 @@ function SectionGroupes({
   setGroupes,
   currentGroupe,
   currentUser,
+  setCurrentGroupe,
 }) {
   const containerRef = useRef(null)
   const groupesRef = useRef(groupes)
@@ -96,14 +97,14 @@ function SectionGroupes({
         <Groupe
           groupe={g}
           currentUser={currentUser}
-          setGroupes={setGroupes}
+          setCurrentGroupe={setCurrentGroupe}
         ></Groupe>
       ))}
     </div>
   )
 }
 
-function GroupesSidebar(currentUser) {
+function GroupesSidebar({ currentUser, setCurrentGroupe }) {
   const [groupes, setGroupes] = useState({ public: [], private: [] })
 
   useEffect(() => {
@@ -130,6 +131,7 @@ function GroupesSidebar(currentUser) {
         groupes={groupes.public}
         setGroupes={setGroupes}
         currentUser={currentUser}
+        setCurrentGroupe={setCurrentGroupe}
       />
       <SectionGroupes
         titre="Groupes privés"
@@ -137,6 +139,7 @@ function GroupesSidebar(currentUser) {
         groupes={groupes.private}
         setGroupes={setGroupes}
         currentUser={currentUser}
+        setCurrentGroupe={setCurrentGroupe}
       />
     </div>
   )

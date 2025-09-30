@@ -5,6 +5,7 @@ import AddGroup from '../Groupes/AddGroup.jsx'
 import GroupesSidebar from './groupsContent.jsx'
 
 function Sidebar({
+  setCurrentGroupe,
   onLogout,
   showFormCreerGroupe,
   showForm,
@@ -34,6 +35,7 @@ function Sidebar({
             groupes={groupes}
             setGroupes={setGroups}
             currentUser={currentUser}
+            setCurrentGroupe={setCurrentGroupe}
           />
         </div>
       )}

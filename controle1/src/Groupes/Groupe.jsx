@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 function Groupe({ currentUser, groupe, setCurrentGroupe }) {
   const [askConfirm, setAskConfirm] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
   const userNom = getNom(currentUser)
@@ -18,12 +19,32 @@ function Groupe({ currentUser, groupe, setCurrentGroupe }) {
     setAskConfirm(true)
   }
 
-  const handleJoin = () => {
-    if (!groupe.participants.some((p) => getNom(p) === userNom)) {
-      groupe.participants.push({ nom: userNom, isTyping: false })
+  const handleJoin = async () => {
+    try {
+      setLoading(true)
+
+      const res = await fetch('http://localhost:3000/groups-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          groupId: groupe.id,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error(`Erreur HTTP ${res.status}`)
+      }
+
+      // Mets à jour l’état local
+      setCurrentGroupe(groupe)
+      console.log(groupe)
+      setAskConfirm(false)
+    } catch (err) {
+      console.error('Erreur lors de la jointure au groupe:', err)
+    } finally {
+      setLoading(false)
     }
-    setCurrentGroupe({ ...groupe })
-    setAskConfirm(false)
   }
 
   const handleCancel = () => {
@@ -47,8 +68,8 @@ function Groupe({ currentUser, groupe, setCurrentGroupe }) {
           >
             <p>Voulez-vous rejoindre ce groupe&nbsp;?</p>
             <div className="actions">
-              <button type="submit" className="btn-yes">
-                Oui
+              <button type="submit" className="btn-yes" disabled={loading}>
+                {loading ? '...' : 'Oui'}
               </button>
               <button type="button" onClick={handleCancel} className="btn-no">
                 Non

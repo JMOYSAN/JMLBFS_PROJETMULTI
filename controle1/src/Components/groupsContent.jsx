@@ -1,11 +1,11 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 
 // Normalisation d’un groupe
 function normaliserGroupe(groupe, index) {
   return {
     id: groupe.id ?? index,
     nom: groupe.name ?? `Groupe${index}`,
-    type: groupe.type ?? 'public', // "public" ou "prive"
+    type: groupe.is_private ? 'private' : 'public',
   }
 }
 
@@ -27,7 +27,7 @@ function SectionGroupes({ titre, type, groupes, setGroupes }) {
 
   const isFetchingRef = useRef(false)
   const dernierFetchIdRef = useRef(
-    groupes.length > 0 ? groupes[groupes.length - 1].id : null
+    groupes && groupes.length > 0 ? groupes[groupes.length - 1].id : null
   )
 
   useEffect(() => {
@@ -39,7 +39,7 @@ function SectionGroupes({ titre, type, groupes, setGroupes }) {
       isFetchingRef.current = true
       dernierFetchIdRef.current = lastId
 
-      fetch(`http://localhost:3000/groupes/next/${type}/${lastId}?limit=20`)
+      fetch(`http://localhost:3000/groups/next/${type}/${lastId}?limit=20`)
         .then((res) => {
           if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`)
           return res.json()
@@ -61,7 +61,8 @@ function SectionGroupes({ titre, type, groupes, setGroupes }) {
     }
 
     const onScroll = () => {
-      const lastGroupe = groupesRef.current[groupesRef.current.length - 1]
+      const lastGroupe =
+        groupesRef.current && groupesRef.current[groupesRef.current.length - 1]
       if (!lastGroupe) return
 
       if (
@@ -90,14 +91,37 @@ function SectionGroupes({ titre, type, groupes, setGroupes }) {
   )
 }
 
-// Sidebar avec deux sections (public et privé)
-function GroupesSidebar({ groupes, setGroupes }) {
+function GroupesSidebar() {
+  const [groupes, setGroupes] = useState({ public: [], private: [] })
+
+  useEffect(() => {
+    fetch('http://localhost:3000/groups')
+      .then((res) => res.json())
+      .then((data) => {
+        // le backend renvoie un tableau brut
+        const publics = data.filter((g) => g.is_private === 0)
+        const privates = data.filter((g) => g.is_private === 1)
+
+        setGroupes({
+          public: publics,
+          private: privates,
+        })
+      })
+      .catch((err) => console.error('Erreur fetch groupes init:', err))
+  }, [])
+
   return (
     <div className="sidebar-groups">
       <SectionGroupes
         titre="Groupes publics"
         type="public"
-        groupes={groupes}
+        groupes={groupes.public}
+        setGroupes={setGroupes}
+      />
+      <SectionGroupes
+        titre="Groupes privés"
+        type="private"
+        groupes={groupes.private}
         setGroupes={setGroupes}
       />
     </div>

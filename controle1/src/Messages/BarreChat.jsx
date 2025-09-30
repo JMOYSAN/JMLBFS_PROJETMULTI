@@ -6,6 +6,49 @@ const StyledWrapper = styled.div`
   justify-content: flex-end;
 `
 
+const MessageBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0f0f0;
+  border-radius: 20px;
+  padding: 6px 12px;
+`
+
+const FileUploadWrapper = styled.div`
+  position: relative;
+
+  input[type='file'] {
+    display: none;
+  }
+
+  label {
+    cursor: pointer;
+    font-size: 18px;
+  }
+`
+
+const MessageInput = styled.input`
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+`
+
+const SendButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+`
+
 const Input = ({ onSend }) => {
   const [message, setMessage] = useState('')
   const [fichier, setFichier] = useState(null)
@@ -15,6 +58,7 @@ const Input = ({ onSend }) => {
     const contenu = { message, fichier }
     onSend(contenu)
     setFichier(null)
+    console.log(contenu)
     setMessage('')
   }
 
@@ -37,12 +81,12 @@ const Input = ({ onSend }) => {
 
   return (
     <StyledWrapper>
-      <div className="messageBox">
-        <div className="fileUploadWrapper">
+      <MessageBox>
+        <FileUploadWrapper>
           <label htmlFor="file">📎</label>
           <input type="file" id="file" onChange={handleFichierChange} />
-        </div>
-        <input
+        </FileUploadWrapper>
+        <MessageInput
           required
           placeholder="Message..."
           type="text"
@@ -51,26 +95,10 @@ const Input = ({ onSend }) => {
           onKeyDown={handleKeyDown}
           id="messageInput"
         />
-        <button id="sendButton" onClick={gererEnvoie}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 664 663"
-          >
-            <path
-              fill="none"
-              d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"
-            />
-            <path
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="33.67"
-              stroke="#6c6c6c"
-              d="M646.293 331.888L17.7538 17.6187L155.245 331.888M646.293 331.888L17.753 646.157L155.245 331.888M646.293 331.888L318.735 330.228L155.245 331.888"
-            />
-          </svg>
-        </button>
-      </div>
+        <SendButton id="sendButton" onClick={gererEnvoie}>
+          <svg>…</svg>
+        </SendButton>
+      </MessageBox>
     </StyledWrapper>
   )
 }

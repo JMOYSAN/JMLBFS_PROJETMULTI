@@ -1,15 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function Groupe({ currentUser, groupe, setCurrentGroupe }) {
   const [askConfirm, setAskConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
-  const userNom = getNom(currentUser)
+  const [estMembre, setEstMembre] = useState(false)
 
-  const estMembre = (groupe.participants || []).some(
-    (p) => getNom(p) === userNom
-  )
+  useEffect(() => {
+    if (currentUser?.id && groupe?.id) {
+      isMember(currentUser.id, groupe.id).then(setEstMembre)
+    }
+  }, [currentUser, groupe])
 
   const handleClick = () => {
     if (estMembre) {
@@ -17,6 +18,19 @@ function Groupe({ currentUser, groupe, setCurrentGroupe }) {
       return
     }
     setAskConfirm(true)
+  }
+  async function isMember(userId, groupId) {
+    try {
+      const res = await fetch(
+        `http://localhost:3000/groups-users/group/${groupId}`
+      )
+      if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`)
+      const members = await res.json()
+      return members.some((m) => m.id === userId)
+    } catch (err) {
+      console.error('Erreur vérification membre:', err)
+      return false
+    }
   }
 
   const handleJoin = async () => {

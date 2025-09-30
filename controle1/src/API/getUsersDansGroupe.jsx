@@ -2,7 +2,9 @@
 
 export const getGroupUsers = async (groupId) => {
   try {
-    const res = await fetch(`http://localhost:3000/groups-users/${groupId}`)
+    const res = await fetch(
+      `http://localhost:3000/groups-users/group/${groupId}`
+    )
     if (!res.ok) {
       throw new Error(`Erreur HTTP ${res.status}`)
     }

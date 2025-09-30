@@ -1,6 +1,7 @@
 import AjouterDansGroupe from '../Groupes/AjouterDansGroupe.jsx'
 import AddGroup from '../Groupes/AddGroup.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { getGroupUsers } from '../API/getUsersDansGroupe.jsx'
 
 function Topbar({
   utilisateurs = [],
@@ -21,30 +22,27 @@ function Topbar({
   const modifierTheme = () => {
     fetch(`http://localhost:3000/users/${currentUser.id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         theme: currentUser.theme === 'dark' ? 'light' : 'dark',
       }),
     })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Erreur lors de la mise à jour')
-        }
-        return response.json()
+      .then((res) => {
+        if (!res.ok) throw new Error('Erreur lors de la mise à jour')
+        return res.json()
       })
       .then((data) => {
-        console.log('Utilisateur mis à jour :', data)
         setCurrentUser(data)
         localStorage.setItem('user', JSON.stringify(data))
       })
-      .catch((error) => {
-        console.error('Erreur :', error)
+      .catch((err) => {
+        console.error('Erreur :', err)
         alert('La mise à jour a échoué')
       })
   }
+
   const [showAjouterDansGroupe, setshowAjouterDansGroupe] = useState(false)
+
   return (
     <>
       {currentGroupe ? (
@@ -55,14 +53,9 @@ function Topbar({
           </div>
           <div>
             Les membres du groupe sont :
-            <ul>
-              {(currentGroupe.participants ?? []).map((p) => {
-                const nom = getNom(p)
-                return <li key={nom}>{nom}</li>
-              })}
-            </ul>
+            <MembersList currentGroupe={currentGroupe} />
           </div>
-          <div onClick={() => modifierTheme()} className="color-mode-switch">
+          <div onClick={modifierTheme} className="color-mode-switch">
             {currentUser.theme === 'light' ? (
               <i className="fa-solid fa-moon"></i>
             ) : (
@@ -85,11 +78,29 @@ function Topbar({
           setShowForm={setShowAjouter}
           setCurrentGroupe={setCurrentGroupe}
           setGroupes={setGroupes}
-        ></AjouterDansGroupe>
+        />
       ) : (
         <AddGroup modifer={false} showFormCreerGroupe={setShowAjouter} />
       )}
     </>
+  )
+}
+
+function MembersList({ currentGroupe }) {
+  const [members, setMembers] = useState([])
+
+  useEffect(() => {
+    if (currentGroupe?.id) {
+      getGroupUsers(currentGroupe.id).then(setMembers)
+    }
+  }, [currentGroupe])
+
+  return (
+    <ul>
+      {members.map((m) => (
+        <li key={m.id}>{m.username}</li>
+      ))}
+    </ul>
   )
 }
 

@@ -161,7 +161,6 @@ function App() {
   return (
     <>
       {isConnect ? (
-        // ✅ Partie chat
         <div id="chat-container">
           <Utilisateurs
             onLogout={handleLogout}

@@ -13,6 +13,7 @@ function Sidebar({
   groupes,
   setGroups,
   currentUser,
+  setCurrentGroupe,
 }) {
   return (
     <div id="sidebar">
@@ -34,6 +35,7 @@ function Sidebar({
             groupes={groupes}
             setGroupes={setGroups}
             currentUser={currentUser}
+            setCurrentGroupe={setCurrentGroupe}
           />
         </div>
       )}

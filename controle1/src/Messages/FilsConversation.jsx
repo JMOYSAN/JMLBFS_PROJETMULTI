@@ -9,48 +9,73 @@ function FilsConversation({
   currentUser,
   setCurrentUser,
   currentGroupe,
-  onSend,
+  onSend, // you can drop this if API fully replaces it
   utilisateurs,
-  OnClose,
+  onClose,
   setCurrentGroupe,
   setGroupes,
 }) {
   const messagesZoneRef = useRef(null)
-  const [visibleCount, setVisibleCount] = useState(10)
+  const [messages, setMessages] = useState([])
+  const [visibleCount, setVisibleCount] = useState(20)
 
-  const messagesFiltres = currentGroupe?.messages || []
-  const totalMessages = messagesFiltres.length
+  useEffect(() => {
+    if (!currentGroupe?.id) return
 
-  const participantsTyping =
-    currentGroupe?.participants?.filter(
-      (p) => p.isTyping && p.nom !== currentUser
-    ) || []
+    const fetchMessages = async () => {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/messages/group/${currentGroupe.id}`
+        )
+        if (!res.ok) throw new Error('Erreur chargement messages')
+        const data = await res.json()
+        setMessages(data)
+      } catch (err) {
+        console.error('Erreur récupération messages:', err)
+      }
+    }
+
+    fetchMessages()
+  }, [currentGroupe])
 
   useEffect(() => {
     if (messagesZoneRef.current) {
       messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
     }
-  }, [messagesFiltres])
+  }, [messages])
 
-  useEffect(() => {
-    const container = messagesZoneRef.current
-    if (!container) return
+  const handleSend = async (contenu) => {
+    if (!contenu.message?.trim() && !contenu.fichier) return
+    try {
+      console.log('Send payload', {
+        user_id: currentUser?.id,
+        group_id: currentGroupe?.id,
+        content: contenu?.message,
+      })
 
-    const onScroll = () => {
-      if (container.scrollTop === 0 && visibleCount < totalMessages) {
-        const previousScrollHeight = container.scrollHeight
-        setVisibleCount((prev) => Math.min(prev + 10, totalMessages))
-        setTimeout(() => {
-          container.scrollTop = container.scrollHeight - previousScrollHeight
-        }, 0)
-      }
+      const res = await fetch('http://localhost:3000/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          group_id: currentGroupe.id,
+          content: contenu.message,
+        }),
+      })
+      if (!res.ok) throw new Error('Erreur envoi message')
+      const newMsg = await res.json()
+      setMessages((prev) => [...prev, newMsg])
+    } catch (err) {
+      console.error('Erreur envoi message:', err)
     }
+  }
 
-    container.addEventListener('scroll', onScroll)
-    return () => container.removeEventListener('scroll', onScroll)
-  }, [visibleCount, totalMessages])
+  const messagesAffiches = messages.slice(-visibleCount)
 
-  const messagesAffiches = messagesFiltres.slice(-visibleCount)
+  const participantsTyping =
+    currentGroupe?.participants?.filter(
+      (p) => p.isTyping && p.nom !== currentUser?.username
+    ) || []
 
   return (
     <div id="fil">
@@ -59,18 +84,24 @@ function FilsConversation({
         currentGroupe={currentGroupe}
         currentUser={currentUser}
         setCurrentUser={setCurrentUser}
-        OnClose={OnClose}
+        onClose={onClose}
         setCurrentGroupe={setCurrentGroupe}
         setGroupes={setGroupes}
       />
 
       <div id="messages-zone" ref={messagesZoneRef}>
         {messagesAffiches.map((message, index) => {
-          const estMoi = message.auteur === currentUser
+          const estMoi = message.user_id === currentUser.id
           return estMoi ? (
-            <Bulle key={message.id ?? index} message={message} />
+            <Bulle
+              key={message.id ?? index}
+              message={{ ...message, texte: message.content }}
+            />
           ) : (
-            <BulleAutre key={message.id ?? index} message={message} />
+            <BulleAutre
+              key={message.id ?? index}
+              message={{ ...message, texte: message.content }}
+            />
           )
         })}
       </div>
@@ -81,7 +112,7 @@ function FilsConversation({
         ))}
       </div>
 
-      <Chat onSend={onSend} />
+      <Chat onSend={handleSend} />
     </div>
   )
 }

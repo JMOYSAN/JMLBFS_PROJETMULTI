@@ -1,6 +1,6 @@
 import AjouterDansGroupe from '../Groupes/AjouterDansGroupe.jsx'
 import AddGroup from '../Groupes/AddGroup.jsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function Topbar({
   utilisateurs = [],
@@ -44,6 +44,18 @@ function Topbar({
         alert('La mise à jour a échoué')
       })
   }
+  const [members, setMembers] = useState([])
+
+  useEffect(() => {
+    if (!currentGroupe?.id) return
+    fetch(`http://localhost:3000/groups-users/group/${currentGroupe.id}`)
+      .then((res) => res.json())
+      .then((data) => setMembers(data))
+      .catch((err) => {
+        console.error('Erreur chargement membres:', err)
+        setMembers([])
+      })
+  }, [currentGroupe])
   const [showAjouterDansGroupe, setshowAjouterDansGroupe] = useState(false)
   return (
     <>
@@ -56,9 +68,9 @@ function Topbar({
           <div>
             Les membres du groupe sont :
             <ul>
-              {(currentGroupe.participants ?? []).map((p) => {
-                const nom = getNom(p)
-                return <li key={nom}>{nom}</li>
+              {members.map((p) => {
+                const nom = p.username || p.nom || ''
+                return <li key={p.id}>{nom}</li>
               })}
             </ul>
           </div>

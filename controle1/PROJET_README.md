@@ -47,7 +47,7 @@ UI (React Components)
   ├── MockGateway
   ├── MockGroupe.js
   ├── MockMessage.js
-  └── MockUtilisateurs.js
+  └── GetUtilisateurs.js
 
 Tests unitaires
 │

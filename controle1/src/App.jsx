@@ -111,7 +111,6 @@ function App() {
     setShowForm(false)
   }
 
-  // Modifier un groupe
   const modifierGroupe = (listeParticipants = []) => {
     const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
     const normalise = (nom) => ({ nom, isTyping: false })
@@ -164,7 +163,7 @@ function App() {
         <div id="chat-container">
           <Utilisateurs
             onLogout={handleLogout}
-            showFormCreerGroupe={() => setShowForm(true)}
+            showFormCreerGroupe={setShowForm}
             showForm={showForm}
             utilisateurs={utilisateurs}
             setUtilisateurs={setUtilisateurs}
@@ -175,8 +174,9 @@ function App() {
           />
           <Sidebar
             onLogout={handleLogout}
-            showFormCreerGroupe={() => setShowForm(true)}
+            showFormCreerGroupe={setShowForm}
             showForm={showForm}
+            setShowForm={setShowForm}
             utilisateurs={utilisateurs}
             onClose={creerNouveauGroupe}
             setCurrentGroupe={setCurrentGroupe}

@@ -50,6 +50,7 @@ function SectionGroupes({
               [type]: [...prev[type], ...result],
             }))
           }
+          console.log('RESULT', result)
         })
         .catch((err) => {
           console.error('Erreur fetch groupes:', err)
@@ -79,7 +80,7 @@ function SectionGroupes({
   const listeGroupes = useMemo(() => {
     return Array.isArray(groupes) ? groupes.map(normaliserGroupe) : []
   }, [groupes])
-
+  console.log('ListeGroupes:', listeGroupes)
   return (
     <div className="group-section" ref={containerRef}>
       <h3>{titre}</h3>
@@ -100,21 +101,33 @@ function GroupesSidebar({ currentUser, setCurrentGroupe }) {
   const [groupes, setGroupes] = useState({ public: [], private: [] })
 
   useEffect(() => {
-    fetch('http://localhost:3000/groups')
+    console.log('RESULT', currentUser)
+    fetch(`http://localhost:3000/groups/private/${currentUser.id}`)
       .then((res) => res.json())
       .then((data) => {
-        // le backend renvoie un tableau brut
-        const publics = data.filter((g) => g.is_private === 0)
-        const privates = data.filter((g) => g.is_private === 1)
-
-        setGroupes({
-          public: publics,
-          private: privates,
-        })
+        console.log('PRIVATE', data)
+        setGroupes((prev) => ({
+          ...prev,
+          private: data,
+        }))
       })
       .catch((err) => console.error('Erreur fetch groupes init:', err))
   }, [])
 
+  useEffect(() => {
+    fetch('http://localhost:3000/groups/public')
+      .then((res) => res.json())
+      .then((data) => {
+        // le backend renvoie un tableau brut
+        console.log('PUBLIC', data)
+
+        setGroupes((prev) => ({
+          ...prev,
+          public: data,
+        }))
+      })
+      .catch((err) => console.error('Erreur fetch groupes init:', err))
+  }, [])
   return (
     <div className="sidebar-groups">
       <SectionGroupes

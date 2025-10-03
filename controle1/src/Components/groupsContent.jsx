@@ -85,6 +85,7 @@ function SectionGroupes({
       <h3>{titre}</h3>
       {listeGroupes.map((g) => (
         <Groupe
+          key={g.id}
           groupe={g}
           currentUser={currentUser}
           setGroupes={setGroupes}

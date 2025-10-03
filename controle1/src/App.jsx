@@ -156,8 +156,8 @@ function App() {
       document.body.classList.remove('light')
     }
   }, [currentUser])
-  console.log('Page actuelle:', page, 'isConnect:', isConnect)
-  console.log('PGrggrrgr:', groupes)
+  //console.log('Page actuelle:', page, 'isConnect:', isConnect)
+  //console.log('Tous les groupes:', groupes)
   return (
     <>
       {isConnect ? (
@@ -196,12 +196,10 @@ function App() {
           />
         </div>
       ) : page === 'login' ? (
-        // ✅ Page login
         <>
           <Login onLogin={gererNouveauUtilisateur} setPage={setPage} />
         </>
       ) : (
-        // ✅ Page register
         <>
           <Register onRegister={() => setPage('login')} setPage={setPage} />
         </>

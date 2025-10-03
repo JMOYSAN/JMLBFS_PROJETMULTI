@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import Bulle from './Bulle'
 import BulleAutre from './BulleAutre.jsx'
 import Chat from './BarreChat.jsx'
@@ -9,7 +9,7 @@ function FilsConversation({
   currentUser,
   setCurrentUser,
   currentGroupe,
-  onSend, // you can drop this if API fully replaces it
+  onSend,
   utilisateurs,
   onClose,
   setCurrentGroupe,
@@ -17,42 +17,89 @@ function FilsConversation({
 }) {
   const messagesZoneRef = useRef(null)
   const [messages, setMessages] = useState([])
-  const [visibleCount, setVisibleCount] = useState(20)
+  const [hasMore, setHasMore] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
+  // Initial load
   useEffect(() => {
     if (!currentGroupe?.id) return
-
-    const fetchMessages = async () => {
-      try {
-        const res = await fetch(
-          `http://localhost:3000/messages/group/${currentGroupe.id}`
-        )
-        if (!res.ok) throw new Error('Erreur chargement messages')
-        const data = await res.json()
-        setMessages(data)
-      } catch (err) {
-        console.error('Erreur récupération messages:', err)
-      }
-    }
-
+    setMessages([])
+    setHasMore(true)
     fetchMessages()
   }, [currentGroupe])
 
+  const fetchMessages = useCallback(
+    async (beforeId = null) => {
+      if (isLoading || !currentGroupe?.id) return
+      setIsLoading(true)
+
+      try {
+        let url = `http://localhost:3000/messages/group/${currentGroupe.id}?limit=20`
+        if (beforeId) {
+          url += `&before=${beforeId}`
+        }
+
+        const res = await fetch(url)
+        if (!res.ok) throw new Error('Erreur chargement messages')
+        const data = await res.json()
+
+        if (data.length === 0) {
+          setHasMore(false)
+        } else {
+          setMessages((prev) => {
+            return beforeId ? [...data, ...prev] : data
+          })
+
+          if (beforeId && messagesZoneRef.current) {
+            // Maintain scroll position after prepending
+            const container = messagesZoneRef.current
+            const scrollOffset = container.scrollHeight - container.scrollTop
+
+            requestAnimationFrame(() => {
+              container.scrollTop = container.scrollHeight - scrollOffset
+            })
+          }
+        }
+      } catch (err) {
+        console.error('Erreur récupération messages:', err)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [currentGroupe?.id, isLoading]
+  )
+
+  // Scroll listener for lazy loading
   useEffect(() => {
-    if (messagesZoneRef.current) {
+    const container = messagesZoneRef.current
+    if (!container) return
+
+    const handleScroll = () => {
+      if (
+        container.scrollTop === 0 &&
+        hasMore &&
+        !isLoading &&
+        messages.length > 0
+      ) {
+        const firstId = messages[0]?.id
+        if (firstId) fetchMessages(firstId)
+      }
+    }
+
+    container.addEventListener('scroll', handleScroll)
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [messages, fetchMessages, hasMore, isLoading])
+
+  // Scroll to bottom on new message load
+  useEffect(() => {
+    if (messagesZoneRef.current && !isLoading) {
       messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
     }
-  }, [messages])
+  }, [currentGroupe?.id])
 
   const handleSend = async (contenu) => {
     if (!contenu.message?.trim() && !contenu.fichier) return
     try {
-      console.log('Send payload', {
-        user_id: currentUser?.id,
-        group_id: currentGroupe?.id,
-        content: contenu?.message,
-      })
-
       const res = await fetch('http://localhost:3000/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,12 +112,18 @@ function FilsConversation({
       if (!res.ok) throw new Error('Erreur envoi message')
       const newMsg = await res.json()
       setMessages((prev) => [...prev, newMsg])
+
+      // Auto-scroll to bottom
+      requestAnimationFrame(() => {
+        if (messagesZoneRef.current) {
+          messagesZoneRef.current.scrollTop =
+            messagesZoneRef.current.scrollHeight
+        }
+      })
     } catch (err) {
       console.error('Erreur envoi message:', err)
     }
   }
-
-  const messagesAffiches = messages.slice(-visibleCount)
 
   const participantsTyping =
     currentGroupe?.participants?.filter(
@@ -90,20 +143,21 @@ function FilsConversation({
       />
 
       <div id="messages-zone" ref={messagesZoneRef}>
-        {messagesAffiches.map((message, index) => {
+        {messages.map((message) => {
           const estMoi = message.user_id === currentUser.id
           return estMoi ? (
             <Bulle
-              key={message.id ?? index}
+              key={message.id}
               message={{ ...message, texte: message.content }}
             />
           ) : (
             <BulleAutre
-              key={message.id ?? index}
+              key={message.id}
               message={{ ...message, texte: message.content }}
             />
           )
         })}
+        {isLoading && <p className="loading">Chargement...</p>}
       </div>
 
       <div>

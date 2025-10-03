@@ -9,6 +9,7 @@ function Sidebar({
   showFormCreerGroupe,
   showForm,
   utilisateurs,
+  setShowForm,
   onClose,
   groupes,
   setGroups,
@@ -22,7 +23,7 @@ function Sidebar({
           utilisateurs={utilisateurs}
           onClose={onClose}
           currentUser={currentUser}
-          showFormCreerGroupe={showFormCreerGroupe}
+          setShowForm={setShowForm}
         />
       ) : (
         <div className="sidebar-content">

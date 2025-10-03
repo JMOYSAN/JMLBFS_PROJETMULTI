@@ -1,61 +1,76 @@
 import { useState } from 'react'
 
-function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
+function FormCreerGroupe({
+  utilisateurs,
+  currentUser,
+  setShowForm,
+  setGroupes,
+}) {
   const [nomGroupe, setNomGroupe] = useState('')
   const [participant, setParticipant] = useState('')
   const [participantsAjoutes, setParticipantsAjoutes] = useState([])
-  const [suggestions, setSuggestions] = useState([])
   const [groupeVisibility, setGroupeVisibility] = useState('public')
 
-  const getNom = (u) => (typeof u === 'string' ? u : u.nom)
-  const listeNoms = Array.isArray(utilisateurs) ? utilisateurs.map(getNom) : []
+  const getNom = (u) =>
+    typeof u === 'string' ? u : u?.nom || u?.username || ''
 
   const handleAddParticipant = (nom) => {
     const cible = (nom || '').trim()
     if (!cible) return
-    const existe = listeNoms.some(
-      (n) => n.toLowerCase() === cible.toLowerCase()
+    if (
+      participantsAjoutes.some((n) => n.toLowerCase() === cible.toLowerCase())
     )
-    const dejaAjoute = participantsAjoutes.some(
-      (n) => n.toLowerCase() === cible.toLowerCase()
-    )
-    const estMoi =
-      currentUser && cible.toLowerCase() === currentUser.toLowerCase()
-
-    if (existe && !dejaAjoute && !estMoi) {
-      setParticipantsAjoutes((prev) => [...prev, cible])
-      setParticipant('')
-      setSuggestions([])
-    }
+      return
+    setParticipantsAjoutes((prev) => [...prev, cible])
+    setParticipant('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!nomGroupe.trim()) return
-    if (onClose)
-      onClose(nomGroupe.trim(), participantsAjoutes, groupeVisibility)
-  }
+    try {
+      const res = await fetch('http://localhost:3000/groups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: nomGroupe.trim(),
+          is_private: groupeVisibility === 'private' ? 1 : 0,
+        }),
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Erreur création groupe')
+      }
+      const group = await res.json()
+      await fetch('http://localhost:3000/groups-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.id, groupId: group.id }),
+      })
+      for (const nom of participantsAjoutes) {
+        const user = utilisateurs.find((u) => getNom(u) === nom)
+        if (!user) continue
+        await fetch('http://localhost:3000/groups-users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: user.id, groupId: group.id }),
+        })
+      }
+      setGroupes?.((prev) => [...prev, { ...group, participants: [] }])
 
-  const mettreAJourSuggestions = (val) => {
-    const v = val.toLowerCase()
-    const res = listeNoms
-      .filter((n) => n.toLowerCase().includes(v))
-      .filter(
-        (n) =>
-          !participantsAjoutes.some((p) => p.toLowerCase() === n.toLowerCase())
-      )
-      .filter(
-        (n) => !(currentUser && n.toLowerCase() === currentUser.toLowerCase())
-      )
-      .slice(0, 5)
-    setSuggestions(res)
+      setShowForm(false)
+    } catch (err) {
+      console.error('Erreur handleSubmit:', err)
+      alert(err.message)
+    } finally {
+      setShowForm(false)
+    }
   }
 
   return (
     <div className="form-popup">
       <form onSubmit={handleSubmit}>
         <h2>Créer un nouveau groupe</h2>
-
         <label>
           Nom du groupe :
           <input
@@ -65,7 +80,6 @@ function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
             required
           />
         </label>
-
         <label>
           Choisir la visibilité :
           <div className="radio-group">
@@ -89,16 +103,12 @@ function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
             </label>
           </div>
         </label>
-
         <label>
           Ajouter un participant :
           <input
             type="text"
             value={participant}
-            onChange={(e) => {
-              setParticipant(e.target.value)
-              mettreAJourSuggestions(e.target.value)
-            }}
+            onChange={(e) => setParticipant(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault()
@@ -108,17 +118,6 @@ function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
             placeholder="Nom d'utilisateur"
           />
         </label>
-
-        {suggestions.length > 0 && (
-          <ul className="suggestions">
-            {suggestions.map((nom) => (
-              <li key={nom} onClick={() => handleAddParticipant(nom)}>
-                {nom}
-              </li>
-            ))}
-          </ul>
-        )}
-
         {participantsAjoutes.length > 0 && (
           <div>
             <strong>Participants ajoutés :</strong>
@@ -129,7 +128,6 @@ function FormCreerGroupe({ utilisateurs, onClose, currentUser }) {
             </ul>
           </div>
         )}
-
         <button type="submit">Créer le groupe</button>
       </form>
     </div>

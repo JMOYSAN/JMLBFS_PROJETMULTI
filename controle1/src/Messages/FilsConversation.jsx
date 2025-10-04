@@ -19,7 +19,6 @@ function FilsConversation({
   const [messages, setMessages] = useState([])
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const prevCount = useRef(0)
 
   // Charger les messages initiaux
   useEffect(() => {
@@ -44,7 +43,18 @@ function FilsConversation({
         if (data.length === 0) {
           setHasMore(false)
         } else {
-          setMessages((prev) => (beforeId ? [...data, ...prev] : data))
+          setMessages((prev) => {
+            const combined = beforeId ? [...data, ...prev] : data
+            const unique = []
+            const seen = new Set()
+            for (const msg of combined) {
+              if (!seen.has(msg.id)) {
+                seen.add(msg.id)
+                unique.push(msg)
+              }
+            }
+            return unique
+          })
         }
       } catch (err) {
         console.error('Erreur récupération messages:', err)
@@ -73,24 +83,6 @@ function FilsConversation({
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
   }, [messages, fetchMessages, hasMore, isLoading])
-
-  // ✅ Scroll only when new messages appended (no jump on load)
-  useEffect(() => {
-    if (!messagesZoneRef.current || isLoading) return
-
-    const container = messagesZoneRef.current
-    const newCount = messages.length
-
-    // scroll only when messages appended at bottom
-    if (newCount > prevCount.current) {
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior: prevCount.current === 0 ? 'auto' : 'smooth',
-      })
-    }
-
-    prevCount.current = newCount
-  }, [messages.length, isLoading])
 
   const handleSend = async (contenu) => {
     if (!contenu.message?.trim()) return

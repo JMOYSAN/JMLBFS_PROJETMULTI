@@ -1,75 +1,26 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef } from 'react'
 import Bulle from './Bulle'
 import BulleAutre from './BulleAutre.jsx'
 import Chat from './BarreChat.jsx'
 import Topbar from '../Components/Topbar.jsx'
 import Typing from './Typing'
 
+import { useMessages } from '../hooks/useMessages'
+
 function FilsConversation({
   currentUser,
   setCurrentUser,
   currentGroupe,
-  onSend,
   utilisateurs,
   onClose,
   setCurrentGroupe,
   setGroupes,
 }) {
   const messagesZoneRef = useRef(null)
-  const [messages, setMessages] = useState([])
-  const [hasMore, setHasMore] = useState(true)
-  const [isLoading, setIsLoading] = useState(false)
 
-  // Initial load
-  useEffect(() => {
-    if (!currentGroupe?.id) return
-    setMessages([])
-    setHasMore(true)
-    fetchMessages()
-  }, [currentGroupe])
+  const { messages, send, loadMoreMessages, hasMore, pending, members } =
+    useMessages(currentGroupe, currentUser)
 
-  const fetchMessages = useCallback(
-    async (beforeId = null) => {
-      if (isLoading || !currentGroupe?.id) return
-      setIsLoading(true)
-
-      try {
-        let url = `http://localhost:3000/messages/group/${currentGroupe.id}?limit=20`
-        if (beforeId) {
-          url += `&before=${beforeId}`
-        }
-
-        const res = await fetch(url)
-        if (!res.ok) throw new Error('Erreur chargement messages')
-        const data = await res.json()
-
-        if (data.length === 0) {
-          setHasMore(false)
-        } else {
-          setMessages((prev) => {
-            return beforeId ? [...data, ...prev] : data
-          })
-
-          if (beforeId && messagesZoneRef.current) {
-            // Maintain scroll position after prepending
-            const container = messagesZoneRef.current
-            const scrollOffset = container.scrollHeight - container.scrollTop
-
-            requestAnimationFrame(() => {
-              container.scrollTop = container.scrollHeight - scrollOffset
-            })
-          }
-        }
-      } catch (err) {
-        console.error('Erreur récupération messages:', err)
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [currentGroupe?.id, isLoading]
-  )
-
-  // Scroll listener for lazy loading
   useEffect(() => {
     const container = messagesZoneRef.current
     if (!container) return
@@ -78,58 +29,47 @@ function FilsConversation({
       if (
         container.scrollTop === 0 &&
         hasMore &&
-        !isLoading &&
+        !pending &&
         messages.length > 0
       ) {
         const firstId = messages[0]?.id
-        if (firstId) fetchMessages(firstId)
+        if (firstId) {
+          loadMoreMessages(firstId).then((olderMessages) => {
+            if (olderMessages && olderMessages.length > 0) {
+              const scrollOffset = container.scrollHeight - container.scrollTop
+              requestAnimationFrame(() => {
+                container.scrollTop = container.scrollHeight - scrollOffset
+              })
+            }
+          })
+        }
       }
     }
 
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
-  }, [messages, fetchMessages, hasMore, isLoading])
+  }, [messages, loadMoreMessages, hasMore, pending])
 
-  // Scroll to bottom on new message load
   useEffect(() => {
-    if (messagesZoneRef.current && !isLoading) {
+    if (messagesZoneRef.current && !pending) {
       messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
     }
   }, [currentGroupe?.id])
 
   const handleSend = async (contenu) => {
-    if (!contenu.message?.trim() && !contenu.fichier) return
-    try {
-      const res = await fetch('http://localhost:3000/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: currentUser.id,
-          group_id: currentGroupe.id,
-          content: contenu.message,
-        }),
-      })
-      if (!res.ok) throw new Error('Erreur envoi message')
-      const newMsg = await res.json()
-      setMessages((prev) => [...prev, newMsg])
+    await send(contenu)
 
-      // Auto-scroll to bottom
-      requestAnimationFrame(() => {
-        if (messagesZoneRef.current) {
-          messagesZoneRef.current.scrollTop =
-            messagesZoneRef.current.scrollHeight
-        }
-      })
-    } catch (err) {
-      console.error('Erreur envoi message:', err)
-    }
+    requestAnimationFrame(() => {
+      if (messagesZoneRef.current) {
+        messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
+      }
+    })
   }
 
   const participantsTyping =
     currentGroupe?.participants?.filter(
       (p) => p.isTyping && p.nom !== currentUser?.username
     ) || []
-
   return (
     <div id="fil">
       <Topbar
@@ -143,21 +83,22 @@ function FilsConversation({
       />
 
       <div id="messages-zone" ref={messagesZoneRef}>
-        {messages.map((message) => {
+        {pending && messages.length === 0 && (
+          <p className="loading">Chargement des messages...</p>
+        )}
+
+        {[...messages].reverse().map((message) => {
           const estMoi = message.user_id === currentUser.id
           return estMoi ? (
-            <Bulle
-              key={message.id}
-              message={{ ...message, texte: message.content }}
-            />
+            <Bulle key={message.id} message={message} members={members} />
           ) : (
-            <BulleAutre
-              key={message.id}
-              message={{ ...message, texte: message.content }}
-            />
+            <BulleAutre key={message.id} message={message} members={members} />
           )
         })}
-        {isLoading && <p className="loading">Chargement...</p>}
+
+        {pending && messages.length > 0 && (
+          <p className="loading">Chargement...</p>
+        )}
       </div>
 
       <div>

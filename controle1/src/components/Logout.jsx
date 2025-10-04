@@ -1,4 +1,5 @@
 import React from 'react'
+import '../Styles/LogoutButton.css'
 
 const Button = ({ onLogout }) => {
   return (

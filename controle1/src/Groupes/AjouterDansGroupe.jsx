@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useGroups } from '../hooks/useGroups'
 
-function FormAjouter({
+function AjouterDansGroupe({
   utilisateurs = [],
   currentGroupe,
   currentUser,
@@ -9,9 +10,22 @@ function FormAjouter({
   setGroupes,
 }) {
   const [saisie, setSaisie] = useState('')
+  const [members, setMembers] = useState([])
+
+  const { addMemberToGroupe, loadGroupMembers, pending } =
+    useGroups(currentUser)
 
   const getNom = (u) =>
     typeof u === 'string' ? u : u?.nom || u?.username || ''
+
+  // Charger les membres actuels
+  useEffect(() => {
+    if (!currentGroupe?.id) return
+
+    loadGroupMembers(currentGroupe.id)
+      .then((data) => setMembers(data))
+      .catch((err) => console.error('Erreur chargement membres:', err))
+  }, [currentGroupe?.id, loadGroupMembers])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -21,54 +35,37 @@ function FormAjouter({
       const user = utilisateurs.find(
         (u) => getNom(u).toLowerCase() === saisie.trim().toLowerCase()
       )
+
       if (!user) {
         alert('Utilisateur introuvable')
         return
       }
 
-      // appel API pour ajouter ce user au groupe
-      const res = await fetch('http://localhost:3000/groups-users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, groupId: currentGroupe.id }),
-      })
+      await addMemberToGroupe(user.id, currentGroupe.id)
 
-      if (!res.ok) {
-        const err = await res.json()
-        console.error('Erreur ajout API:', err)
-        alert(err.error || "Erreur lors de l'ajout")
-        return
-      }
+      // Recharger les membres
+      const updatedMembers = await loadGroupMembers(currentGroupe.id)
+      setMembers(updatedMembers)
 
-      // recharger membres depuis API
-      const updatedRes = await fetch(
-        `http://localhost:3000/groups-users/group/${currentGroupe.id}`
-      )
-      const members = await updatedRes.json()
-
-      const groupeMisAJour = { ...currentGroupe, participants: members }
-      setCurrentGroupe(groupeMisAJour)
-      setGroupes?.((prev) =>
-        prev.map((g) => (g.id === currentGroupe.id ? groupeMisAJour : g))
-      )
+      alert('Participant ajouté avec succès')
+      setSaisie('')
       setShowForm?.(false)
     } catch (err) {
       console.error('Erreur handleSubmit:', err)
-    } finally {
-      setSaisie('')
+      alert(err.message || "Erreur lors de l'ajout")
     }
   }
 
   return (
     <div className="form-popup">
       <form onSubmit={handleSubmit}>
-        <h2>Ajouter un participant à “{currentGroupe?.nom}”</h2>
+        <h2>Ajouter un participant à "{currentGroupe?.nom}"</h2>
 
         <div>
           Membres actuels :
           <ul>
-            {(currentGroupe?.participants || []).map((p) => (
-              <li key={p.id || getNom(p)}>{getNom(p)}</li>
+            {members.map((p) => (
+              <li key={p.id}>{getNom(p)}</li>
             ))}
           </ul>
         </div>
@@ -80,13 +77,16 @@ function FormAjouter({
             value={saisie}
             onChange={(e) => setSaisie(e.target.value)}
             placeholder="Nom d'utilisateur"
+            disabled={pending}
           />
         </label>
 
-        <button type="submit">Enregistrer</button>
+        <button type="submit" disabled={pending}>
+          {pending ? 'Ajout...' : 'Enregistrer'}
+        </button>
       </form>
     </div>
   )
 }
 
-export default FormAjouter
+export default AjouterDansGroupe

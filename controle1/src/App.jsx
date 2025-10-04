@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 import FilsConversation from './Messages/FilsConversation'
 import Login from './Users/Login'
-
 import Sidebar from './Components/Sidebar.jsx'
 import Utilisateurs from './Users/Utilisateurs.jsx'
 import getGroupes from './Mock/MockGroupe.js'
@@ -12,20 +11,19 @@ function App() {
   const [utilisateurs, setUtilisateurs] = useState([])
   const [currentUser, setCurrentUser] = useState()
   const [groupes, setGroupes] = useState(getGroupes())
-  const [currentGroupe, setCurrentGroupe] = useState([])
+  const [currentGroupe, setCurrentGroupe] = useState(null)
   const [showForm, setShowForm] = useState(false)
   const [isConnect, setIsConnect] = useState(false)
-
   const [page, setPage] = useState('login')
+
+  const ws = useRef(null)
 
   // Charger les utilisateurs depuis l’API
   useEffect(() => {
     fetch(`http://localhost:3000/users`)
       .then((res) => res.json())
-      .then(
-        (result) => setUtilisateurs(result),
-        (error) => console.log(error)
-      )
+      .then((result) => setUtilisateurs(result))
+      .catch((error) => console.error(error))
   }, [])
 
   // Connexion réussie
@@ -42,75 +40,102 @@ function App() {
     setCurrentGroupe(null)
     setIsConnect(false)
     setPage('login')
+    if (ws.current) ws.current.close()
   }
 
-  // Nouveau message
-  const gererNouveauMessageFichier = (contenu) => {
-    if (
-      !currentGroupe ||
-      !currentUser ||
-      (!contenu.message?.trim() && !contenu.fichier)
-    )
-      return
+  // WebSocket
+  useEffect(() => {
+    if (!isConnect || !currentUser) return
 
-    const nouveauMessage = {
-      id: crypto.randomUUID?.() || `${Date.now()}`,
-      texte: contenu.message || '',
-      fichier: contenu.fichier || null,
-      auteur: currentUser,
-      date: new Date().toLocaleString([], {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
+    ws.current = new WebSocket(`ws://localhost:3000?user=${currentUser.id}`)
+
+    ws.current.onopen = () => console.log('Connected to WebSocket')
+    ws.current.onclose = () => console.log('WebSocket closed')
+
+    ws.current.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      if (data.type === 'message') {
+        setGroupes((prev) =>
+          prev.map((g) =>
+            g.id === data.group_id
+              ? { ...g, messages: [...(g.messages || []), data] }
+              : g
+          )
+        )
+      }
+
+      // NEW: update the active group if it matches
+      setCurrentGroupe((prev) => {
+        if (prev && prev.id === data.group_id) {
+          return { ...prev, messages: [...(prev.messages || []), data] }
+        }
+        return prev
+      })
     }
 
-    setGroupes((prevGroupes) => {
-      const nouveauxGroupes = prevGroupes.map((groupe) =>
-        groupe.nom === currentGroupe.nom
-          ? {
-              ...groupe,
-              messages: [...(groupe.messages || []), nouveauMessage],
-            }
-          : groupe
-      )
+    return () => ws.current && ws.current.close()
+  }, [isConnect, currentUser])
 
-      const groupeMisAJour = nouveauxGroupes.find(
-        (g) => g.nom === currentGroupe.nom
-      )
-      setCurrentGroupe(groupeMisAJour)
+  // Récupérer les anciens messages du groupe sélectionné
+  useEffect(() => {
+    if (!currentGroupe?.id) return
 
-      return nouveauxGroupes
-    })
+    fetch(`http://localhost:3000/messages/group/${currentGroupe.id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setGroupes((prev) =>
+          prev.map((g) =>
+            g.id === currentGroupe.id ? { ...g, messages: data } : g
+          )
+        )
+      })
+      .catch((err) => console.error('Erreur récupération messages:', err))
+  }, [currentGroupe?.id])
+
+  // Envoyer un message via WebSocket
+  const gererNouveauMessageFichier = (contenu) => {
+    if (!currentGroupe || !currentUser || !contenu.message?.trim()) return
+
+    const message = {
+      type: 'message',
+      content: contenu.message,
+      user_id: currentUser.id,
+      group_id: currentGroupe.id,
+    }
+
+    ws.current?.send(JSON.stringify(message))
+
+    setGroupes((prev) =>
+      prev.map((g) =>
+        g.id === currentGroupe.id
+          ? { ...g, messages: [...(g.messages || []), message] }
+          : g
+      )
+    )
   }
 
-  // Créer un nouveau groupe
+  // Créer un nouveau groupe localement
   const creerNouveauGroupe = (
     nomGroupe,
     participantsAjoutes,
     groupeVisibility
   ) => {
-    const formaterParticipant = (nom) => ({
-      nom: nom,
-      isTyping: false,
-    })
-
+    const formaterParticipant = (nom) => ({ nom, isTyping: false })
     const groupe = {
+      id: crypto.randomUUID?.() || Date.now(),
       nom: nomGroupe,
       participants: [
         ...participantsAjoutes.map(formaterParticipant),
         formaterParticipant(currentUser),
       ],
       messages: [],
-      groupeVisibility: groupeVisibility,
+      groupeVisibility,
     }
-
     setGroupes((prev) => [...prev, groupe])
     setShowForm(false)
   }
 
+  // Modifier les participants d’un groupe
   const modifierGroupe = (listeParticipants = []) => {
     const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
     const normalise = (nom) => ({ nom, isTyping: false })
@@ -138,25 +163,21 @@ function App() {
     )
   }
 
-  // Restaurer utilisateur en mémoire
+  // Gestion du thème clair/sombre
   useEffect(() => {
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser))
+    if (currentUser?.theme === 'light') document.body.classList.add('light')
+    else document.body.classList.remove('light')
+  }, [currentUser])
+
+  // Restaurer utilisateur depuis localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem('user')
+    if (stored) {
+      setCurrentUser(JSON.parse(stored))
       setIsConnect(true)
     }
   }, [])
 
-  // Gestion thème clair/sombre
-  useEffect(() => {
-    if (currentUser?.theme === 'light') {
-      document.body.classList.add('light')
-    } else {
-      document.body.classList.remove('light')
-    }
-  }, [currentUser])
-  //console.log('Page actuelle:', page, 'isConnect:', isConnect)
-  //console.log('Tous les groupes:', groupes)
   return (
     <>
       {isConnect ? (
@@ -196,13 +217,9 @@ function App() {
           />
         </div>
       ) : page === 'login' ? (
-        <>
-          <Login onLogin={gererNouveauUtilisateur} setPage={setPage} />
-        </>
+        <Login onLogin={gererNouveauUtilisateur} setPage={setPage} />
       ) : (
-        <>
-          <Register onRegister={() => setPage('login')} setPage={setPage} />
-        </>
+        <Register onRegister={() => setPage('login')} setPage={setPage} />
       )}
     </>
   )

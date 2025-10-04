@@ -19,8 +19,9 @@ function FilsConversation({
   const [messages, setMessages] = useState([])
   const [hasMore, setHasMore] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const prevCount = useRef(0)
 
-  // Initial load
+  // Charger les messages initiaux
   useEffect(() => {
     if (!currentGroupe?.id) return
     setMessages([])
@@ -32,12 +33,9 @@ function FilsConversation({
     async (beforeId = null) => {
       if (isLoading || !currentGroupe?.id) return
       setIsLoading(true)
-
       try {
         let url = `http://localhost:3000/messages/group/${currentGroupe.id}?limit=20`
-        if (beforeId) {
-          url += `&before=${beforeId}`
-        }
+        if (beforeId) url += `&before=${beforeId}`
 
         const res = await fetch(url)
         if (!res.ok) throw new Error('Erreur chargement messages')
@@ -46,19 +44,7 @@ function FilsConversation({
         if (data.length === 0) {
           setHasMore(false)
         } else {
-          setMessages((prev) => {
-            return beforeId ? [...data, ...prev] : data
-          })
-
-          if (beforeId && messagesZoneRef.current) {
-            // Maintain scroll position after prepending
-            const container = messagesZoneRef.current
-            const scrollOffset = container.scrollHeight - container.scrollTop
-
-            requestAnimationFrame(() => {
-              container.scrollTop = container.scrollHeight - scrollOffset
-            })
-          }
+          setMessages((prev) => (beforeId ? [...data, ...prev] : data))
         }
       } catch (err) {
         console.error('Erreur récupération messages:', err)
@@ -69,11 +55,10 @@ function FilsConversation({
     [currentGroupe?.id, isLoading]
   )
 
-  // Scroll listener for lazy loading
+  // Lazy load on scroll top
   useEffect(() => {
     const container = messagesZoneRef.current
     if (!container) return
-
     const handleScroll = () => {
       if (
         container.scrollTop === 0 &&
@@ -85,20 +70,30 @@ function FilsConversation({
         if (firstId) fetchMessages(firstId)
       }
     }
-
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
   }, [messages, fetchMessages, hasMore, isLoading])
 
-  // Scroll to bottom on new message load
+  // ✅ Scroll only when new messages appended (no jump on load)
   useEffect(() => {
-    if (messagesZoneRef.current && !isLoading) {
-      messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
+    if (!messagesZoneRef.current || isLoading) return
+
+    const container = messagesZoneRef.current
+    const newCount = messages.length
+
+    // scroll only when messages appended at bottom
+    if (newCount > prevCount.current) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: prevCount.current === 0 ? 'auto' : 'smooth',
+      })
     }
-  }, [currentGroupe?.id])
+
+    prevCount.current = newCount
+  }, [messages.length, isLoading])
 
   const handleSend = async (contenu) => {
-    if (!contenu.message?.trim() && !contenu.fichier) return
+    if (!contenu.message?.trim()) return
     try {
       const res = await fetch('http://localhost:3000/messages', {
         method: 'POST',
@@ -112,14 +107,6 @@ function FilsConversation({
       if (!res.ok) throw new Error('Erreur envoi message')
       const newMsg = await res.json()
       setMessages((prev) => [...prev, newMsg])
-
-      // Auto-scroll to bottom
-      requestAnimationFrame(() => {
-        if (messagesZoneRef.current) {
-          messagesZoneRef.current.scrollTop =
-            messagesZoneRef.current.scrollHeight
-        }
-      })
     } catch (err) {
       console.error('Erreur envoi message:', err)
     }

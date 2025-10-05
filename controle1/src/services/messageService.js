@@ -1,32 +1,29 @@
 const API_URL = 'http://localhost:3000'
 
-// Chargement initial des messages (les plus récents)
-export async function fetchMessages(groupId, limit = 20) {
+export function fetchMessages(groupId, limit = 20) {
   const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}`
 
-  const res = await fetch(url)
-
-  if (!res.ok) {
-    throw new Error('Erreur chargement messages')
-  }
-
-  return res.json()
+  return fetch(url).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur chargement messages')
+    }
+    return res.json()
+  })
 }
 
-export async function fetchOlderMessages(groupId, beforeId, limit = 20) {
+export function fetchOlderMessages(groupId, beforeId, limit = 20) {
   const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}&beforeId=${beforeId}`
 
-  const res = await fetch(url)
-
-  if (!res.ok) {
-    throw new Error('Erreur chargement messages anciens')
-  }
-
-  return res.json()
+  return fetch(url).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur chargement messages anciens')
+    }
+    return res.json()
+  })
 }
 
-export async function sendMessage(userId, groupId, content) {
-  const res = await fetch(`${API_URL}/messages`, {
+export function sendMessage(userId, groupId, content) {
+  return fetch(`${API_URL}/messages`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -34,11 +31,10 @@ export async function sendMessage(userId, groupId, content) {
       group_id: groupId,
       content,
     }),
+  }).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur envoi message')
+    }
+    return res.json()
   })
-
-  if (!res.ok) {
-    throw new Error('Erreur envoi message')
-  }
-
-  return res.json()
 }

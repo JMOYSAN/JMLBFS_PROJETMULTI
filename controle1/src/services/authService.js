@@ -1,35 +1,33 @@
 const API_URL = 'http://localhost:3000'
 
-export async function login(username, password) {
-  const res = await fetch(`${API_URL}/users/login`, {
+export function login(username, password) {
+  return fetch(`${API_URL}/users/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   })
-
-  const data = await res.json()
-
-  if (!res.ok) {
-    throw new Error(data.error || 'Erreur de connexion')
-  }
-
-  return data
+    .then((res) => res.json().then((data) => ({ res, data })))
+    .then(({ res, data }) => {
+      if (!res.ok) {
+        throw new Error(data.error || 'Erreur de connexion')
+      }
+      return data
+    })
 }
 
-export async function register(username, password) {
-  const res = await fetch(`${API_URL}/users/register`, {
+export function register(username, password) {
+  return fetch(`${API_URL}/users/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   })
-
-  const data = await res.json()
-
-  if (res.status !== 201) {
-    throw new Error(data.error || "Erreur lors de l'inscription")
-  }
-
-  return data
+    .then((res) => res.json().then((data) => ({ res, data })))
+    .then(({ res, data }) => {
+      if (res.status !== 201) {
+        throw new Error(data.error || "Erreur lors de l'inscription")
+      }
+      return data
+    })
 }
 
 export function saveUserToStorage(user) {
@@ -57,16 +55,15 @@ export function clearUserFromStorage() {
   localStorage.clear()
 }
 
-export async function updateUserTheme(userId, newTheme) {
-  const res = await fetch(`${API_URL}/users/${userId}`, {
+export function updateUserTheme(userId, newTheme) {
+  return fetch(`${API_URL}/users/${userId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ theme: newTheme }),
+  }).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur lors de la mise à jour du thème')
+    }
+    return res.json()
   })
-
-  if (!res.ok) {
-    throw new Error('Erreur lors de la mise à jour du thème')
-  }
-
-  return res.json()
 }

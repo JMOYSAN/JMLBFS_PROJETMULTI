@@ -1,88 +1,83 @@
 const API_URL = 'http://localhost:3000'
 
-export async function listPublicGroups() {
-  const res = await fetch(`${API_URL}/groups/public`)
-
-  if (!res.ok) {
-    throw new Error('Erreur lors de la récupération des groupes publics')
-  }
-
-  return res.json()
+export function listPublicGroups() {
+  return fetch(`${API_URL}/groups/public`).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur lors de la récupération des groupes publics')
+    }
+    return res.json()
+  })
 }
 
-export async function fetchGroupMembers(groupId) {
-  const res = await fetch(`${API_URL}/groups-users/group/${groupId}`)
-  if (!res.ok) {
-    throw new Error('Erreur récupération membres du groupe')
-  }
-  const data = await res.json()
-  return data
+export function fetchGroupMembers(groupId) {
+  return fetch(`${API_URL}/groups-users/group/${groupId}`).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur récupération membres du groupe')
+    }
+    return res.json()
+  })
 }
 
-export async function listPrivateGroups(userId) {
-  const res = await fetch(`${API_URL}/groups/private/${userId}`)
-  if (!res.ok) {
-    throw new Error('Erreur lors de la récupération des groupes privés')
-  }
-
-  const data = await res.json()
-  return data
+export function listPrivateGroups(userId) {
+  return fetch(`${API_URL}/groups/private/${userId}`).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur lors de la récupération des groupes privés')
+    }
+    return res.json()
+  })
 }
 
-export async function fetchNextGroups(type, lastGroupId, limit = 20) {
-  await delay()
-  const res = await fetch(
+export function fetchNextGroups(type, lastGroupId, limit = 20) {
+  return fetch(
     `${API_URL}/groups/next/${type}/${lastGroupId}?limit=${limit}`
-  )
-
-  if (!res.ok) {
-    throw new Error(`Erreur HTTP ${res.status}`)
-  }
-
-  return res.json()
+  ).then((res) => {
+    if (!res.ok) {
+      throw new Error(`Erreur HTTP ${res.status}`)
+    }
+    return res.json()
+  })
 }
 
-export async function createGroup(name, isPrivate) {
-  const res = await fetch(`${API_URL}/groups`, {
+export function createGroup(name, isPrivate) {
+  return fetch(`${API_URL}/groups`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       name: name.trim(),
       is_private: isPrivate ? 1 : 0,
     }),
+  }).then((res) => {
+    if (!res.ok) {
+      return res.json().then((err) => {
+        throw new Error(err.error || 'Erreur création groupe')
+      })
+    }
+    return res.json()
   })
-
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.error || 'Erreur création groupe')
-  }
-
-  return res.json()
 }
 
-export async function addUserToGroup(userId, groupId) {
-  const res = await fetch(`${API_URL}/groups-users`, {
+export function addUserToGroup(userId, groupId) {
+  return fetch(`${API_URL}/groups-users`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, groupId }),
+  }).then((res) => {
+    if (!res.ok) {
+      return res.json().then((err) => {
+        throw new Error(err.error || "Erreur lors de l'ajout au groupe")
+      })
+    }
+    return res.json()
   })
-
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(err.error || "Erreur lors de l'ajout au groupe")
-  }
-
-  return res.json()
 }
 
-export async function getGroupMembers(groupId) {
-  const res = await fetch(`${API_URL}/groups-users/group/${groupId}`)
-
-  if (!res.ok) {
-    throw new Error('Erreur lors de la récupération des membres')
-  }
-
-  return res.json()
+export function getGroupMembers(groupId) {
+  return fetch(`${API_URL}/groups-users/group/${groupId}`).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur lors de la récupération des membres')
+    }
+    return res.json()
+  })
 }
 
 export function normalizeGroup(groupe, index = 0) {

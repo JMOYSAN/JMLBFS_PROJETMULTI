@@ -24,7 +24,6 @@ function FilsConversation({
   useEffect(() => {
     const container = messagesZoneRef.current
     if (!container) return
-
     const handleScroll = () => {
       if (
         container.scrollTop === 0 &&
@@ -45,7 +44,6 @@ function FilsConversation({
         }
       }
     }
-
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
   }, [messages, loadMoreMessages, hasMore, pending])

@@ -30,6 +30,7 @@ function App() {
     logout()
     setCurrentGroupe(null)
     setPage('login')
+    if (ws.current) ws.current.close()
   }
 
   const creerNouveauGroupe = async (

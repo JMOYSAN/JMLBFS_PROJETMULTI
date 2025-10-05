@@ -1,15 +1,13 @@
 import { useState } from 'react'
+import { useGroups } from '../hooks/useGroups'
 
-function FormCreerGroupe({
-  utilisateurs,
-  currentUser,
-  setShowForm,
-  setGroupes,
-}) {
+function FormCreerGroupe({ utilisateurs, currentUser, setShowForm }) {
   const [nomGroupe, setNomGroupe] = useState('')
   const [participant, setParticipant] = useState('')
   const [participantsAjoutes, setParticipantsAjoutes] = useState([])
   const [groupeVisibility, setGroupeVisibility] = useState('public')
+
+  const { creerGroupe, pending } = useGroups(currentUser)
 
   const getNom = (u) =>
     typeof u === 'string' ? u : u?.nom || u?.username || ''
@@ -28,42 +26,14 @@ function FormCreerGroupe({
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!nomGroupe.trim()) return
-    try {
-      const res = await fetch('http://localhost:3000/groups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: nomGroupe.trim(),
-          is_private: groupeVisibility === 'private' ? 1 : 0,
-        }),
-      })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Erreur création groupe')
-      }
-      const group = await res.json()
-      await fetch('http://localhost:3000/groups-users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: currentUser.id, groupId: group.id }),
-      })
-      for (const nom of participantsAjoutes) {
-        const user = utilisateurs.find((u) => getNom(u) === nom)
-        if (!user) continue
-        await fetch('http://localhost:3000/groups-users', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: user.id, groupId: group.id }),
-        })
-      }
-      setGroupes?.((prev) => [...prev, { ...group, participants: [] }])
 
+    try {
+      const isPrivate = groupeVisibility === 'private'
+      await creerGroupe(nomGroupe, participantsAjoutes, isPrivate, utilisateurs)
       setShowForm(false)
     } catch (err) {
       console.error('Erreur handleSubmit:', err)
-      alert(err.message)
-    } finally {
-      setShowForm(false)
+      alert(err.message || 'Erreur lors de la création du groupe')
     }
   }
 
@@ -78,6 +48,7 @@ function FormCreerGroupe({
             value={nomGroupe}
             onChange={(e) => setNomGroupe(e.target.value)}
             required
+            disabled={pending}
           />
         </label>
         <label>
@@ -89,6 +60,7 @@ function FormCreerGroupe({
                 value="public"
                 checked={groupeVisibility === 'public'}
                 onChange={(e) => setGroupeVisibility(e.target.value)}
+                disabled={pending}
               />
               Public
             </label>
@@ -98,6 +70,7 @@ function FormCreerGroupe({
                 value="private"
                 checked={groupeVisibility === 'private'}
                 onChange={(e) => setGroupeVisibility(e.target.value)}
+                disabled={pending}
               />
               Privé
             </label>
@@ -116,6 +89,7 @@ function FormCreerGroupe({
               }
             }}
             placeholder="Nom d'utilisateur"
+            disabled={pending}
           />
         </label>
         {participantsAjoutes.length > 0 && (
@@ -128,7 +102,9 @@ function FormCreerGroupe({
             </ul>
           </div>
         )}
-        <button type="submit">Créer le groupe</button>
+        <button type="submit" disabled={pending}>
+          {pending ? 'Création...' : 'Créer le groupe'}
+        </button>
       </form>
     </div>
   )

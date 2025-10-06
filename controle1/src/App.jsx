@@ -1,3 +1,4 @@
+// src/App.jsx
 import { useState } from 'react'
 import FilsConversation from './Messages/FilsConversation'
 import Login from './Users/Login'
@@ -14,9 +15,7 @@ function App() {
   const [page, setPage] = useState('login')
 
   const { currentUser, setCurrentUser, isConnect, logout } = useAuth()
-
   const { utilisateurs, setUtilisateurs } = useUsers()
-
   const {
     groupes,
     setGroupes,
@@ -30,7 +29,6 @@ function App() {
     logout()
     setCurrentGroupe(null)
     setPage('login')
-    if (ws.current) ws.current.close()
   }
 
   const creerNouveauGroupe = async (
@@ -50,9 +48,7 @@ function App() {
 
   const modifierGroupe = async (listeParticipants = []) => {
     if (!currentGroupe?.id) return
-
     const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
-
     try {
       for (const participant of listeParticipants) {
         const nom = getNom(participant)

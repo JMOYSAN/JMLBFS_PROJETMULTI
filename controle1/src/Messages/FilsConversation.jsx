@@ -17,10 +17,10 @@ function FilsConversation({
   setGroupes,
 }) {
   const messagesZoneRef = useRef(null)
-
-  const { messages, send, loadMoreMessages, hasMore, pending, members } =
+  const { messages, loadMoreMessages, hasMore, pending, members, refresh } =
     useMessages(currentGroupe, currentUser)
 
+  // --- Lazy load
   useEffect(() => {
     const container = messagesZoneRef.current
     if (!container) return
@@ -54,20 +54,37 @@ function FilsConversation({
     }
   }, [currentGroupe?.id])
 
+  // --- Send message through API (persistent + Redis broadcast)
   const handleSend = async (contenu) => {
-    await send(contenu)
-
-    requestAnimationFrame(() => {
-      if (messagesZoneRef.current) {
-        messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
-      }
-    })
+    if (!currentUser || !currentGroupe || !contenu?.message?.trim()) return
+    try {
+      const res = await fetch('http://localhost:3000/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: currentUser.id,
+          group_id: currentGroupe.id,
+          content: contenu.message,
+        }),
+      })
+      if (!res.ok) throw new Error('Erreur envoi message')
+      await res.json() // the live update will arrive via WebSocket
+      requestAnimationFrame(() => {
+        if (messagesZoneRef.current) {
+          messagesZoneRef.current.scrollTop =
+            messagesZoneRef.current.scrollHeight
+        }
+      })
+    } catch (err) {
+      console.error('Erreur envoi message:', err)
+    }
   }
 
   const participantsTyping =
     currentGroupe?.participants?.filter(
       (p) => p.isTyping && p.nom !== currentUser?.username
     ) || []
+
   return (
     <div id="fil">
       <Topbar

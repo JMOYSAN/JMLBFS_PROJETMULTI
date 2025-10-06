@@ -1,19 +1,22 @@
 import FormCreerGroupe from '../Form/FormCreerGroupe.jsx'
-
 import Logout from './Logout.jsx'
 import AddGroup from '../Groupes/AddGroup.jsx'
 import GroupesSidebar from './groupsContent.jsx'
+import { useGroups } from '../hooks/useGroups'
 
 function Sidebar({
   onLogout,
   showFormCreerGroupe,
   showForm,
   utilisateurs,
+  setShowForm,
   onClose,
-  groupes,
-  setGroups,
   currentUser,
+  setCurrentGroupe,
 }) {
+  // Hook groupes pour le lazy loading
+  const { groupes, loadMoreGroups } = useGroups(currentUser)
+
   return (
     <div id="sidebar">
       {showForm ? (
@@ -21,7 +24,7 @@ function Sidebar({
           utilisateurs={utilisateurs}
           onClose={onClose}
           currentUser={currentUser}
-          showFormCreerGroupe={showFormCreerGroupe}
+          setShowForm={setShowForm}
         />
       ) : (
         <div className="sidebar-content">
@@ -32,8 +35,9 @@ function Sidebar({
 
           <GroupesSidebar
             groupes={groupes}
-            setGroupes={setGroups}
+            loadMoreGroups={loadMoreGroups}
             currentUser={currentUser}
+            setCurrentGroupe={setCurrentGroupe}
           />
         </div>
       )}

@@ -1,156 +1,92 @@
-import { useMemo, useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useGroups } from '../hooks/useGroups'
 
-function FormAjouter({
+function AjouterDansGroupe({
   utilisateurs = [],
   currentGroupe,
   currentUser,
-  onClose,
   setShowForm,
   setCurrentGroupe,
   setGroupes,
 }) {
-  const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
-  const moi = getNom(currentUser)
-  const membresActuels = useMemo(
-    () => (currentGroupe?.participants ?? []).map(getNom).filter(Boolean),
-    [currentGroupe]
-  )
-
-  const listeNoms = useMemo(
-    () => utilisateurs.map(getNom).filter(Boolean),
-    [utilisateurs]
-  )
-
   const [saisie, setSaisie] = useState('')
-  const [participantsAjoutes, setParticipantsAjoutes] = useState([])
-  const [suggestions, setSuggestions] = useState([])
+  const [members, setMembers] = useState([])
 
-  const handleAddParticipant = (nom) => {
-    const cible = (nom || '').trim()
-    if (!cible) return
-    const lower = cible.toLowerCase()
-    if (lower === moi.toLowerCase()) return
-    if (membresActuels.some((n) => n.toLowerCase() === lower)) return
-    if (participantsAjoutes.some((n) => n.toLowerCase() === lower)) return
-    setParticipantsAjoutes((prev) => [...prev, cible])
-    setSaisie('')
-    setSuggestions([])
-  }
+  const { addMemberToGroupe, loadGroupMembers, pending } =
+    useGroups(currentUser)
 
-  const mettreAJourSuggestions = (val) => {
-    const q = (val || '').toLowerCase()
-    if (!q) return setSuggestions([])
-    const exclu = new Set([
-      ...membresActuels.map((n) => n.toLowerCase()),
-      ...participantsAjoutes.map((n) => n.toLowerCase()),
-      moi.toLowerCase(),
-    ])
-    const res = listeNoms
-      .filter((n) => n.toLowerCase().includes(q))
-      .filter((n) => !exclu.has(n.toLowerCase()))
-      .slice(0, 5)
-    setSuggestions(res)
-  }
+  const getNom = (u) =>
+    typeof u === 'string' ? u : u?.nom || u?.username || ''
 
-  const handleSubmit = (e) => {
+  // Charger les membres actuels
+  useEffect(() => {
+    if (!currentGroupe?.id) return
+
+    loadGroupMembers(currentGroupe.id)
+      .then((data) => setMembers(data))
+      .catch((err) => console.error('Erreur chargement membres:', err))
+  }, [currentGroupe?.id, loadGroupMembers])
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!currentGroupe) return
+    if (!currentGroupe?.id || !saisie.trim()) return
 
-    const setSeen = new Set()
-    const norm = (nom) => ({ nom, isTyping: false })
-
-    const exists = (arr, nom) =>
-      arr.some((p) => getNom(p).toLowerCase() === nom.toLowerCase())
-
-    const fusion = [
-      ...(currentGroupe.participants || []),
-      ...participantsAjoutes
-        .filter((nom) => !exists(currentGroupe.participants || [], nom))
-        .map(norm),
-    ]
-      .filter((p) => {
-        const n = getNom(p)
-        if (!n) return false
-        const k = n.toLowerCase()
-        if (setSeen.has(k)) return false
-        setSeen.add(k)
-        return true
-      })
-      .map((p) =>
-        typeof p === 'string' ? norm(p) : { nom: p.nom, isTyping: !!p.isTyping }
+    try {
+      const user = utilisateurs.find(
+        (u) => getNom(u).toLowerCase() === saisie.trim().toLowerCase()
       )
 
-    const groupeMisAJour = { ...currentGroupe, participants: fusion }
+      if (!user) {
+        alert('Utilisateur introuvable')
+        return
+      }
 
-    setCurrentGroupe(groupeMisAJour)
-    onClose?.(groupeMisAJour.participants)
+      await addMemberToGroupe(user.id, currentGroupe.id)
 
-    setGroupes?.((prev) =>
-      prev.map((g) => (g.nom === currentGroupe.nom ? groupeMisAJour : g))
-    )
-    setCurrentGroupe?.(groupeMisAJour)
-    setShowForm?.(false)
+      // Recharger les membres
+      const updatedMembers = await loadGroupMembers(currentGroupe.id)
+      setMembers(updatedMembers)
+
+      alert('Participant ajouté avec succès')
+      setSaisie('')
+      setShowForm?.(false)
+    } catch (err) {
+      console.error('Erreur handleSubmit:', err)
+      alert(err.message || "Erreur lors de l'ajout")
+    }
   }
 
   return (
     <div className="form-popup">
       <form onSubmit={handleSubmit}>
-        <h2>Ajouter des participants à “{currentGroupe?.nom}”</h2>
+        <h2>Ajouter un participant à "{currentGroupe?.nom}"</h2>
 
         <div>
           Membres actuels :
           <ul>
-            {membresActuels.map((n) => (
-              <li key={n}>{n}</li>
+            {members.map((p) => (
+              <li key={p.id}>{getNom(p)}</li>
             ))}
           </ul>
         </div>
 
         <label>
-          Ajouter un participant :
+          Nom d'utilisateur :
           <input
             type="text"
             value={saisie}
-            onChange={(e) => {
-              const v = e.target.value
-              setSaisie(v)
-              mettreAJourSuggestions(v)
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                handleAddParticipant(saisie)
-              }
-            }}
+            onChange={(e) => setSaisie(e.target.value)}
             placeholder="Nom d'utilisateur"
+            disabled={pending}
           />
         </label>
 
-        {suggestions.length > 0 && (
-          <ul className="suggestions">
-            {suggestions.map((nom) => (
-              <li key={nom} onClick={() => handleAddParticipant(nom)}>
-                {nom}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {participantsAjoutes.length > 0 && (
-          <div>
-            <strong>À ajouter :</strong>
-            <ul className="participants-list">
-              {participantsAjoutes.map((nom) => (
-                <li key={nom}>{nom}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        <button type="submit">Enregistrer</button>
+        <button type="submit" disabled={pending}>
+          {pending ? 'Ajout...' : 'Enregistrer'}
+        </button>
       </form>
     </div>
   )
 }
 
-export default FormAjouter
+export default AjouterDansGroupe

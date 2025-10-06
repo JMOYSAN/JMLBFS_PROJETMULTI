@@ -12,7 +12,7 @@ async function genererUtilisateurs() {
   }
 }
 
-export async function getUtilisateursLazy(id) {
+export async function getUtilisateursById(id) {
   try {
     const response = await fetch(`http://localhost:3000/users/next/${id}`)
     if (!response.ok) {

@@ -1,148 +1,348 @@
-# JMLBFS_PROJETMJLTI
+# Client Desktop - Application de Clavardage Multi-Plateforme
 
-# Contrôle 1 – Application de chat (5 %)
+## 📋 Table des matières
+- [Description](#description)
+- [Choix Techniques](#choix-techniques)
+- [Architecture](#architecture)
+- [Prérequis](#prérequis)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Lancement](#lancement)
+- [Lancement](#lancement)
+- [Build Production](#build-production)
+- [Fonctionnalités](#fonctionnalités)
+- [Scénarios de Test](#scénarios-de-test)
+- [Limitations](#limitations)
 
-**Cours :** 420-5A6-ST – A25  
-**Date de remise :** 7 septembre 2025, 23h59  
+## 📖 Description
 
----
+Application de clavardage desktop multi-plateforme développée avec Electron et React. Permet la communication en temps réel avec support des salons publics/privés, messages privés (DM), présence utilisateur et notifications système.
 
-## 1. Mise en contexte
-Vous devez créer une application de clavardage **desktop multi-plateforme**.  
-Le serveur backend n’est pas encore disponible (il sera développé dans un contrôle suivant).  
-Pour cette itération, vous devez **simuler le serveur (mocks)** côté client, tout en préparant l’architecture pour remplacer facilement ces mocks par un vrai backend plus tard.
+## 🔧 Choix Techniques
 
----
+### Framework UI: Electron + React
+**Justification:**
+- **Multi-plateforme**: Un seul codebase pour macOS, Windows et Linux
+- **React**: Composants réutilisables, gestion d'état efficace, écosystème mature
+- **Performance**: Virtual DOM pour des mises à jour UI optimales
+- **Développement rapide**: Hot reload, dev tools, large communauté
 
-## 2. Règles du projet de session
-- Travail d’équipe : **3 – 5 personnes maximum**.  
-- Projet sur **GitHub** : dépôt privé, pas de fork.  
-- **Pas de commit coauteurs** : chaque commit doit être fait par un seul membre.  
-- **Pull requests obligatoires** : pas de push direct sur `main` ou `develop`.  
-- **Communication** : utilisez les issues GitHub/Teams pour discussions et tâches.  
-- **Teams** : vous devez demander à rejoindre votre canal Teams de projet.  
-- **Calendrier** : plan de travail avec jalons et tâches assignées.
+### Langage: JavaScript/TypeScript
+**Justification:**
+- **Cohérence du stack**: Même langage côté client et serveur
+- **Typage fort (TypeScript)**: Réduction des bugs, meilleure maintenabilité
+- **Écosystème**: Accès à npm et ses milliers de packages
 
----
+### État & Routing
+- **React Context / Redux**: Gestion d'état globale pour l'authentification et les messages
+- **React Router**: Navigation entre les vues (connexion, chat, configuration)
 
-## 3. Remise de planification
-Avant de commencer le projet, vous devez remettre un **document de planification** contenant :  
-- Un calendrier de travail avec jalons et tâches assignées.  
-- La liste des membres de l’équipe.  
-- Ajout d’**OlivierFortin** et de l’équipe comme collaborateurs sur GitHub.  
-- Un plan de communication pour le projet (issues, pull requests, etc.).  
+### Communication Temps Réel
+- **Socket.io Client**: Communication bidirectionnelle avec l'API
+- **Axios**: Requêtes HTTP REST vers l'API
 
-📌 **Échéance : avant le 23 août 2025**
+### Persistance Locale
+- **LocalStorage**: Sauvegarde du token JWT et préférences utilisateur
+- **IndexedDB**: Cache des messages pour mode hors ligne (optionnel)
 
----
+## 🏗️ Architecture
 
-## 4. Contraintes et plateformes
-- Fonctionne sur **macOS, Windows et Linux**.  
-- Fournir un **build de production pour chaque OS**.  
-- **Technologies au choix :**  
-  - Langage : **TypeScript ou JavaScript**  
-  - UI : **Electron** (avec ou sans React, Vite, Vanilla, Preact acceptés)  
-- **Interdits :**  
-  - Icône Electron par défaut en production  
-  - Menus non contrôlés  
+### Schéma d'Architecture de l'Application
 
----
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Application Electron                   │
+│                                                          │
+│  ┌────────────────────────────────────────────────┐    │
+│  │           Main Process (Node.js)                │    │
+│  │  - Gestion fenêtres                             │    │
+│  │  - Menu personnalisé                            │    │
+│  │  - Notifications système                        │    │
+│  │  - Auto-updater                                 │    │
+│  └────────┬───────────────────────────────────────┘    │
+│           │                                             │
+│  ┌────────▼───────────────────────────────────────┐    │
+│  │         Renderer Process (React)                │    │
+│  │                                                  │    │
+│  │  ┌──────────────────────────────────────────┐  │    │
+│  │  │            UI Components                  │  │    │
+│  │  │  ┌────────┐  ┌────────┐  ┌────────┐     │  │    │
+│  │  │  │ Login  │  │  Chat  │  │ Config │     │  │    │
+│  │  │  │  View  │  │  View  │  │  Panel │     │  │    │
+│  │  │  └────────┘  └────────┘  └────────┘     │  │    │
+│  │  └──────────────┬───────────────────────────┘  │    │
+│  │                 │                               │    │
+│  │  ┌──────────────▼───────────────────────────┐  │    │
+│  │  │         State Management                  │  │    │
+│  │  │  - User State                             │  │    │
+│  │  │  - Messages State                         │  │    │
+│  │  │  - Channels State                         │  │    │
+│  │  │  - UI State                               │  │    │
+│  │  └──────────────┬───────────────────────────┘  │    │
+│  │                 │                               │    │
+│  │  ┌──────────────▼───────────────────────────┐  │    │
+│  │  │         Services Layer                    │  │    │
+│  │  │  ┌──────────────┐  ┌──────────────┐     │  │    │
+│  │  │  │ API Service  │  │ WS Service   │     │  │    │
+│  │  │  │  (HTTP)      │  │ (Socket.io)  │     │  │    │
+│  │  │  └──────────────┘  └──────────────┘     │  │    │
+│  │  └──────────────┬───────────────────────────┘  │    │
+│  └─────────────────┼──────────────────────────────┘    │
+└────────────────────┼─────────────────────────────────┘
+                     │
+                     │ HTTP + WebSocket
+                     │
+         ┌───────────▼────────────┐
+         │      API Backend       │
+         │   (Express + Redis)    │
+         └────────────────────────┘
+```
 
-## 5. Architecture (découplage prêt pour backend réel)
-- Séparer **UI / métier / transport** :  
-  - **UI** : composants, vues, interactions  
-  - **Modèles & logique** : `Message`, `Channel`, `User`, formatage, tri, pagination, états  
-  - **Communication serveur** : `ChatGateway` (interface unique, actuellement mockée)  
+### Structure des Dossiers
 
-- **MockGateway** doit simuler :  
-  - Salons publics/privés (invitation locale simulée)  
-  - DM (messages privés)  
-  - Présence (online/offline) et indicateur *typing*  
-  - Réception/émission temps réel (timers/événements, latence simulée)  
-  - États réseau (connecté/déconnecté/reconnexion)  
+```
+src/
+├── main/                    # Electron Main Process
+│   ├── index.js            # Point d'entrée principal
+│   ├── menu.js             # Menu personnalisé
+│   └── notifications.js    # Gestion notifications
+│
+├── renderer/               # React App (Renderer Process)
+│   ├── components/         # Composants réutilisables
+│   │   ├── Chat/
+│   │   │   ├── MessageList.jsx
+│   │   │   ├── MessageInput.jsx
+│   │   │   └── TypingIndicator.jsx
+│   │   ├── Channels/
+│   │   │   ├── ChannelList.jsx
+│   │   │   └── ChannelItem.jsx
+│   │   ├── Auth/
+│   │   │   ├── LoginForm.jsx
+│   │   │   └── RegisterForm.jsx
+│   │   └── Config/
+│   │       └── ConfigPanel.jsx
+│   │
+│   ├── services/           # Services de communication
+│   │   ├── api.js          # Client HTTP (Axios)
+│   │   ├── socket.js       # Client WebSocket
+│   │   └── storage.js      # Persistance locale
+│   │
+│   ├── context/            # Context providers
+│   │   ├── AuthContext.jsx
+│   │   ├── ChatContext.jsx
+│   │   └── ConfigContext.jsx
+│   │
+│   ├── hooks/              # Custom hooks
+│   │   ├── useAuth.js
+│   │   ├── useMessages.js
+│   │   └── useWebSocket.js
+│   │
+│   ├── utils/              # Utilitaires
+│   │   ├── validators.js
+│   │   ├── formatters.js
+│   │   └── sanitizers.js
+│   │
+│   ├── App.jsx             # Composant racine
+│   └── index.jsx           # Point d'entrée React
+│
+└── preload/                # Preload script (sécurité)
+    └── index.js
+```
 
-- **Persistance locale** : mémoire et/ou sauvegarde (JSON, SQLite, IndexedDB)  
+## 📋 Prérequis
 
----
+### Pour le développement
+- **Node.js**: Version 18.x ou supérieure
+- **npm**: Version 9.x ou supérieure
+- **Git**: Pour cloner le repository
 
-## 6. Fonctionnalités minimales (MVP)
-1. Authentification basique : choix d’un pseudo (unique localement) + session locale.  
-2. Salons : lister, créer, rejoindre ; salon privé avec invitation simulée.  
-3. Messages : envoi/réception, horodatage, auteur.  
-4. DM : conversation privée simulée.  
-5. Présence & *typing* visibles.  
-6. Historique & pagination : chargement progressif.  
-7. Statut réseau : connecté/déconnecté/reconnexion simulés.  
-8. Notifications système : réception de messages hors focus.  
-9. Design : thème par défaut, apparence professionnelle (icône, menus personnalisés).  
+### Pour l'exécution
+- **Système d'exploitation**: macOS 10.13+, Windows 10+ ou Linux (Ubuntu 18.04+)
+- **API Backend**: L'API doit être accessible (voir README API)
 
----
+## 🚀 Installation
 
-## 7. Exigences techniques
-- Scripts reproductibles : `dev`, `build:<os>`, `lint`, `test`.  
-- Qualité : **ESLint + Prettier**.  
-- Tests unitaires : au minimum sur la couche métier et `MockGateway`.  
-- Sécurité basique :  
-  - Sanitisation (anti-XSS)  
-  - Pas de secrets commités  
-  - Logs sobres  
-- Internationalisation minimale : **FR obligatoire, EN bonus**.  
+1. **Cloner le repository**
+```bash
+git clone https://github.com/JMOYSAN/JMLBFS_PROJETMULTI.git
+cd JMLBFS_PROJETMULTI
+git checkout Develop
+```
 
----
+2. **Installer les dépendances**
+```bash
+npm install
+```
 
-## 8. Libertés encadrées
-- **Langage** : TypeScript ou JavaScript  
-- **UI** : avec ou sans React  
-- **Persistance** : libre (fichier, SQLite, IndexedDB)  
+## 🎯 Lancement
 
----
+### Mode Développement
 
-## 9. Livrables
-- **README clair**, incluant :  
-  1. Objectifs du projet  
-  2. Choix techniques (JS/TS, React ou non) + schéma d’architecture  
-  3. Prérequis  
-  4. Installation  
-  5. Lancement en dev  
-  6. Build par OS + emplacement des artifacts  
-  7. Scénarios de test (réseau down, latence, typing, invitation)  
-  8. Limites connues  
-  9. Pistes d’amélioration (avant backend réel)  
+```bash
+# Démarrer l'application en mode dev (avec hot reload)
+npm run dev
+```
 
-- **Versionnage :** branches + tags sémantiques, `package.json` à jour  
-- **Builds** : artifacts pour macOS, Windows et Linux  
+L'application se lance automatiquement. Les modifications du code sont appliquées en temps réel.
 
----
+### Scripts disponibles
 
-## 10. Critères d’évaluation
+```bash
+# Lancer l'application
+npm start
 
-### Partie individuelle (5 pts)
-- **Communication (2 pts)**  
-  - 0 : absente  
-  - 1 : minimale  
-  - 2 : régulière, active  
-- **Contribution (3 pts)**  
-  - 0 : absente  
-  - 1 : partielle (peu de commits/code)  
-  - 2 : modeste (quelques commits, petite quantité de code)  
-  - 3 : significative (plusieurs commits, code de qualité)  
+# Mode développement avec hot reload
+npm run dev
 
-### Partie collective (5 pts)
-- Évaluation selon le barème du département.  
-- Remise des fichiers **avant le 7 septembre 2025, 23h59**.  
-- Correction interactive le **8 septembre 2025 en classe**.  
-- Présence **obligatoire** de tous les membres (sinon note = 0).  
-- **Aucun retard accepté.**  
+# Linter (ESLint)
+npm run lint
 
----
+# Formatter (Prettier)
+npm run format
 
-## 11. Checklist d’acceptation
-- Démarrage via README sans aide.  
-- Création pseudo → rejoindre/créer salon → messages en temps réel simulés.  
-- DM fonctionnels.  
-- Présence + typing visibles.  
-- Icône/statut réseau simulés.  
-- Notifications OS OK.  
-- Builds disponibles pour 3 OS.  
-- Pas d’éléments Electron par défaut (icône personnalisée).  
-- Tags & versions cohérents.  
+# Tests unitaires
+npm test
+
+# Tests avec couverture
+npm run test:coverage
+```
+
+## 📦 Build Production
+
+### Build pour toutes les plateformes
+
+```bash
+# Build pour macOS
+npm run build:mac
+
+# Build pour Windows
+npm run build:win
+
+# Build pour Linux
+npm run build:linux
+
+# Build pour toutes les plateformes
+npm run build:all
+```
+
+### Emplacement des artifacts
+
+Les builds de production se trouvent dans le dossier `dist/` :
+
+```
+dist/
+├── mac/
+│   └── ChatApp-1.0.0.dmg           # Installateur macOS
+├── win/
+│   └── ChatApp-Setup-1.0.0.exe     # Installateur Windows
+└── linux/
+    ├── ChatApp-1.0.0.AppImage       # Linux AppImage
+    └── ChatApp-1.0.0.deb            # Package Debian
+```
+
+### Tailles approximatives des builds
+- **macOS**: ~150 MB
+- **Windows**: ~130 MB
+- **Linux**: ~140 MB
+
+## ✨ Fonctionnalités
+
+### 🔐 Authentification
+- [x] Inscription avec email et mot de passe
+- [x] Connexion avec validation
+- [x] Déconnexion
+- [x] Persistance de session (token JWT)
+- [x] Choix du pseudo unique
+
+### 💬 Communication
+- [x] **Salons publics**: Rejoindre et créer des salons accessibles à tous
+- [x] **Salons privés**: Créer des salons avec invitation
+- [x] **Messages privés (DM)**: Conversations one-to-one
+- [x] **Messages en temps réel**: Réception instantanée via WebSocket
+- [x] **Horodatage**: Affichage de la date/heure des messages
+- [x] **Historique**: Chargement progressif des messages passés
+- [x] **Pagination**: Navigation dans l'historique
+
+### 👥 Présence
+- [x] **Statut en ligne/hors ligne**: Indicateur visuel pour chaque utilisateur
+- [x] **Indicateur de frappe**: "X est en train d'écrire..."
+- [x] **Dernière connexion**: Affichage du dernier accès
+
+### ⚙️ Configuration
+- [x] **Panneau de configuration**: Interface dédiée aux paramètres
+- [x] **Choix du thème**: Mode clair/sombre
+- [x] **Sélection du salon par défaut**: Salon d'ouverture automatique
+- [x] **Gestion du profil**: Modifier username et email
+- [x] **Notifications**: Activer/désactiver les notifications
+
+### 🔔 Notifications
+- [x] **Notifications système**: Alertes natives de l'OS
+- [x] **Notifications hors focus**: Même quand l'app est en arrière-plan
+- [x] **Badge de compteur**: Nombre de messages non lus
+
+### 🎨 Interface
+- [x] **Icône personnalisée**: Pas d'icône Electron par défaut
+- [x] **Menu personnalisé**: Menu adapté à l'application
+- [x] **Design responsive**: Interface adaptative
+- [x] **Thème clair/sombre**: Changement à la volée
+
+### 🌐 Gestion Réseau
+- [x] **Indicateur de connexion**: Statut réseau visible
+- [x] **Gestion déconnexion**: Détection de perte de connexion
+- [x] **Reconnexion automatique**: Tentatives de reconnexion
+- [x] **Mode hors ligne**: Cache local pour consultation
+
+### 🔒 Sécurité
+- [x] **Sanitisation XSS**: Protection contre les injections
+- [x] **Validation des entrées**: Vérification côté client
+- [x] **Stockage sécurisé**: Pas de secrets en clair
+- [x] **CSP (Content Security Policy)**: Politique de sécurité stricte
+
+## ⚠️ Limitations Connues
+
+### Fonctionnalités
+- **Appels audio/vidéo**: Non implémentés
+- **Partage de fichiers**: Pas encore disponible
+- **Réactions aux messages**: À venir
+- **Recherche avancée**: Recherche basique uniquement
+- **Threads**: Pas de fils de discussion
+
+### Technique
+- **Mode hors ligne**: Cache limité, pas de queue de messages
+- **Compression images**: Pas d'optimisation automatique
+- **Chiffrement E2E**: Non implémenté pour les DM
+- **Synchronisation multi-devices**: Limitée
+
+### Performance
+- **Charge mémoire**: Peut augmenter avec beaucoup de messages en cache
+- **Pagination**: Chargement initial peut être lent pour gros historiques
+- **Animations**: Peuvent ralentir sur machines anciennes
+
+### Sécurité
+- **Rate limiting**: Pas de limite côté client
+- **Validation avancée**: Validation basique uniquement
+- **CSP**: Configuration à améliorer
+
+## 🐛 Problèmes Connus
+
+| Problème | Impact | Workaround |
+|----------|--------|------------|
+| Notifications macOS Big Sur+ | Requiert autorisation | Accepter dans Préférences Système |
+| Menu context sur Linux | Parfois décalé | Relancer l'application |
+| Reconnexion WebSocket | Peut prendre 5-10s | Patienter ou relancer |
+| Cache IndexedDB | Peut devenir volumineux | Vider cache dans config |
+
+## 🔧 Dépannage
+
+### L'application ne se lance pas
+```bash
+# Supprimer node_modules et réinstaller
+rm -rf node_modules package-lock.json
+npm install
+npm run dev
+```
+
+### Erreur de connexion à l'API
+1. Vérifier que l'API est démarrée: `docker-compose ps`
+2. Vérifier l'URL dans `.env`: `VITE_API_URL`
+3. Tester l

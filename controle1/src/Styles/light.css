@@ -249,7 +249,57 @@ body .light,
     color: black;
     align-self: center;
 }
+/* ===== Light Theme ===== */
+.light .messageBox {
+    background-color: #EBE3D5;
+    border: 1px solid #B0A695;
+}
 
+.light .messageBox:focus-within {
+    border: 1px solid #776B5D;
+}
+
+.light #messageInput {
+    color: black;
+}
+
+.light #messageInput::placeholder {
+    color: #776B5D;
+}
+
+.light .fileUploadWrapper label svg path {
+    stroke: #776B5D;
+}
+
+.light .fileUploadWrapper label:hover svg path {
+    stroke: #2c3639;
+}
+
+.light .fileUploadWrapper label:hover svg circle {
+    stroke: #2c3639;
+    fill: #B0A695;
+}
+
+.light .tooltip {
+    color: black;
+    background-color: #F3EEEA;
+    border: 1px solid #B0A695;
+}
+
+.light #messageInput:focus ~ #sendButton svg path,
+.light #messageInput:valid ~ #sendButton svg path {
+    fill: #B0A695;
+    stroke: #2c3639;
+}
+
+.light #sendButton svg path {
+    stroke: #776B5D;
+}
+
+.light #sendButton:hover svg path {
+    fill: #B0A695;
+    stroke: #2c3639;
+}
 /* ===== Typing Indicator ===== */
 
 /* ===== Scrollbars ===== */
@@ -288,4 +338,3 @@ body .light,
 .light .c-main {
     text-align: center;
 }
-

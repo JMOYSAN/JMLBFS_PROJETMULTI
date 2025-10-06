@@ -13,6 +13,7 @@ function genererGroupes() {
       ],
       groupeVisibility: 'public',
       messages: [],
+      id: 1,
     },
     {
       nom: 'Groupe 2',
@@ -24,6 +25,7 @@ function genererGroupes() {
       ],
       groupeVisibility: 'private',
       messages: [],
+      id: 2,
     },
     {
       nom: 'Groupe 3',
@@ -35,6 +37,7 @@ function genererGroupes() {
       ],
       groupeVisibility: 'private',
       messages: [],
+      id: 3,
     },
     {
       nom: 'Groupe 4',
@@ -45,6 +48,7 @@ function genererGroupes() {
       ],
       groupeVisibility: 'private',
       messages: [],
+      id: 4,
     },
     {
       nom: 'Groupe 5',
@@ -55,6 +59,7 @@ function genererGroupes() {
       ],
       groupeVisibility: 'public',
       messages: [],
+      id: 5,
     },
     ...Array.from({ length: 25 }, (_, i) => ({
       nom: `Groupe ${i + 6}`,
@@ -65,6 +70,7 @@ function genererGroupes() {
       ],
       groupeVisibility: 'public',
       messages: [],
+      id: i + 6,
     })),
   ]
 

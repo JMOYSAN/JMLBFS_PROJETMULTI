@@ -23,25 +23,10 @@ const Input = ({ onSend }) => {
       gererEnvoie()
     }
   }
-  const handleFichierChange = (e) => {
-    const file = e.target.files[0]
-    if (file) {
-      setFichier({
-        nom: file.name,
-        type: file.type,
-        taille: file.size,
-        url: URL.createObjectURL(file),
-      })
-    }
-  }
 
   return (
     <StyledWrapper>
       <div className="messageBox">
-        <div className="fileUploadWrapper">
-          <label htmlFor="file">📎</label>
-          <input type="file" id="file" onChange={handleFichierChange} />
-        </div>
         <input
           required
           placeholder="Message..."

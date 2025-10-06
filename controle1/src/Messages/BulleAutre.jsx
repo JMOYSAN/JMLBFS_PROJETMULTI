@@ -1,11 +1,11 @@
-function BulleAutre({ message }) {
+function BulleAutre({ message, members }) {
   return (
     <div className="containerMessage">
-      <div className="timestamp">{message.date}</div>
+      <div className="timestamp">{message.created_at}</div>
       <div className="bulleAutre">
-        <div className="username">{message.auteur}</div>
+        <div className="username">{members[message.user_id]}</div>
 
-        {message.texte && <div className="message">{message.texte}</div>}
+        {message.content && <div className="message">{message.content}</div>}
 
         {message.fichier?.type?.startsWith('image/') && (
           <img

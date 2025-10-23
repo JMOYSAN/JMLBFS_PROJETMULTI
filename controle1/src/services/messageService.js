@@ -1,9 +1,10 @@
+import { fetchWithAuth } from './authService.js'
 const API_URL = 'http://localhost:3000'
 
 export function fetchMessages(groupId, limit = 20) {
   const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}`
 
-  return fetch(url).then((res) => {
+  return fetchWithAuth(url).then((res) => {
     if (!res.ok) {
       throw new Error('Erreur chargement messages')
     }
@@ -14,7 +15,7 @@ export function fetchMessages(groupId, limit = 20) {
 export function fetchOlderMessages(groupId, beforeId, limit = 20) {
   const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}&beforeId=${beforeId}`
 
-  return fetch(url).then((res) => {
+  return fetchWithAuth(url).then((res) => {
     if (!res.ok) {
       throw new Error('Erreur chargement messages anciens')
     }
@@ -23,7 +24,7 @@ export function fetchOlderMessages(groupId, beforeId, limit = 20) {
 }
 
 export function sendMessage(userId, groupId, content) {
-  return fetch(`${API_URL}/messages`, {
+  return fetchWithAuth(`${API_URL}/messages`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

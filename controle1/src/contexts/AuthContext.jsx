@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  useRef,
 } from 'react'
 import {
   login as loginService,
@@ -12,6 +13,10 @@ import {
   loadUserFromStorage,
   clearUserFromStorage,
   updateUserTheme as updateThemeService,
+  logout as logoutService,
+  refreshToken as refreshTokenService,
+  setAccessToken,
+  getAccessToken,
 } from '../services/authService.js'
 
 const AuthContext = createContext(null)
@@ -21,7 +26,7 @@ export function AuthProvider({ children }) {
   const [isConnect, setIsConnect] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
-
+  const accessTokenRef = useRef(null)
   const runWithPending = useCallback(async (task) => {
     setPending(true)
     setError('')
@@ -40,6 +45,19 @@ export function AuthProvider({ children }) {
     if (storedUser) {
       setCurrentUser(storedUser)
       setIsConnect(true)
+      refreshAccessToken()
+    }
+  }, [])
+
+  const refreshAccessToken = useCallback(async () => {
+    try {
+      const success = await refreshTokenService()
+      if (success) {
+        const token = getAccessToken()
+        accessTokenRef.current = token
+      }
+    } catch {
+      logout()
     }
   }, [])
 
@@ -53,11 +71,15 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async (username, password) => {
-      const user = await runWithPending(() => loginService(username, password))
-      setCurrentUser(user)
-      saveUserToStorage(user)
+      const data = await runWithPending(() => loginService(username, password))
+
+      setCurrentUser(data.user)
+      saveUserToStorage(data.user, data.accessToken)
+      accessTokenRef.current = data.accessToken
+      setAccessToken(data.accessToken)
       setIsConnect(true)
-      return user
+
+      return data.user
     },
     [runWithPending]
   )
@@ -73,19 +95,19 @@ export function AuthProvider({ children }) {
   )
 
   const logout = useCallback(() => {
+    logoutService()
     clearUserFromStorage()
+    accessTokenRef.current = null
     setCurrentUser(null)
     setIsConnect(false)
   }, [])
 
   const toggleTheme = useCallback(async () => {
     if (!currentUser) return
-
     const newTheme = currentUser.theme === 'dark' ? 'light' : 'dark'
     const updatedUser = await runWithPending(() =>
       updateThemeService(currentUser.id, newTheme)
     )
-
     setCurrentUser(updatedUser)
     saveUserToStorage(updatedUser)
   }, [currentUser, runWithPending])
@@ -100,6 +122,8 @@ export function AuthProvider({ children }) {
     toggleTheme,
     pending,
     error,
+    accessTokenRef,
+    refreshAccessToken,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

@@ -76,8 +76,6 @@ export function useMessages(currentGroupe, currentUser) {
         sendMessage(currentUser.id, currentGroupe.id, contenu.message)
       )
 
-      // append locally for instant feel
-      setMessages((prev) => [newMsg, ...prev])
       return newMsg
     },
     [currentUser?.id, currentGroupe?.id, runWithPending]

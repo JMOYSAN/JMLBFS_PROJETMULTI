@@ -17,10 +17,16 @@ function FilsConversation({
   setGroupes,
 }) {
   const messagesZoneRef = useRef(null)
-  const { messages, loadMoreMessages, hasMore, pending, members, refresh } =
-    useMessages(currentGroupe, currentUser)
+  const {
+    messages,
+    loadMoreMessages,
+    hasMore,
+    pending,
+    members,
+    refresh,
+    send,
+  } = useMessages(currentGroupe, currentUser)
 
-  // --- Lazy load
   useEffect(() => {
     const container = messagesZoneRef.current
     if (!container) return
@@ -57,18 +63,9 @@ function FilsConversation({
   // --- Send message through API (persistent + Redis broadcast)
   const handleSend = async (contenu) => {
     if (!currentUser || !currentGroupe || !contenu?.message?.trim()) return
+
     try {
-      const res = await fetch('http://localhost:3000/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: currentUser.id,
-          group_id: currentGroupe.id,
-          content: contenu.message,
-        }),
-      })
-      if (!res.ok) throw new Error('Erreur envoi message')
-      await res.json() // the live update will arrive via WebSocket
+      await send(contenu)
       requestAnimationFrame(() => {
         if (messagesZoneRef.current) {
           messagesZoneRef.current.scrollTop =

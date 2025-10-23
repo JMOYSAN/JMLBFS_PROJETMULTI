@@ -1,33 +1,43 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useGroups } from '../hooks/useGroups'
 
 function Groupe({ currentUser, groupe, setCurrentGroupe }) {
   const [askConfirm, setAskConfirm] = useState(false)
+  const [isMember, setIsMember] = useState(false)
 
-  const getNom = (u) => (typeof u === 'string' ? u : u?.nom || '')
-  const userNom = getNom(currentUser)
+  const { joinGroupe, loadGroupMembers, pending } = useGroups(currentUser)
 
-  const estMembre = (groupe.participants || []).some(
-    (p) => getNom(p) === userNom
-  )
+  // Vérifier si l'utilisateur est membre du groupe
+  useEffect(() => {
+    if (!groupe?.id || !currentUser?.id) return
+
+    loadGroupMembers(groupe.id)
+      .then((members) => {
+        const found = members.some((m) => m.id === currentUser.id)
+        setIsMember(found)
+      })
+      .catch((err) =>
+        console.error('Erreur vérification membre du groupe:', err)
+      )
+  }, [groupe?.id, currentUser?.id, loadGroupMembers])
 
   const handleClick = () => {
-    if (estMembre) {
+    if (isMember) {
       setCurrentGroupe(groupe)
       return
     }
     setAskConfirm(true)
   }
 
-  const handleJoin = () => {
-    if (!groupe.participants.some((p) => getNom(p) === userNom)) {
-      groupe.participants.push({ nom: userNom, isTyping: false })
+  const handleJoin = async () => {
+    try {
+      await joinGroupe(groupe.id)
+      setIsMember(true)
+      setAskConfirm(false)
+    } catch (err) {
+      console.error('Erreur lors de la jointure au groupe:', err)
+      alert('Impossible de rejoindre le groupe')
     }
-    setCurrentGroupe({ ...groupe })
-    setAskConfirm(false)
-  }
-
-  const handleCancel = () => {
-    setAskConfirm(false)
   }
 
   return (
@@ -47,10 +57,14 @@ function Groupe({ currentUser, groupe, setCurrentGroupe }) {
           >
             <p>Voulez-vous rejoindre ce groupe&nbsp;?</p>
             <div className="actions">
-              <button type="submit" className="btn-yes">
-                Oui
+              <button type="submit" className="btn-yes" disabled={pending}>
+                {pending ? '...' : 'Oui'}
               </button>
-              <button type="button" onClick={handleCancel} className="btn-no">
+              <button
+                type="button"
+                onClick={() => setAskConfirm(false)}
+                className="btn-no"
+              >
                 Non
               </button>
             </div>

@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import AjouterDansGroupe from '../Groupes/AjouterDansGroupe.jsx'
 import AddGroup from '../Groupes/AddGroup.jsx'
-import { useState } from 'react'
+import { useAuth } from '../hooks/useAuth'
+import { useGroups } from '../hooks/useGroups'
 
 function Topbar({
   utilisateurs = [],
@@ -11,6 +13,12 @@ function Topbar({
   setCurrentGroupe,
   setGroupes,
 }) {
+  const [showAjouterDansGroupe, setshowAjouterDansGroupe] = useState(false)
+  const [members, setMembers] = useState([])
+
+  const { toggleTheme } = useAuth()
+  const { loadGroupMembers } = useGroups(currentUser)
+
   const getNom = (u) => (typeof u === 'string' ? u : u?.username || '')
   const moi = getNom(currentUser)
 
@@ -18,52 +26,45 @@ function Topbar({
     setshowAjouterDansGroupe(!showAjouterDansGroupe)
   }
 
-  const modifierTheme = () => {
-    fetch(`http://localhost:3000/users/${currentUser.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        theme: currentUser.theme === 'dark' ? 'light' : 'dark',
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Erreur lors de la mise à jour')
-        }
-        return response.json()
+  // Charger les membres quand le groupe change
+  useEffect(() => {
+    if (!currentGroupe?.id) return
+
+    loadGroupMembers(currentGroupe.id)
+      .then((data) => setMembers(data))
+      .catch((err) => {
+        console.error('Erreur chargement membres:', err)
+        setMembers([])
       })
-      .then((data) => {
-        console.log('Utilisateur mis à jour :', data)
-        setCurrentUser(data)
-        localStorage.setItem('user', JSON.stringify(data))
-      })
-      .catch((error) => {
-        console.error('Erreur :', error)
-        alert('La mise à jour a échoué')
-      })
+  }, [currentGroupe?.id, loadGroupMembers])
+
+  const handleToggleTheme = async () => {
+    try {
+      await toggleTheme()
+    } catch (err) {
+      console.error('Erreur changement thème:', err)
+    }
   }
-  const [showAjouterDansGroupe, setshowAjouterDansGroupe] = useState(false)
+
   return (
     <>
       {currentGroupe ? (
         <>
           <div>
-            Bienvenue dans le groupe {currentGroupe.groupeVisibility}{' '}
+            Bienvenue dans le groupe {currentGroupe.type || 'public'}{' '}
             {currentGroupe.nom}
           </div>
           <div>
             Les membres du groupe sont :
             <ul>
-              {(currentGroupe.participants ?? []).map((p) => {
-                const nom = getNom(p)
-                return <li key={nom}>{nom}</li>
+              {members.map((p) => {
+                const nom = p.username || p.nom || ''
+                return <li key={p.id}>{nom}</li>
               })}
             </ul>
           </div>
-          <div onClick={() => modifierTheme()} className="color-mode-switch">
-            {currentUser.theme === 'light' ? (
+          <div onClick={handleToggleTheme} className="color-mode-switch">
+            {currentUser?.theme === 'light' ? (
               <i className="fa-solid fa-moon"></i>
             ) : (
               <i className="fa-solid fa-sun icon-light"></i>
@@ -85,7 +86,7 @@ function Topbar({
           setShowForm={setShowAjouter}
           setCurrentGroupe={setCurrentGroupe}
           setGroupes={setGroupes}
-        ></AjouterDansGroupe>
+        />
       ) : (
         <AddGroup modifer={false} showFormCreerGroupe={setShowAjouter} />
       )}

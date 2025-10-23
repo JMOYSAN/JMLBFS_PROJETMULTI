@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styled from 'styled-components'
+import { useAuth } from '../hooks/useAuth'
 
 const RegisterWrapper = styled.div`
   display: flex;
@@ -54,47 +55,47 @@ const Button = styled.button`
   &:hover {
     background: #2c3639;
   }
+  &:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
 `
 
 function Register({ onRegister, setPage }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
+  const [localError, setLocalError] = useState('')
   const [success, setSuccess] = useState('')
 
-  const handleSubmit = (e) => {
+  const { register, pending, error } = useAuth()
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setError('')
+    setLocalError('')
     setSuccess('')
 
     if (!username.trim() || !password.trim()) return
+
     if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas')
+      setLocalError('Les mots de passe ne correspondent pas')
       return
     }
 
-    fetch('http://localhost:3000/users/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    })
-      .then((res) =>
-        res.json().then((data) => ({ status: res.status, body: data }))
-      )
-      .then(({ status, body }) => {
-        if (status !== 201) {
-          setError(body.error || 'Erreur lors de l’inscription')
-        } else {
-          setSuccess('Compte créé avec succès !')
-          if (onRegister) onRegister(body)
-        }
-      })
-      .catch((err) => {
-        console.error(err)
-        setError(`Erreur serveur`)
-      })
+    try {
+      await register(username, password)
+      setSuccess('Compte créé avec succès !')
+
+      // Rediriger vers login après 1.5s
+      setTimeout(() => {
+        if (onRegister) onRegister()
+      }, 1500)
+    } catch (err) {
+      setLocalError(err.message)
+    }
   }
+
+  const displayError = localError || error
 
   return (
     <RegisterWrapper>
@@ -107,6 +108,7 @@ function Register({ onRegister, setPage }) {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            disabled={pending}
           />
           <Input
             type="password"
@@ -114,6 +116,7 @@ function Register({ onRegister, setPage }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={pending}
           />
           <Input
             type="password"
@@ -121,12 +124,15 @@ function Register({ onRegister, setPage }) {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            disabled={pending}
           />
-          {error && <p style={{ color: 'red' }}>{error}</p>}
+          {displayError && <p style={{ color: 'red' }}>{displayError}</p>}
           {success && <p style={{ color: 'green' }}>{success}</p>}
-          <Button type="submit">S'inscrire</Button>
+          <Button type="submit" disabled={pending}>
+            {pending ? 'Inscription...' : "S'inscrire"}
+          </Button>
         </form>
-        <p style={{ textAlign: 'center', color: 'black' }}>
+        <p style={{ textAlign: 'center', color: 'black', marginTop: '15px' }}>
           <button
             onClick={() => setPage('login')}
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}

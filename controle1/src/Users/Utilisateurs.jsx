@@ -1,13 +1,33 @@
 import { useEffect, useRef } from 'react'
 import { useUsers } from '../hooks/useUsers'
+import { useAuth } from '../hooks/useAuth.js'
+import { useGroups } from '../hooks/useGroups.js'
 
 // Ligne d'utilisateur
 function LigneUtilisateur({ utilisateur, estUtilisateurActuel }) {
   const { nom, statut, avatar } = utilisateur
   const initiale = nom?.[0]?.toUpperCase() ?? '?'
+  const { currentUser } = useAuth()
+  const { creerGroupe } = useGroups(currentUser)
+  const { normalizedUsers } = useUsers()
 
+  const handleClick = async () => {
+    if (estUtilisateurActuel) return
+
+    try {
+      const groupName = `${currentUser.username} & ${nom}`
+      await creerGroupe(groupName, [nom], true, normalizedUsers)
+      console.log(`Groupe créé avec ${nom}`)
+    } catch (error) {
+      console.error('Erreur création groupe:', error)
+    }
+  }
   return (
-    <div className={`utilisateur-ligne ${estUtilisateurActuel ? 'moi' : ''}`}>
+    <button
+      className={`utilisateur-ligne ${estUtilisateurActuel ? 'moi' : ''}`}
+      onClick={handleClick}
+      disabled={estUtilisateurActuel}
+    >
       <span className={`statut ${statut}`} />
       {avatar ? (
         <img className="avatar" src={avatar} alt={`Avatar de ${nom}`} />
@@ -15,7 +35,7 @@ function LigneUtilisateur({ utilisateur, estUtilisateurActuel }) {
         <div className="avatar">{initiale}</div>
       )}
       <div className="nom">{nom}</div>
-    </div>
+    </button>
   )
 }
 

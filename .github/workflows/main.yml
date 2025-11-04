@@ -54,16 +54,20 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
+      - name: Clean node_modules and lockfile (Unix)
+        if: runner.os != 'Windows'
+        working-directory: controle1
+        run: rm -rf node_modules package-lock.json
+
+      - name: Clean node_modules and lockfile (Windows)
+        if: runner.os == 'Windows'
+        working-directory: controle1
+        shell: powershell
+        run: Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue
+
       - name: Install dependencies
         working-directory: controle1
-        shell: bash
-        run: |
-           if [ "$RUNNER_OS" == "Windows" ]; then
-            powershell.exe -Command "Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue"
-           else
-            rm -rf node_modules package-lock.json
-           fi
-           npm install
+        run: npm install
 
       - name: Build Electron app
         working-directory: controle1

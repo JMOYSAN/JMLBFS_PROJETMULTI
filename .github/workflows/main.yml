@@ -17,11 +17,14 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: 'controle1/package-lock.json'
           
       - name: Installer les dependances
+        working-directory: controle1
         run: npm ci
 
       - name: Run ESLint
+        working-directory: controle1
         run: npm run lint
 
        

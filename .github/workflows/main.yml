@@ -57,8 +57,12 @@ jobs:
       - name: Install dependencies
         working-directory: controle1
         run: |
-          rm -rf node_modules package-lock.json
-          npm install
+           if [ "$RUNNER_OS" == "Windows" ]; then
+            powershell -Command "Remove-Item -Recurse -Force node_modules, package-lock.json"
+           else
+            rm -rf node_modules package-lock.json
+           fi
+           npm install
 
       - name: Build Electron app
         working-directory: controle1

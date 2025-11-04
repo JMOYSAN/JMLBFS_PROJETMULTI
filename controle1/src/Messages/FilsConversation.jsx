@@ -17,15 +17,8 @@ function FilsConversation({
   setGroupes,
 }) {
   const messagesZoneRef = useRef(null)
-  const {
-    messages,
-    loadMoreMessages,
-    hasMore,
-    pending,
-    members,
-    refresh,
-    send,
-  } = useMessages(currentGroupe, currentUser)
+  const { messages, loadMoreMessages, hasMore, pending, members, send } =
+    useMessages(currentGroupe, currentUser)
 
   useEffect(() => {
     const container = messagesZoneRef.current
@@ -58,7 +51,7 @@ function FilsConversation({
     if (messagesZoneRef.current && !pending) {
       messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
     }
-  }, [currentGroupe?.id])
+  }, [currentGroupe.id, pending])
 
   // --- Send message through API (persistent + Redis broadcast)
   const handleSend = async (contenu) => {

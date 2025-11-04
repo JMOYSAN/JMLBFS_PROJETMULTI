@@ -19,7 +19,9 @@ jobs:
           cache: 'npm'
           
       - name: Installer les dependances
-        run: npm ci
+        run:
+          cd controle1
+          npm ci
 
       - name: Run ESLint
         run: npm run lint

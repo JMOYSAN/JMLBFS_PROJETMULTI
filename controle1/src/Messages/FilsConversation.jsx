@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import Bulle from './Bulle'
 import BulleAutre from './BulleAutre.jsx'
 import Chat from './BarreChat.jsx'
-import Topbar from '../Components/Topbar.jsx'
+import Topbar from '../components/Topbar.jsx'
 import Typing from './Typing'
 
 import { useMessages } from '../hooks/useMessages'

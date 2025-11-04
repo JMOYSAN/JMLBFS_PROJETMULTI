@@ -60,7 +60,7 @@ jobs:
 
       - name: Build Electron app
         working-directory: controle1
-        run: npm run build:electron
+        run: npm run build
 
       - name: Package Electron
         working-directory: controle1

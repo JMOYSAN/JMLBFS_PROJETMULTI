@@ -59,7 +59,7 @@ jobs:
         shell: bash
         run: |
            if [ "$RUNNER_OS" == "Windows" ]; then
-            powershell -Command "Remove-Item -Recurse -Force node_modules, package-lock.json"
+            powershell.exe -Command "Remove-Item -Recurse -Force node_modules, package-lock.json -ErrorAction SilentlyContinue"
            else
             rm -rf node_modules package-lock.json
            fi

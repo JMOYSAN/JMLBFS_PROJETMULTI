@@ -56,7 +56,9 @@ jobs:
 
       - name: Install dependencies
         working-directory: controle1
-        run: npm ci
+        run: |
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Build Electron app
         working-directory: controle1

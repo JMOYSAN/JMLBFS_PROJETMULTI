@@ -1,4 +1,4 @@
-// Les tests on été écrits par ChatGPT
+// Les tests on été écrits par ChatGPT!!!
 
 import genererGroupes from '../Mock/MockGroupe.js'
 

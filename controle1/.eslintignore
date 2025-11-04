@@ -1,0 +1,11 @@
+# Build outputs
+dist/
+dist-electron/
+out/
+
+# Dependencies
+node_modules/
+
+# Cache
+.cache/
+*.log

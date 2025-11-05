@@ -29,29 +29,30 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: 'controle1/package-lock.json'
 
       - name: Install dependencies
         working-directory: controle1
         run: npm ci
 
-      - name: Build Electron app
-        working-directory: controle1
-        run: npm run build:electron
-
-      - name: Package Electron
+      - name: Build & Package Electron App
         working-directory: controle1
         run: |
-          if [ "${{ matrix.platform }}" == "win" ]; then npm run package:win;
-          elif [ "${{ matrix.platform }}" == "mac" ]; then npm run package:mac;
-          else npm run package:linux; fi
+          if [ "${{ matrix.platform }}" = "win" ]; then
+            npm run build:win;
+          elif [ "${{ matrix.platform }}" = "mac" ]; then
+            npm run build:mac;
+          else
+            npm run build:linux -- --targets deb;  # optionnel pour éviter le RPM
+          fi
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: electron-${{ matrix.platform }}-${{ matrix.arch }}
           path: |
-            controle1/dist/electron/**/*.*
-          retention-days: 3
+            controle1/out/**/*.*  # selon le dossier de sortie de electron-forge
+          retention-days: 7
 
   release:
     name: Create GitHub Release

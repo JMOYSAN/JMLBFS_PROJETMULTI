@@ -331,3 +331,18 @@ export async function fetchWithAuth(pathOrUrl, options = {}) {
 
   return res
 }
+
+export async function updateUserTheme(userId, newTheme) {
+  const res = await fetchWithAuth(`/api/users/${userId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ theme: newTheme }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json()
+    throw new Error(err.error || 'Erreur lors de la mise à jour du thème')
+  }
+
+  return res.json()
+}

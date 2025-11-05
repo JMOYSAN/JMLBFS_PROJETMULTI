@@ -8,7 +8,6 @@ function Topbar({
   utilisateurs = [],
   currentGroupe,
   currentUser,
-  setCurrentUser,
   onClose,
   setCurrentGroupe,
   setGroupes,

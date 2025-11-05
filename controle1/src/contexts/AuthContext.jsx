@@ -1,22 +1,22 @@
 import {
   createContext,
-  useContext,
   useCallback,
+  useContext,
   useEffect,
-  useState,
   useRef,
+  useState,
 } from 'react'
 import {
-  login as loginService,
-  register as registerService,
-  saveUserToStorage,
-  loadUserFromStorage,
   clearUserFromStorage,
-  updateUserTheme as updateThemeService,
+  getAccessToken,
+  loadUserFromStorage,
+  login as loginService,
   logout as logoutService,
   refreshToken as refreshTokenService,
+  register as registerService,
+  saveUserToStorage,
   setAccessToken,
-  getAccessToken,
+  updateUserTheme as updateThemeService,
 } from '../services/authService.js'
 
 const AuthContext = createContext(null)
@@ -47,19 +47,18 @@ export function AuthProvider({ children }) {
       setIsConnect(true)
       refreshAccessToken()
     }
-  }, [])
+  }, [refreshAccessToken])
 
   const refreshAccessToken = useCallback(async () => {
     try {
       const success = await refreshTokenService()
       if (success) {
-        const token = getAccessToken()
-        accessTokenRef.current = token
+        accessTokenRef.current = getAccessToken()
       }
     } catch {
       logout()
     }
-  }, [])
+  }, [logout])
 
   useEffect(() => {
     if (currentUser?.theme === 'light') {
@@ -86,10 +85,7 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(
     async (username, password) => {
-      const user = await runWithPending(() =>
-        registerService(username, password)
-      )
-      return user
+      return await runWithPending(() => registerService(username, password))
     },
     [runWithPending]
   )
@@ -129,6 +125,7 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {

@@ -35,7 +35,7 @@ jobs:
         working-directory: controle1
         run: npm ci
 
-      - name: Build & Package Electron App
+      - name: Build & Package Electron
         working-directory: controle1
         run: |
           if [ "${{ matrix.platform }}" = "win" ]; then
@@ -43,8 +43,9 @@ jobs:
           elif [ "${{ matrix.platform }}" = "mac" ]; then
             npm run build:mac;
           else
-            npm run build:linux -- --targets deb;  # optionnel pour éviter le RPM
+            npm run build:linux;
           fi
+
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

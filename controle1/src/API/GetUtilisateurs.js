@@ -1,4 +1,4 @@
-import { API_URL } from '@env'
+const API_URL = import.meta.env.VITE_API_URL
 
 async function genererUtilisateurs() {
   try {

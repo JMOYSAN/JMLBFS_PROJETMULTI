@@ -1,5 +1,6 @@
+/*
 import { fetchWithAuth } from './authService.js'
-import { API_URL } from '@env'
+const API_URL = import.meta.env.VITE_API_URL
 
 export function listPublicGroups() {
   return fetchWithAuth(`${API_URL}/groups/public`).then((res) => {
@@ -91,4 +92,48 @@ export function normalizeGroup(groupe, index = 0) {
     nom: groupe.name ?? `Groupe${index}`,
     type: groupe.is_private ? 'private' : 'public',
   }
+}
+*/
+
+// src/services/groupService.js
+import { fetchWithAuth } from './authService.js'
+
+export async function listPublicGroups() {
+  const res = await fetchWithAuth(`/api/groups/public`, { method: 'GET' })
+  if (!res.ok) throw new Error('Erreur récupération des groupes publics')
+  return res.json()
+}
+
+export async function listPrivateGroups(userId) {
+  const res = await fetchWithAuth(`/api/groups/private/${userId}`, {
+    method: 'GET',
+  })
+  if (!res.ok) throw new Error('Erreur récupération des groupes privés')
+  return res.json()
+}
+
+export async function createGroup(name, isPublic = true) {
+  const res = await fetchWithAuth(`/api/groups`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, isPublic }),
+  })
+  if (!res.ok) throw new Error('Erreur création du groupe')
+  return res.json()
+}
+
+export async function joinGroup(groupId) {
+  const res = await fetchWithAuth(`/api/groups/${groupId}/join`, {
+    method: 'POST',
+  })
+  if (!res.ok) throw new Error('Erreur pour rejoindre le groupe')
+  return res.json()
+}
+
+export async function leaveGroup(groupId) {
+  const res = await fetchWithAuth(`/api/groups/${groupId}/leave`, {
+    method: 'POST',
+  })
+  if (!res.ok) throw new Error('Erreur pour quitter le groupe')
+  return res.json()
 }

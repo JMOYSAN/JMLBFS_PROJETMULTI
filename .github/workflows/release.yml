@@ -1,0 +1,78 @@
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-electron:
+    name: Build Electron - ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            arch: x64
+          - os: macos-latest
+            platform: mac
+            arch: universal
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        working-directory: controle1
+        run: npm ci
+
+      - name: Build Electron app
+        working-directory: controle1
+        run: npm run build:electron
+
+      - name: Package Electron
+        working-directory: controle1
+        run: |
+          if [ "${{ matrix.platform }}" == "win" ]; then npm run package:win;
+          elif [ "${{ matrix.platform }}" == "mac" ]; then npm run package:mac;
+          else npm run package:linux; fi
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: electron-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            controle1/dist/electron/**/*.*
+          retention-days: 3
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-electron
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: ./release_artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: "Release ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+          files: |
+            release_artifacts/**/*
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,6 +1,8 @@
+import { API_URL } from '@env'
+
 async function genererUtilisateurs() {
   try {
-    const response = await fetch(`http://localhost:3000/users`)
+    const response = await fetch(`${API_URL}/users`)
     if (response) {
       console.log('Res ', response)
     }
@@ -14,7 +16,7 @@ async function genererUtilisateurs() {
 
 export async function getUtilisateursById(id) {
   try {
-    const response = await fetch(`http://localhost:3000/users/next/${id}`)
+    const response = await fetch(`${API_URL}/users/next/${id}`)
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`)
     }

@@ -1,6 +1,5 @@
 import { fetchWithAuth } from './authService.js'
-
-const API_URL = 'http://localhost:3000'
+import { API_URL } from '@env'
 
 export function listUsers() {
   return fetchWithAuth(`${API_URL}/users`).then((res) => {

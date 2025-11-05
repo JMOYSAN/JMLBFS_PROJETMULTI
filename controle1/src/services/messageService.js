@@ -1,5 +1,5 @@
 import { fetchWithAuth } from './authService.js'
-const API_URL = 'http://localhost:3000'
+import { API_URL } from '@env'
 
 export function fetchMessages(groupId, limit = 20) {
   const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}`

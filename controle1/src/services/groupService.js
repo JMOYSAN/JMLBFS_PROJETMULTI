@@ -1,5 +1,5 @@
 import { fetchWithAuth } from './authService.js'
-const API_URL = 'http://localhost:3000'
+import { API_URL } from '@env'
 
 export function listPublicGroups() {
   return fetchWithAuth(`${API_URL}/groups/public`).then((res) => {

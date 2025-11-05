@@ -37,16 +37,16 @@ jobs:
 
       - name: Build & Package Electron
         working-directory: controle1
+        shell: bash
         run: |
           if [ "${{ matrix.platform }}" = "win" ]; then
-            npm run build:win;
+            npm run build:win
           elif [ "${{ matrix.platform }}" = "mac" ]; then
-            npm run build:mac;
+            npm run build:mac
           else
-            npm run build:linux;
+            npm run build:linux
           fi
-
-
+          
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:

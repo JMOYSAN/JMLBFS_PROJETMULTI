@@ -1,5 +1,5 @@
 import { fetchWithAuth } from './authService.js'
-const API_URL = 'http://localhost:3000'
+const API_URL = import.meta.env.VITE_API_URL
 
 export function fetchMessages(groupId, limit = 20) {
   const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}`

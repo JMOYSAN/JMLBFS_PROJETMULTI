@@ -81,11 +81,10 @@ export function useMessages(currentGroupe, currentUser) {
     [currentUser?.id, currentGroupe?.id, runWithPending]
   )
 
-  // ✅ WebSocket live sync from Redis
   useEffect(() => {
     if (!currentUser?.id) return
 
-    ws.current = new WebSocket(`ws://localhost:3000?user=${currentUser.id}`)
+    ws.current = new WebSocket(`ws://bobberchat.com/ws?user=${currentUser.id}`)
 
     ws.current.onopen = () => console.log('[useMessages] WS connected')
     ws.current.onclose = () => console.log('[useMessages] WS closed')

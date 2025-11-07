@@ -411,7 +411,7 @@ L'application est divisée en 3 zones:
 
 ---
 
-### 🆘 Canaux de support
+### Canaux de support
 
 #### Problèmes techniques
 
@@ -440,7 +440,7 @@ Si vous rencontrez des bugs ou problèmes:
 
 ---
 
-## 🔧 Variables d'environnement
+## Variables d'environnement
 
 | Variable | Description | Valeur par défaut | Requis |
 |----------|-------------|-------------------|--------|
@@ -463,7 +463,7 @@ GITHUB_TOKEN=your_token_here
 
 ---
 
-## 📜 Scripts disponibles
+## Scripts disponibles
 
 | Script | Description |
 |--------|-------------|

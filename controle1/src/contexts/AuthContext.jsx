@@ -27,6 +27,7 @@ export function AuthProvider({ children }) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
   const accessTokenRef = useRef(null)
+
   const runWithPending = useCallback(async (task) => {
     setPending(true)
     setError('')
@@ -40,14 +41,13 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  useEffect(() => {
-    const storedUser = loadUserFromStorage()
-    if (storedUser) {
-      setCurrentUser(storedUser)
-      setIsConnect(true)
-      refreshAccessToken()
-    }
-  }, [refreshAccessToken])
+  const logout = useCallback(() => {
+    logoutService()
+    clearUserFromStorage()
+    accessTokenRef.current = null
+    setCurrentUser(null)
+    setIsConnect(false)
+  }, [])
 
   const refreshAccessToken = useCallback(async () => {
     try {
@@ -59,6 +59,15 @@ export function AuthProvider({ children }) {
       logout()
     }
   }, [logout])
+
+  useEffect(() => {
+    const storedUser = loadUserFromStorage()
+    if (storedUser) {
+      setCurrentUser(storedUser)
+      setIsConnect(true)
+      refreshAccessToken()
+    }
+  }, [refreshAccessToken])
 
   useEffect(() => {
     if (currentUser?.theme === 'light') {
@@ -78,6 +87,8 @@ export function AuthProvider({ children }) {
       setAccessToken(data.accessToken)
       setIsConnect(true)
 
+      console.log(data.accessToken)
+
       return data.user
     },
     [runWithPending]
@@ -89,14 +100,6 @@ export function AuthProvider({ children }) {
     },
     [runWithPending]
   )
-
-  const logout = useCallback(() => {
-    logoutService()
-    clearUserFromStorage()
-    accessTokenRef.current = null
-    setCurrentUser(null)
-    setIsConnect(false)
-  }, [])
 
   const toggleTheme = useCallback(async () => {
     if (!currentUser) return
@@ -125,11 +128,10 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {
-    throw new Error('useAuth doit être utilisé dans un AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }

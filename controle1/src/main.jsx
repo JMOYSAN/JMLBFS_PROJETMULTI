@@ -10,7 +10,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </AuthProvider>
   </React.StrictMode>
 )
-
+//test
 // Use contextBridge
 window.ipcRenderer.on('main-process-message', (_event, message) => {
   window.notify('Build finished', 'All tasks completed')

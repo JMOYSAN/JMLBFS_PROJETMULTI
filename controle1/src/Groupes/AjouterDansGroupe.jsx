@@ -6,8 +6,6 @@ function AjouterDansGroupe({
   currentGroupe,
   currentUser,
   setShowForm,
-  setCurrentGroupe,
-  setGroupes,
 }) {
   const [saisie, setSaisie] = useState('')
   const [members, setMembers] = useState([])

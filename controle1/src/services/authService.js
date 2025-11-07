@@ -148,7 +148,7 @@ export function clearUserFromStorage() {
 }
 
 export function updateUserTheme(userId, newTheme) {
-  return fetchWithAuth(`${API_URL}/users/${userId}`, {
+  return fetchWithAuth(`${API_URL}/api/users/${userId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ theme: newTheme }),

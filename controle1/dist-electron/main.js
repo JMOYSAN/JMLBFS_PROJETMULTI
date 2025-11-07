@@ -9,7 +9,7 @@ function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
 var main = { exports: {} };
-const version$1 = "17.2.3";
+const version$1 = "17.2.2";
 const require$$4 = {
   version: version$1
 };
@@ -23,12 +23,9 @@ const TIPS = [
   "🔐 encrypt with Dotenvx: https://dotenvx.com",
   "🔐 prevent committing .env to code: https://dotenvx.com/precommit",
   "🔐 prevent building .env in docker: https://dotenvx.com/prebuild",
-  "📡 add observability to secrets: https://dotenvx.com/ops",
-  "👥 sync secrets across teammates & machines: https://dotenvx.com/ops",
-  "🗂️ backup and recover secrets: https://dotenvx.com/ops",
-  "✅ audit secrets and track compliance: https://dotenvx.com/ops",
-  "🔄 add secrets lifecycle management: https://dotenvx.com/ops",
-  "🔑 add access controls to secrets: https://dotenvx.com/ops",
+  "📡 observe env with Radar: https://dotenvx.com/radar",
+  "📡 auto-backup env with Radar: https://dotenvx.com/radar",
+  "📡 version env with Radar: https://dotenvx.com/radar",
   "🛠️  run anywhere with `dotenvx run -- yourcommand`",
   "⚙️  specify custom .env file path with { path: '/custom/path/.env' }",
   "⚙️  enable debug logging with { debug: true }",

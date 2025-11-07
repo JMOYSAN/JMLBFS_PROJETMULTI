@@ -1,3 +1,4 @@
+// src/services/groupService.js
 import { fetchWithAuth } from './authService.js'
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -47,18 +48,10 @@ export function createGroup(name, isPrivate) {
   return fetchWithAuth(`${API_URL}/api/groups`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: name.trim(),
-      is_private: isPrivate ? 1 : 0,
-    }),
-  }).then((res) => {
-    if (!res.ok) {
-      return res.json().then((err) => {
-        throw new Error(err.error || 'Erreur création groupe')
-      })
-    }
-    return res.json()
+    body: JSON.stringify({ name, is_private: isPrivate ? 1 : 0 }),
   })
+  if (!res.ok) throw new Error('Erreur création groupe')
+  return res.json()
 }
 
 export function addUserToGroup(userId, groupId) {
@@ -72,8 +65,9 @@ export function addUserToGroup(userId, groupId) {
         throw new Error(err.error || "Erreur lors de l'ajout au groupe")
       })
     }
-    return res.json()
-  })
+  )
+  if (!res.ok) throw new Error('Erreur ajout utilisateur au groupe')
+  return res.json()
 }
 
 export function getGroupMembers(groupId) {
@@ -87,10 +81,8 @@ export function getGroupMembers(groupId) {
   )
 }
 
-export function normalizeGroup(groupe, index = 0) {
-  return {
-    id: groupe.id ?? index,
-    nom: groupe.name ?? `Groupe${index}`,
-    type: groupe.is_private ? 'private' : 'public',
-  }
+export async function getGroupMembers(groupId) {
+  const res = await fetchWithAuth(`${API_URL}/api/groups/${groupId}/members`)
+  if (!res.ok) throw new Error('Erreur membres du groupe')
+  return res.json()
 }

@@ -1,54 +1,33 @@
-import { useCallback, useEffect, useState } from 'react'
-import {
-  listUsers,
-  fetchNextUsers,
-  normalizeUser,
-} from '../services/userService.js'
+// src/hooks/useUsers.js
+import { useEffect, useState, useCallback } from 'react'
+import { fetchWithAuth } from '../services/authService.js'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 export function useUsers() {
-  const [utilisateurs, setUtilisateurs] = useState([])
+  const [users, setUsers] = useState([])
   const [pending, setPending] = useState(false)
-  const [hasMore, setHasMore] = useState(true)
+  const [error, setError] = useState('')
 
-  const runWithPending = useCallback(async (task) => {
+  const load = useCallback(async () => {
     setPending(true)
+    setError('')
     try {
-      return await task()
+      const res = await fetchWithAuth(`${API_URL}/api/users`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+      setUsers(Array.isArray(data) ? data : [])
+    } catch (e) {
+      setError(e.message || 'Erreur chargement utilisateurs')
+      setUsers([])
     } finally {
       setPending(false)
     }
   }, [])
 
-  // Charger les utilisateurs au montage
   useEffect(() => {
-    runWithPending(() => listUsers())
-      .then((users) => setUtilisateurs(users))
-      .catch((err) => console.error('Erreur chargement utilisateurs:', err))
-  }, [runWithPending])
+    load()
+  }, [load])
 
-  const loadMoreUsers = useCallback(
-    async (lastUserId) => {
-      if (!hasMore || !lastUserId) return
-
-      const nextUsers = await runWithPending(() => fetchNextUsers(lastUserId))
-
-      if (nextUsers.length === 0) {
-        setHasMore(false)
-      } else {
-        setUtilisateurs((prev) => [...prev, ...nextUsers])
-      }
-    },
-    [hasMore, runWithPending]
-  )
-
-  const normalizedUsers = utilisateurs.map(normalizeUser)
-
-  return {
-    utilisateurs,
-    normalizedUsers,
-    setUtilisateurs,
-    loadMoreUsers,
-    hasMore,
-    pending,
-  }
+  return { users, pending, error, reload: load }
 }

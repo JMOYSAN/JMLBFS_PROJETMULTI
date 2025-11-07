@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState, useRef } from 'react'
+// src/hooks/useGroups.js
+import { useCallback, useEffect, useState } from 'react'
 import {
   listPublicGroups,
   listPrivateGroups,
@@ -7,149 +8,103 @@ import {
   addUserToGroup,
   getGroupMembers,
 } from '../services/groupService.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
-export function useGroups(currentUser) {
-  const [groupes, setGroupes] = useState({ public: [], private: [] })
-  const [currentGroupe, setCurrentGroupe] = useState(null)
+export function useGroups() {
+  const { currentUser } = useAuth()
+
+  const [publicGroups, setPublicGroups] = useState([])
+  const [privateGroups, setPrivateGroups] = useState([])
+  const [membersByGroup, setMembersByGroup] = useState({})
+  const [offset, setOffset] = useState(0)
   const [pending, setPending] = useState(false)
+  const [error, setError] = useState('')
 
-  // Lazy loading state
-  const lastLoadedIdRef = useRef({ public: 20, private: 20 })
-  const hasMoreRef = useRef({ public: true, private: true })
-
-  const runWithPending = useCallback(async (task) => {
+  const loadPublic = useCallback(async () => {
     setPending(true)
+    setError('')
     try {
-      return await task()
+      const list = await listPublicGroups()
+      setPublicGroups(list)
+    } catch (e) {
+      setError(e.message || 'Erreur groupes publics')
+      setPublicGroups([])
     } finally {
       setPending(false)
     }
   }, [])
 
-  // Initial fetch public groups
-  useEffect(() => {
-    runWithPending(() => listPublicGroups())
-      .then((data) => setGroupes((prev) => ({ ...prev, public: data })))
-      .catch((err) => console.error('Erreur fetch groupes publics:', err))
-  }, [runWithPending])
-
-  // Initial fetch private groups
-  useEffect(() => {
+  const loadPrivate = useCallback(async () => {
     if (!currentUser?.id) return
+    setPending(true)
+    setError('')
+    try {
+      const list = await listPrivateGroups(currentUser.id)
+      setPrivateGroups(list)
+    } catch (e) {
+      setError(e.message || 'Erreur groupes privés')
+      setPrivateGroups([])
+    } finally {
+      setPending(false)
+    }
+  }, [currentUser?.id])
 
-    runWithPending(() => listPrivateGroups(currentUser.id))
-      .then((data) => setGroupes((prev) => ({ ...prev, private: data })))
-      .catch((err) => console.error('Erreur fetch groupes privés:', err))
-  }, [currentUser?.id, runWithPending])
+  const loadMore = useCallback(async () => {
+    setPending(true)
+    setError('')
+    try {
+      const page = await fetchNextGroups(offset)
+      setPublicGroups((prev) => [...prev, ...page])
+      setOffset((prev) => prev + page.length)
+    } catch (e) {
+      setError(e.message || 'Erreur pagination groupes')
+    } finally {
+      setPending(false)
+    }
+  }, [offset])
 
-  // Lazy loading next groups
-  const loadMoreGroups = useCallback(
-    async (type) => {
-      if (!hasMoreRef.current[type]) return
-
-      const lastId = lastLoadedIdRef.current[type]
-      const nextGroups = await runWithPending(() =>
-        fetchNextGroups(type, lastId)
-      )
-
-      if (nextGroups.length === 0) {
-        hasMoreRef.current[type] = false
-      } else {
-        setGroupes((prev) => ({
-          ...prev,
-          [type]: [
-            ...prev[type],
-            ...nextGroups.filter(
-              (g) => !prev[type].some((existing) => existing.id === g.id)
-            ),
-          ],
-        }))
-        lastLoadedIdRef.current[type] = nextGroups[nextGroups.length - 1].id
-      }
-    },
-    [runWithPending]
-  )
-
-  // Create group
-  const creerGroupe = useCallback(
-    async (nomGroupe, participantsAjoutes, isPrivate, utilisateurs) => {
-      const group = await runWithPending(() =>
-        createGroup(nomGroupe, isPrivate)
-      )
-
-      await addUserToGroup(currentUser.id, group.id)
-
-      for (const nom of participantsAjoutes) {
-        const user = utilisateurs.find((u) => (u.username || u.nom) === nom)
-        if (user) await addUserToGroup(user.id, group.id)
-      }
-
-      setGroupes((prev) => ({
-        ...prev,
-        [isPrivate ? 'private' : 'public']: [
-          ...prev[isPrivate ? 'private' : 'public'],
-          { ...group, participants: [] },
-        ],
-      }))
-
-      return group
-    },
-    [currentUser, runWithPending]
-  )
-
-  // Join group
-  const joinGroupe = useCallback(
-    async (groupId) => {
-      await runWithPending(() => addUserToGroup(currentUser.id, groupId))
+  const loadMembers = useCallback(async (groupId) => {
+    setError('')
+    try {
       const members = await getGroupMembers(groupId)
+      setMembersByGroup((prev) => ({ ...prev, [groupId]: members }))
+    } catch (e) {
+      setError(e.message || 'Erreur chargement membres')
+    }
+  }, [])
 
-      const groupe = [...groupes.public, ...groupes.private].find(
-        (g) => g.id === groupId
-      )
-      if (groupe) setCurrentGroupe({ ...groupe, participants: members })
+  const create = useCallback(async (name, isPrivate = false) => {
+    const g = await createGroup(name, isPrivate)
+    if (isPrivate) setPrivateGroups((prev) => [g, ...prev])
+    else setPublicGroups((prev) => [g, ...prev])
+    return g
+  }, [])
+
+  const addUser = useCallback(
+    async (groupId, userId) => {
+      await addUserToGroup(groupId, userId)
+      // optionally refresh members
+      await loadMembers(groupId)
     },
-    [currentUser, groupes, runWithPending]
+    [loadMembers]
   )
 
-  // Add member to group
-  const addMemberToGroupe = useCallback(
-    async (userId, groupId) => {
-      await runWithPending(() => addUserToGroup(userId, groupId))
-      const members = await getGroupMembers(groupId)
-
-      if (currentGroupe?.id === groupId) {
-        setCurrentGroupe((prev) => ({ ...prev, participants: members }))
-      }
-
-      setGroupes((prev) => {
-        const updateList = (list) =>
-          list.map((g) =>
-            g.id === groupId ? { ...g, participants: members } : g
-          )
-        return {
-          public: updateList(prev.public),
-          private: updateList(prev.private),
-        }
-      })
-    },
-    [currentGroupe, runWithPending]
-  )
-
-  const loadGroupMembers = useCallback(
-    async (groupId) => runWithPending(() => getGroupMembers(groupId)),
-    [runWithPending]
-  )
+  useEffect(() => {
+    loadPublic()
+  }, [loadPublic])
+  useEffect(() => {
+    loadPrivate()
+  }, [loadPrivate])
 
   return {
-    groupes,
-    setGroupes,
-    currentGroupe,
-    setCurrentGroupe,
-    creerGroupe,
-    joinGroupe,
-    addMemberToGroupe,
-    loadMoreGroups,
-    loadGroupMembers,
+    publicGroups,
+    privateGroups,
+    membersByGroup,
     pending,
+    error,
+    loadMore,
+    loadMembers,
+    createGroup: create,
+    addUserToGroup: addUser,
   }
 }

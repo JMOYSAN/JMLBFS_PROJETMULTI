@@ -1,22 +1,22 @@
 import {
   createContext,
-  useContext,
   useCallback,
+  useContext,
   useEffect,
-  useState,
   useRef,
+  useState,
 } from 'react'
 import {
-  login as loginService,
-  register as registerService,
-  saveUserToStorage,
-  loadUserFromStorage,
   clearUserFromStorage,
-  updateUserTheme as updateThemeService,
+  getAccessToken,
+  loadUserFromStorage,
+  login as loginService,
   logout as logoutService,
   refreshToken as refreshTokenService,
+  register as registerService,
+  saveUserToStorage,
   setAccessToken,
-  getAccessToken,
+  updateUserTheme as updateThemeService,
 } from '../services/authService.js'
 
 const AuthContext = createContext(null)
@@ -27,6 +27,7 @@ export function AuthProvider({ children }) {
   const [pending, setPending] = useState(false)
   const [error, setError] = useState('')
   const accessTokenRef = useRef(null)
+
   const runWithPending = useCallback(async (task) => {
     setPending(true)
     setError('')
@@ -40,6 +41,25 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
+  const logout = useCallback(() => {
+    logoutService()
+    clearUserFromStorage()
+    accessTokenRef.current = null
+    setCurrentUser(null)
+    setIsConnect(false)
+  }, [])
+
+  const refreshAccessToken = useCallback(async () => {
+    try {
+      const success = await refreshTokenService()
+      if (success) {
+        accessTokenRef.current = getAccessToken()
+      }
+    } catch {
+      logout()
+    }
+  }, [logout])
+
   useEffect(() => {
     const storedUser = loadUserFromStorage()
     if (storedUser) {
@@ -47,19 +67,7 @@ export function AuthProvider({ children }) {
       setIsConnect(true)
       refreshAccessToken()
     }
-  }, [])
-
-  const refreshAccessToken = useCallback(async () => {
-    try {
-      const success = await refreshTokenService()
-      if (success) {
-        const token = getAccessToken()
-        accessTokenRef.current = token
-      }
-    } catch {
-      logout()
-    }
-  }, [])
+  }, [refreshAccessToken])
 
   useEffect(() => {
     if (currentUser?.theme === 'light') {
@@ -79,6 +87,8 @@ export function AuthProvider({ children }) {
       setAccessToken(data.accessToken)
       setIsConnect(true)
 
+      console.log(data.accessToken)
+
       return data.user
     },
     [runWithPending]
@@ -86,21 +96,10 @@ export function AuthProvider({ children }) {
 
   const register = useCallback(
     async (username, password) => {
-      const user = await runWithPending(() =>
-        registerService(username, password)
-      )
-      return user
+      return await runWithPending(() => registerService(username, password))
     },
     [runWithPending]
   )
-
-  const logout = useCallback(() => {
-    logoutService()
-    clearUserFromStorage()
-    accessTokenRef.current = null
-    setCurrentUser(null)
-    setIsConnect(false)
-  }, [])
 
   const toggleTheme = useCallback(async () => {
     if (!currentUser) return
@@ -132,7 +131,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (!context) {
-    throw new Error('useAuth doit être utilisé dans un AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }

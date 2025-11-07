@@ -1,10 +1,10 @@
+// src/Messages/FilsConversation.jsx
 import { useEffect, useRef } from 'react'
 import Bulle from './Bulle'
 import BulleAutre from './BulleAutre.jsx'
 import Chat from './BarreChat.jsx'
-import Topbar from '../Components/Topbar.jsx'
+import Topbar from '../components/Topbar.jsx'
 import Typing from './Typing'
-
 import { useMessages } from '../hooks/useMessages'
 
 function FilsConversation({
@@ -16,6 +16,9 @@ function FilsConversation({
   setCurrentGroupe,
   setGroupes,
 }) {
+  // ✅ Safety: do not render until required data exists
+  if (!currentUser || !currentGroupe) return null
+
   const messagesZoneRef = useRef(null)
   const {
     messages,
@@ -31,6 +34,7 @@ function FilsConversation({
   useEffect(() => {
     const container = messagesZoneRef.current
     if (!container) return
+
     const handleScroll = () => {
       if (
         container.scrollTop === 0 &&
@@ -41,7 +45,7 @@ function FilsConversation({
         const firstId = messages[0]?.id
         if (firstId) {
           loadMoreMessages(firstId).then((olderMessages) => {
-            if (olderMessages && olderMessages.length > 0) {
+            if (olderMessages?.length > 0) {
               const scrollOffset = container.scrollHeight - container.scrollTop
               requestAnimationFrame(() => {
                 container.scrollTop = container.scrollHeight - scrollOffset
@@ -51,36 +55,30 @@ function FilsConversation({
         }
       }
     }
+
     container.addEventListener('scroll', handleScroll)
     return () => container.removeEventListener('scroll', handleScroll)
   }, [messages, loadMoreMessages, hasMore, pending])
 
   useEffect(() => {
-    if (messagesZoneRef.current && !pending) {
+    if (!pending && messagesZoneRef.current) {
       messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
     }
-  }, [currentGroupe?.id])
+  }, [currentGroupe.id, pending])
 
-  // --- Send message through API (persistent + Redis broadcast)
   const handleSend = async (contenu) => {
-    if (!currentUser || !currentGroupe || !contenu?.message?.trim()) return
-
-    try {
-      await send(contenu)
-      requestAnimationFrame(() => {
-        if (messagesZoneRef.current) {
-          messagesZoneRef.current.scrollTop =
-            messagesZoneRef.current.scrollHeight
-        }
-      })
-    } catch (err) {
-      console.error('Erreur envoi message:', err)
-    }
+    if (!contenu?.message?.trim()) return
+    await send(contenu)
+    requestAnimationFrame(() => {
+      if (messagesZoneRef.current) {
+        messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
+      }
+    })
   }
 
   const participantsTyping =
     currentGroupe?.participants?.filter(
-      (p) => p.isTyping && p.nom !== currentUser?.username
+      (p) => p.isTyping && p.nom !== currentUser.username
     ) || []
 
   return (

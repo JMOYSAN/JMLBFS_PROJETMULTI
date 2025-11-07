@@ -6,6 +6,7 @@ import {
   sendMessage,
 } from '../services/messageService.js'
 import { fetchGroupMembers } from '../services/groupService.js'
+import { deleteMessage } from '../services/messageService'
 
 export function useMessages(currentGroupe, currentUser) {
   const [messages, setMessages] = useState([])
@@ -81,6 +82,15 @@ export function useMessages(currentGroupe, currentUser) {
     [currentUser?.id, currentGroupe?.id, runWithPending]
   )
 
+  const remove = useCallback(async (id) => {
+    try {
+      await deleteMessage(id)
+      setMessages((prev) => prev.filter((m) => m.id !== id))
+    } catch (err) {
+      console.error('Erreur suppression:', err)
+    }
+  }, [])
+
   useEffect(() => {
     if (!currentUser?.id) return
 
@@ -93,9 +103,13 @@ export function useMessages(currentGroupe, currentUser) {
     ws.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
+
         if (data.type === 'message' && data.group_id === currentGroupe?.id) {
-          console.log('[useMessages] incoming live:', data)
           setMessages((prev) => [data, ...prev])
+        }
+
+        if (data.type === 'delete') {
+          setMessages((prev) => prev.filter((m) => m.id !== data.id))
         }
       } catch (err) {
         console.error('[useMessages] parse error:', err)
@@ -117,5 +131,6 @@ export function useMessages(currentGroupe, currentUser) {
     loadMoreMessages,
     hasMore,
     pending,
+    remove,
   }
 }

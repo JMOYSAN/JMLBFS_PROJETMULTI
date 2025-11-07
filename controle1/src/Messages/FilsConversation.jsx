@@ -25,6 +25,7 @@ function FilsConversation({
     members,
     refresh,
     send,
+    remove,
   } = useMessages(currentGroupe, currentUser)
 
   useEffect(() => {
@@ -102,7 +103,12 @@ function FilsConversation({
         {[...messages].reverse().map((message) => {
           const estMoi = message.user_id === currentUser.id
           return estMoi ? (
-            <Bulle key={message.id} message={message} members={members} />
+            <Bulle
+              key={message.id}
+              message={message}
+              members={members}
+              onDelete={() => remove(message.id)}
+            />
           ) : (
             <BulleAutre key={message.id} message={message} members={members} />
           )

@@ -1,9 +1,8 @@
-// src/services/groupService.js
 import { fetchWithAuth } from './authService.js'
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = 'http://localhost:3000'
 
 export function listPublicGroups() {
-  return fetchWithAuth(`${API_URL}/api/groups/public`).then((res) => {
+  return fetchWithAuth(`${API_URL}/groups/public`).then((res) => {
     if (!res.ok) {
       throw new Error('Erreur lors de la récupération des groupes publics')
     }
@@ -12,7 +11,7 @@ export function listPublicGroups() {
 }
 
 export function fetchGroupMembers(groupId) {
-  return fetchWithAuth(`${API_URL}/api/groups-users/group/${groupId}`).then(
+  return fetchWithAuth(`${API_URL}/groups-users/group/${groupId}`).then(
     (res) => {
       if (!res.ok) {
         throw new Error('Erreur récupération membres du groupe')
@@ -23,19 +22,17 @@ export function fetchGroupMembers(groupId) {
 }
 
 export function listPrivateGroups(userId) {
-  return fetchWithAuth(`${API_URL}/api/groups/private/${userId}`).then(
-    (res) => {
-      if (!res.ok) {
-        throw new Error('Erreur lors de la récupération des groupes privés')
-      }
-      return res.json()
+  return fetchWithAuth(`${API_URL}/groups/private/${userId}`).then((res) => {
+    if (!res.ok) {
+      throw new Error('Erreur lors de la récupération des groupes privés')
     }
-  )
+    return res.json()
+  })
 }
 
 export function fetchNextGroups(type, lastGroupId, limit = 20) {
   return fetchWithAuth(
-    `${API_URL}/api/groups/next/${type}/${lastGroupId}?limit=${limit}`
+    `${API_URL}/groups/next/${type}/${lastGroupId}?limit=${limit}`
   ).then((res) => {
     if (!res.ok) {
       throw new Error(`Erreur HTTP ${res.status}`)
@@ -45,17 +42,25 @@ export function fetchNextGroups(type, lastGroupId, limit = 20) {
 }
 
 export function createGroup(name, isPrivate) {
-  return fetchWithAuth(`${API_URL}/api/groups`, {
+  return fetchWithAuth(`${API_URL}/groups`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, is_private: isPrivate ? 1 : 0 }),
+    body: JSON.stringify({
+      name: name.trim(),
+      is_private: isPrivate ? 1 : 0,
+    }),
+  }).then((res) => {
+    if (!res.ok) {
+      return res.json().then((err) => {
+        throw new Error(err.error || 'Erreur création groupe')
+      })
+    }
+    return res.json()
   })
-  if (!res.ok) throw new Error('Erreur création groupe')
-  return res.json()
 }
 
 export function addUserToGroup(userId, groupId) {
-  return fetchWithAuth(`${API_URL}/api/groups-users`, {
+  return fetchWithAuth(`${API_URL}/groups-users`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, groupId }),
@@ -65,13 +70,12 @@ export function addUserToGroup(userId, groupId) {
         throw new Error(err.error || "Erreur lors de l'ajout au groupe")
       })
     }
-  )
-  if (!res.ok) throw new Error('Erreur ajout utilisateur au groupe')
-  return res.json()
+    return res.json()
+  })
 }
 
 export function getGroupMembers(groupId) {
-  return fetchWithAuth(`${API_URL}/api/groups-users/group/${groupId}`).then(
+  return fetchWithAuth(`${API_URL}/groups-users/group/${groupId}`).then(
     (res) => {
       if (!res.ok) {
         throw new Error('Erreur lors de la récupération des membres')
@@ -81,8 +85,10 @@ export function getGroupMembers(groupId) {
   )
 }
 
-export async function getGroupMembers(groupId) {
-  const res = await fetchWithAuth(`${API_URL}/api/groups/${groupId}/members`)
-  if (!res.ok) throw new Error('Erreur membres du groupe')
-  return res.json()
+export function normalizeGroup(groupe, index = 0) {
+  return {
+    id: groupe.id ?? index,
+    nom: groupe.name ?? `Groupe${index}`,
+    type: groupe.is_private ? 'private' : 'public',
+  }
 }

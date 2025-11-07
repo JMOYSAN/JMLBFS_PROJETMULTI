@@ -1,33 +1,54 @@
-// src/hooks/useUsers.js
-import { useEffect, useState, useCallback } from 'react'
-import { fetchWithAuth } from '../services/authService.js'
-
-const API_URL = import.meta.env.VITE_API_URL
+import { useCallback, useEffect, useState } from 'react'
+import {
+  listUsers,
+  fetchNextUsers,
+  normalizeUser,
+} from '../services/userService.js'
 
 export function useUsers() {
-  const [users, setUsers] = useState([])
+  const [utilisateurs, setUtilisateurs] = useState([])
   const [pending, setPending] = useState(false)
-  const [error, setError] = useState('')
+  const [hasMore, setHasMore] = useState(true)
 
-  const load = useCallback(async () => {
+  const runWithPending = useCallback(async (task) => {
     setPending(true)
-    setError('')
     try {
-      const res = await fetchWithAuth(`${API_URL}/api/users`)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const data = await res.json()
-      setUsers(Array.isArray(data) ? data : [])
-    } catch (e) {
-      setError(e.message || 'Erreur chargement utilisateurs')
-      setUsers([])
+      return await task()
     } finally {
       setPending(false)
     }
   }, [])
 
+  // Charger les utilisateurs au montage
   useEffect(() => {
-    load()
-  }, [load])
+    runWithPending(() => listUsers())
+      .then((users) => setUtilisateurs(users))
+      .catch((err) => console.error('Erreur chargement utilisateurs:', err))
+  }, [runWithPending])
 
-  return { users, pending, error, reload: load }
+  const loadMoreUsers = useCallback(
+    async (lastUserId) => {
+      if (!hasMore || !lastUserId) return
+
+      const nextUsers = await runWithPending(() => fetchNextUsers(lastUserId))
+
+      if (nextUsers.length === 0) {
+        setHasMore(false)
+      } else {
+        setUtilisateurs((prev) => [...prev, ...nextUsers])
+      }
+    },
+    [hasMore, runWithPending]
+  )
+
+  const normalizedUsers = utilisateurs.map(normalizeUser)
+
+  return {
+    utilisateurs,
+    normalizedUsers,
+    setUtilisateurs,
+    loadMoreUsers,
+    hasMore,
+    pending,
+  }
 }

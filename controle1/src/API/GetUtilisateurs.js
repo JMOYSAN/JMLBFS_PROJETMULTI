@@ -1,8 +1,6 @@
-const API_URL = import.meta.env.VITE_API_URL
-
 async function genererUtilisateurs() {
   try {
-    const response = await fetch(`${API_URL}/users`)
+    const response = await fetch(`http://localhost:3000/users`)
     if (response) {
       console.log('Res ', response)
     }
@@ -16,7 +14,7 @@ async function genererUtilisateurs() {
 
 export async function getUtilisateursById(id) {
   try {
-    const response = await fetch(`${API_URL}/users/next/${id}`)
+    const response = await fetch(`http://localhost:3000/users/next/${id}`)
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`)
     }

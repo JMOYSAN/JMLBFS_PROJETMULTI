@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import FilsConversation from './Messages/FilsConversation'
 import Login from './Users/Login'
-import Sidebar from './Components/Sidebar.jsx'
+import Sidebar from './components/Sidebar.jsx'
 import Utilisateurs from './Users/Utilisateurs.jsx'
 import Register from './Users/Register.jsx'
 

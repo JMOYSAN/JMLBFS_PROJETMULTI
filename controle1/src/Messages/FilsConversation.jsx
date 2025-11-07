@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import Bulle from './Bulle'
 import BulleAutre from './BulleAutre.jsx'
 import Chat from './BarreChat.jsx'
-import Topbar from '../Components/Topbar.jsx'
+import Topbar from '../components/Topbar.jsx'
 import Typing from './Typing'
 
 import { useMessages } from '../hooks/useMessages'
@@ -17,16 +17,8 @@ function FilsConversation({
   setGroupes,
 }) {
   const messagesZoneRef = useRef(null)
-  const {
-    messages,
-    loadMoreMessages,
-    hasMore,
-    pending,
-    members,
-    refresh,
-    send,
-    remove,
-  } = useMessages(currentGroupe, currentUser)
+  const { messages, loadMoreMessages, hasMore, pending, members, send } =
+    useMessages(currentGroupe, currentUser)
 
   useEffect(() => {
     const container = messagesZoneRef.current
@@ -59,7 +51,7 @@ function FilsConversation({
     if (messagesZoneRef.current && !pending) {
       messagesZoneRef.current.scrollTop = messagesZoneRef.current.scrollHeight
     }
-  }, [currentGroupe?.id])
+  }, [currentGroupe.id, pending])
 
   // --- Send message through API (persistent + Redis broadcast)
   const handleSend = async (contenu) => {
@@ -103,12 +95,7 @@ function FilsConversation({
         {[...messages].reverse().map((message) => {
           const estMoi = message.user_id === currentUser.id
           return estMoi ? (
-            <Bulle
-              key={message.id}
-              message={message}
-              members={members}
-              onDelete={() => remove(message.id)}
-            />
+            <Bulle key={message.id} message={message} members={members} />
           ) : (
             <BulleAutre key={message.id} message={message} members={members} />
           )

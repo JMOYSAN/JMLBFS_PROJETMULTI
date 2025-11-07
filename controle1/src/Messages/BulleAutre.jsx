@@ -1,5 +1,4 @@
 function BulleAutre({ message, members }) {
-  console.log(members)
   return (
     <div className="containerMessage">
       <div className="timestamp">{message.created_at}</div>

@@ -1,8 +1,8 @@
 import { fetchWithAuth } from './authService.js'
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = 'http://localhost:3000'
 
 export function fetchMessages(groupId, limit = 20) {
-  const url = `${API_URL}/api/messages/group/${groupId}/lazy?limit=${limit}`
+  const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}`
 
   return fetchWithAuth(url).then((res) => {
     if (!res.ok) {
@@ -13,7 +13,7 @@ export function fetchMessages(groupId, limit = 20) {
 }
 
 export function fetchOlderMessages(groupId, beforeId, limit = 20) {
-  const url = `${API_URL}/api/messages/group/${groupId}/lazy?limit=${limit}&beforeId=${beforeId}`
+  const url = `${API_URL}/messages/group/${groupId}/lazy?limit=${limit}&beforeId=${beforeId}`
 
   return fetchWithAuth(url).then((res) => {
     if (!res.ok) {
@@ -23,17 +23,8 @@ export function fetchOlderMessages(groupId, beforeId, limit = 20) {
   })
 }
 
-export function deleteMessage(id) {
-  return fetchWithAuth(`${API_URL}/api/messages/${id}`, {
-    method: 'DELETE',
-  }).then((res) => {
-    if (!res.ok) throw new Error('Erreur suppression message')
-    return res.json()
-  })
-}
-
 export function sendMessage(userId, groupId, content) {
-  return fetchWithAuth(`${API_URL}/api/messages`, {
+  return fetchWithAuth(`${API_URL}/messages`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

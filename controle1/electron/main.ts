@@ -5,8 +5,6 @@ import path from 'node:path'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 process.env.APP_ROOT = path.join(__dirname, '..')
 
-import dotenv from 'dotenv'
-dotenv.config()
 export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
@@ -46,6 +44,7 @@ function createWindow() {
     webPreferences: { preload: path.join(__dirname, 'preload.mjs') },
     show: false,
   })
+
 
   win.webContents.openDevTools()
 

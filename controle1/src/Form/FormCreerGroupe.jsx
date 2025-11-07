@@ -9,9 +9,6 @@ function FormCreerGroupe({ utilisateurs, currentUser, setShowForm }) {
 
   const { creerGroupe, pending } = useGroups(currentUser)
 
-  const getNom = (u) =>
-    typeof u === 'string' ? u : u?.nom || u?.username || ''
-
   const handleAddParticipant = (nom) => {
     const cible = (nom || '').trim()
     if (!cible) return

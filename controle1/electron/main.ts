@@ -2,6 +2,11 @@ import { app, BrowserWindow, ipcMain, Notification } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
+import dotenv from 'dotenv'
+dotenv.config()
+
+console.log('Main env:', process.env.VITE_API_URL)
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 process.env.APP_ROOT = path.join(__dirname, '..')
 

@@ -1,3 +1,4 @@
+/*
 import { fetchWithAuth } from './authService.js'
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -47,4 +48,34 @@ export function sendMessage(userId, groupId, content) {
     }
     return res.json()
   })
+}
+*/
+
+// src/services/messageService.js
+import { fetchWithAuth } from './authService.js'
+
+export async function fetchMessages(groupId, limit = 50, beforeId = null) {
+  const params = new URLSearchParams({ limit: String(limit) })
+  if (beforeId) params.set('beforeId', String(beforeId))
+
+  const res = await fetchWithAuth(
+    `/api/messages/group/${groupId}?${params.toString()}`,
+    { method: 'GET' }
+  )
+  if (!res.ok) throw new Error('Erreur récupération des messages')
+  return res.json()
+}
+
+export async function fetchOlderMessages(groupId, beforeId, limit = 50) {
+  return fetchMessages(groupId, limit, beforeId)
+}
+
+export async function sendMessage(groupId, text) {
+  const res = await fetchWithAuth(`/api/messages`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ groupId, text }),
+  })
+  if (!res.ok) throw new Error('Erreur envoi du message')
+  return res.json()
 }

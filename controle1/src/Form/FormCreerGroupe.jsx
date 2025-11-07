@@ -33,7 +33,7 @@ function FormCreerGroupe({ utilisateurs, currentUser, setShowForm }) {
       setShowForm(false)
     } catch (err) {
       console.error('Erreur handleSubmit:', err)
-      alert(err.message || 'Erreur lors de la création du groupe')
+      //alert(err.message || 'Erreur lors de la création du groupe')
     }
   }
 

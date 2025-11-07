@@ -44,7 +44,7 @@ function App() {
       setShowForm(false)
     } catch (err) {
       console.error('Erreur création groupe:', err)
-      alert('Erreur lors de la création du groupe')
+      // alert('Erreur lors de la création du groupe')
     }
   }
 

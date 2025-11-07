@@ -10,6 +10,8 @@ import { useAuth } from './contexts/AuthContext'
 import { useUsers } from './hooks/useUsers'
 import { useGroups } from './hooks/useGroups'
 
+//TEST
+
 function App() {
   const [showForm, setShowForm] = useState(false)
   const [page, setPage] = useState('login')

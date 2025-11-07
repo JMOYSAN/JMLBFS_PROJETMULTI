@@ -133,7 +133,6 @@ export function getAccessTokenFromStorage() {
     return null
   }
 }
-
 export function updateAccessTokenInStorage(token) {
   if (typeof window === 'undefined') return
   try {

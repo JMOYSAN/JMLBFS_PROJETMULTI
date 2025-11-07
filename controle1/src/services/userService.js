@@ -3,7 +3,7 @@ import { fetchWithAuth } from './authService.js'
 const API_URL = import.meta.env.VITE_API_URL
 
 export function listUsers() {
-  return fetchWithAuth(`${API_URL}/users`).then((res) => {
+  return fetchWithAuth(`${API_URL}/api/users`).then((res) => {
     if (!res.ok) {
       throw new Error('Erreur lors de la récupération des utilisateurs')
     }
@@ -12,12 +12,14 @@ export function listUsers() {
 }
 
 export function fetchNextUsers(lastUserId) {
-  return fetchWithAuth(`${API_URL}/users/next/${lastUserId}`).then((res) => {
-    if (!res.ok) {
-      throw new Error(`Erreur HTTP ${res.status}`)
+  return fetchWithAuth(`${API_URL}/api/users/next/${lastUserId}`).then(
+    (res) => {
+      if (!res.ok) {
+        throw new Error(`Erreur HTTP ${res.status}`)
+      }
+      return res.json()
     }
-    return res.json()
-  })
+  )
 }
 
 export function normalizeUser(user, index = 0) {

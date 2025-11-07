@@ -14,7 +14,7 @@ function AjouterDansGroupe({
 
   const { addMemberToGroupe, loadGroupMembers, pending } =
     useGroups(currentUser)
-
+  //commentaire
   const getNom = (u) =>
     typeof u === 'string' ? u : u?.nom || u?.username || ''
 

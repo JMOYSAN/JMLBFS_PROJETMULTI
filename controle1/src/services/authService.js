@@ -1,3 +1,5 @@
+import { CryptoService } from './crypto/CryptoService.js'
+
 const API_URL = import.meta.env.VITE_API_URL
 
 let accessToken = null
@@ -24,6 +26,11 @@ export async function login(username, password) {
   accessToken = data.accessToken
 
   saveUserToStorage(data.user, data.accessToken)
+
+  // new line for E2EE
+  CryptoService.registerDevice(data.user.id, 'electron-' + data.user.id).catch(
+    (err) => console.error('E2EE registration failed:', err)
+  )
 
   return { user: data.user, accessToken: data.accessToken }
 }

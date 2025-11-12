@@ -1,6 +1,7 @@
-// src/services/crypto/CryptoService.js
 import * as signal from 'libsignal-protocol-typescript'
 import { store } from './storage.js'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 export const CryptoService = {
   /** Initialize device identity (one-time) */
@@ -16,7 +17,6 @@ export const CryptoService = {
       rid = registrationId
       console.log('Generated new identity keys')
     } else {
-      // Convert back from base64 to ArrayBuffer
       ik = {
         pubKey: Buffer.from(ik.pubKey, 'base64'),
         privKey: Buffer.from(ik.privKey, 'base64'),
@@ -27,7 +27,41 @@ export const CryptoService = {
     return { identityKeyPair: ik, registrationId: rid }
   },
 
-  /** Generate a batch of prekeys */
+  /** Upload device public keys to backend */
+  async registerDevice(userId, deviceId, displayName = 'Electron') {
+    const { identityKeyPair } = await this.initIdentity()
+    const signedPreKey = await this.generateSignedPreKey(identityKeyPair, 1)
+    const preKeys = await this.generatePreKeys(1, 10)
+
+    const body = {
+      user_id: userId,
+      device_id: deviceId,
+      ik_pub: Buffer.from(identityKeyPair.pubKey).toString('base64'),
+      sig_pub: Buffer.from(identityKeyPair.pubKey).toString('base64'),
+      spk_pub: Buffer.from(signedPreKey.keyPair.pubKey).toString('base64'),
+      spk_sig: Buffer.from(signedPreKey.signature).toString('base64'),
+      opks: preKeys.map((p) =>
+        Buffer.from(p.keyPair.pubKey).toString('base64')
+      ),
+      display_name: displayName,
+    }
+
+    const res = await fetch(`${API_URL}/e2ee/devices/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      const text = await res.text()
+      console.error('E2EE registration failed:', text)
+      throw new Error('E2EE device registration failed')
+    }
+
+    console.log('E2EE device registered with backend')
+  },
+
+  /** Generate batches of prekeys */
   async generatePreKeys(startId = 1, count = 20) {
     const preKeys = []
     for (let i = startId; i < startId + count; i++) {
@@ -37,14 +71,14 @@ export const CryptoService = {
     return preKeys
   },
 
-  /** Generate a signed prekey */
   async generateSignedPreKey(identityKeyPair, keyId = 1) {
     return await signal.KeyHelper.generateSignedPreKey(identityKeyPair, keyId)
   },
 
-  /** Create a session with a remote device (X3DH handshake) */
-  async createSession(remoteBundle, remoteAddr) {
-    const builder = new signal.SessionBuilder(store, remoteAddr)
+  /** Create a session tied to group + remote user */
+  async createSession(remoteBundle, groupId, remoteUserId) {
+    const addr = `${groupId}:${remoteUserId}`
+    const builder = new signal.SessionBuilder(store, addr)
     await builder.processPreKey({
       registrationId: remoteBundle.registrationId,
       identityKey: Buffer.from(remoteBundle.ik_pub, 'base64'),
@@ -62,25 +96,23 @@ export const CryptoService = {
     })
   },
 
-  /** Encrypt a plaintext for a remote session */
-  async encryptMessage(remoteAddr, plaintext) {
-    const cipher = new signal.SessionCipher(store, remoteAddr)
+  async encryptMessage(groupId, remoteUserId, plaintext) {
+    const addr = `${groupId}:${remoteUserId}`
+    const cipher = new signal.SessionCipher(store, addr)
     const result = await cipher.encrypt(Buffer.from(plaintext, 'utf8'))
-    return result // contains type + body
+    return result
   },
 
-  /** Decrypt an incoming message */
-  async decryptMessage(remoteAddr, message) {
-    const cipher = new signal.SessionCipher(store, remoteAddr)
+  async decryptMessage(groupId, senderUserId, message) {
+    const addr = `${groupId}:${senderUserId}`
+    const cipher = new signal.SessionCipher(store, addr)
     let plaintext
     if (message.type === 3) {
-      // prekey message
       plaintext = await cipher.decryptPreKeyWhisperMessage(
         Buffer.from(message.body, 'base64'),
         'binary'
       )
     } else {
-      // normal message
       plaintext = await cipher.decryptWhisperMessage(
         Buffer.from(message.body, 'base64'),
         'binary'

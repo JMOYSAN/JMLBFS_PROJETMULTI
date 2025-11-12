@@ -1,7 +1,22 @@
 import * as signal from 'libsignal-protocol-typescript'
 import { store } from './storage.js'
+import { Buffer } from 'buffer'
+if (typeof window !== 'undefined') window.Buffer = Buffer
 
 const API_URL = import.meta.env.VITE_API_URL
+
+function toArrayBuffer(obj) {
+  if (obj instanceof ArrayBuffer) return obj
+  if (ArrayBuffer.isView(obj)) return obj.buffer
+  if (obj && obj.data && Array.isArray(obj.data)) {
+    return Uint8Array.from(obj.data).buffer // handle { type: 'Buffer', data: [...] }
+  }
+  if (typeof obj === 'string') {
+    return Buffer.from(obj, 'base64').buffer
+  }
+  console.error('Unexpected key format:', obj)
+  throw new Error('Invalid key format')
+}
 
 export const CryptoService = {
   /** Initialize device identity (one-time) */
@@ -18,8 +33,8 @@ export const CryptoService = {
       console.log('Generated new identity keys')
     } else {
       ik = {
-        pubKey: Buffer.from(ik.pubKey, 'base64'),
-        privKey: Buffer.from(ik.privKey, 'base64'),
+        pubKey: toArrayBuffer(ik.pubKey),
+        privKey: toArrayBuffer(ik.privKey),
       }
       console.log('Loaded existing identity keys')
     }

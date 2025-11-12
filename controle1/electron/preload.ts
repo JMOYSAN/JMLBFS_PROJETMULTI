@@ -25,3 +25,9 @@ contextBridge.exposeInMainWorld(
   (title: string, body: string, options = {}) =>
     ipcRenderer.invoke('notify', { title, body, ...options })
 )
+
+contextBridge.exposeInMainWorld('secureStore', {
+  get: (key: string) => ipcRenderer.invoke('store:get', key),
+  set: (key: string, value: any) => ipcRenderer.invoke('store:set', key, value),
+  remove: (key: string) => ipcRenderer.invoke('store:remove', key),
+})

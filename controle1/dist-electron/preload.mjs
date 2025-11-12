@@ -22,3 +22,8 @@ electron.contextBridge.exposeInMainWorld(
   "notify",
   (title, body, options = {}) => electron.ipcRenderer.invoke("notify", { title, body, ...options })
 );
+electron.contextBridge.exposeInMainWorld("secureStore", {
+  get: (key) => electron.ipcRenderer.invoke("store:get", key),
+  set: (key, value) => electron.ipcRenderer.invoke("store:set", key, value),
+  remove: (key) => electron.ipcRenderer.invoke("store:remove", key)
+});

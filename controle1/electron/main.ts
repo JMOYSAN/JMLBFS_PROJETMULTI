@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import fs from 'fs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 process.env.APP_ROOT = path.join(__dirname, '..')
@@ -58,7 +59,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  app.setAppUserModelId('Rogue Rats Chat')
+  app.setAppUserModelId('Bobberchat')
   process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
     ? path.join(process.env.APP_ROOT!, 'public')
     : RENDERER_DIST
@@ -68,6 +69,37 @@ app.whenReady().then(() => {
     const n = new Notification({ title, body })
     n.show()
   })
+})
+
+const basePath = path.join(app.getPath('userData'), 'crypto-store.json')
+
+function readStore() {
+  try {
+    return JSON.parse(fs.readFileSync(basePath, 'utf8'))
+  } catch {
+    return {}
+  }
+}
+
+function writeStore(data: Record<string, any>) {
+  fs.writeFileSync(basePath, JSON.stringify(data, null, 2))
+}
+
+ipcMain.handle('store:get', (_event, key: string) => {
+  const data = readStore()
+  return data[key]
+})
+
+ipcMain.handle('store:set', (_event, key: string, value: any) => {
+  const data = readStore()
+  data[key] = value
+  writeStore(data)
+})
+
+ipcMain.handle('store:remove', (_event, key: string) => {
+  const data = readStore()
+  delete data[key]
+  writeStore(data)
 })
 
 app.on('activate', () => {

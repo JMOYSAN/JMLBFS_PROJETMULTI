@@ -1,7 +1,7 @@
 import { Menu, app, ipcMain, Notification, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import path$1 from "node:path";
-import require$$0 from "fs";
+import fs$1 from "fs";
 import require$$1 from "path";
 import require$$2 from "os";
 import require$$3 from "crypto";
@@ -9,11 +9,11 @@ function getDefaultExportFromCjs(x) {
   return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, "default") ? x["default"] : x;
 }
 var main = { exports: {} };
-const version$1 = "17.2.2";
+const version$1 = "17.2.3";
 const require$$4 = {
   version: version$1
 };
-const fs = require$$0;
+const fs = fs$1;
 const path = require$$1;
 const os = require$$2;
 const crypto = require$$3;
@@ -23,9 +23,12 @@ const TIPS = [
   "🔐 encrypt with Dotenvx: https://dotenvx.com",
   "🔐 prevent committing .env to code: https://dotenvx.com/precommit",
   "🔐 prevent building .env in docker: https://dotenvx.com/prebuild",
-  "📡 observe env with Radar: https://dotenvx.com/radar",
-  "📡 auto-backup env with Radar: https://dotenvx.com/radar",
-  "📡 version env with Radar: https://dotenvx.com/radar",
+  "📡 add observability to secrets: https://dotenvx.com/ops",
+  "👥 sync secrets across teammates & machines: https://dotenvx.com/ops",
+  "🗂️ backup and recover secrets: https://dotenvx.com/ops",
+  "✅ audit secrets and track compliance: https://dotenvx.com/ops",
+  "🔄 add secrets lifecycle management: https://dotenvx.com/ops",
+  "🔑 add access controls to secrets: https://dotenvx.com/ops",
   "🛠️  run anywhere with `dotenvx run -- yourcommand`",
   "⚙️  specify custom .env file path with { path: '/custom/path/.env' }",
   "⚙️  enable debug logging with { debug: true }",
@@ -378,13 +381,38 @@ function createWindow() {
   else win.loadFile(path$1.join(RENDERER_DIST, "index.html"));
 }
 app.whenReady().then(() => {
-  app.setAppUserModelId("Rogue Rats Chat");
+  app.setAppUserModelId("Bobberchat");
   process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path$1.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
   createWindow();
   ipcMain.handle("notify", (_e, { title, body }) => {
     const n = new Notification({ title, body });
     n.show();
   });
+});
+const basePath = path$1.join(app.getPath("userData"), "crypto-store.json");
+function readStore() {
+  try {
+    return JSON.parse(fs$1.readFileSync(basePath, "utf8"));
+  } catch {
+    return {};
+  }
+}
+function writeStore(data) {
+  fs$1.writeFileSync(basePath, JSON.stringify(data, null, 2));
+}
+ipcMain.handle("store:get", (_event, key) => {
+  const data = readStore();
+  return data[key];
+});
+ipcMain.handle("store:set", (_event, key, value) => {
+  const data = readStore();
+  data[key] = value;
+  writeStore(data);
+});
+ipcMain.handle("store:remove", (_event, key) => {
+  const data = readStore();
+  delete data[key];
+  writeStore(data);
 });
 app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();

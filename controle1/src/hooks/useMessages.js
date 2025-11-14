@@ -109,7 +109,7 @@ export function useMessages(currentGroupe, currentUser) {
     if (!currentUser?.id) return
 
     const wsUrl = `${
-      import.meta.env.WEBSOCKET_URL
+      import.meta.env.VITE_WEBSOCKET_URL
     }?user=${currentUser.id}&token=${localStorage.getItem('accessToken') || ''}`
 
     console.log('[useMessages] Opening WS:', wsUrl)

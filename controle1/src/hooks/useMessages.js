@@ -73,9 +73,23 @@ export function useMessages(currentGroupe, currentUser) {
       if (!contenu.message?.trim() && !contenu.fichier) return
       if (!currentUser?.id || !currentGroupe?.id) return
 
+      // envoi via API (persistance + éventuel broadcast côté serveur)
       const newMsg = await runWithPending(() =>
         sendMessage(currentUser.id, currentGroupe.id, contenu.message)
       )
+
+      // ajout optimiste dans la liste locale
+      if (newMsg) {
+        setMessages((prev) => [
+          {
+            ...newMsg,
+            content: contenu.message,
+            sender_user_id: currentUser.id,
+            group_id: currentGroupe.id,
+          },
+          ...prev,
+        ])
+      }
 
       return newMsg
     },
@@ -94,7 +108,13 @@ export function useMessages(currentGroupe, currentUser) {
   useEffect(() => {
     if (!currentUser?.id) return
 
-    ws.current = new WebSocket(`ws://bobberchat.com/ws?user=${currentUser.id}`)
+    const wsUrl = `${
+      import.meta.env.WEBSOCKET_URL
+    }?user=${currentUser.id}&token=${localStorage.getItem('accessToken') || ''}`
+
+    console.log('[useMessages] Opening WS:', wsUrl)
+
+    ws.current = new WebSocket(wsUrl)
 
     ws.current.onopen = () => console.log('[useMessages] WS connected')
     ws.current.onclose = () => console.log('[useMessages] WS closed')
@@ -105,6 +125,7 @@ export function useMessages(currentGroupe, currentUser) {
         const data = JSON.parse(event.data)
 
         if (data.type === 'message' && data.group_id === currentGroupe?.id) {
+          // ici, data est le message envoyé par l’API via Redis/WS
           setMessages((prev) => [data, ...prev])
         }
 

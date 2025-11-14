@@ -1,7 +1,12 @@
 import { app, BrowserWindow, ipcMain, Notification } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
-
+import * as Sentry from '@sentry/electron/main'
+Sentry.init({
+  dsn: 'https://7857ca788a7b5b7a3adde2295ee8b6f1@o4510364801040384.ingest.us.sentry.io/4510364802940928',
+  // Enable logs to be sent to Sentry
+  _experiments: { enableLogs: true },
+})
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 process.env.APP_ROOT = path.join(__dirname, '..')
 

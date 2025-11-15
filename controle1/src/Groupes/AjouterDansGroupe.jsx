@@ -12,7 +12,7 @@ function AjouterDansGroupe({
 
   const { addMemberToGroupe, loadGroupMembers, pending } =
     useGroups(currentUser)
-
+  //commentaire
   const getNom = (u) =>
     typeof u === 'string' ? u : u?.nom || u?.username || ''
 
@@ -35,7 +35,7 @@ function AjouterDansGroupe({
       )
 
       if (!user) {
-        alert('Utilisateur introuvable')
+        //alert('Utilisateur introuvable')
         return
       }
 
@@ -45,7 +45,7 @@ function AjouterDansGroupe({
       const updatedMembers = await loadGroupMembers(currentGroupe.id)
       setMembers(updatedMembers)
 
-      alert('Participant ajouté avec succès')
+      //alert('Participant ajouté avec succès')
       setSaisie('')
       setShowForm?.(false)
     } catch (err) {

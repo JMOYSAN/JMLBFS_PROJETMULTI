@@ -36,7 +36,7 @@ function Groupe({ currentUser, groupe, setCurrentGroupe }) {
       setAskConfirm(false)
     } catch (err) {
       console.error('Erreur lors de la jointure au groupe:', err)
-      alert('Impossible de rejoindre le groupe')
+      //alert('Impossible de rejoindre le groupe')
     }
   }
 

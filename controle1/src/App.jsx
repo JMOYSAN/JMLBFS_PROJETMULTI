@@ -11,7 +11,7 @@ import { useUsers } from './hooks/useUsers'
 import { useGroups } from './hooks/useGroups'
 
 //TEST
-//test
+
 function App() {
   const [showForm, setShowForm] = useState(false)
   const [page, setPage] = useState('login')
@@ -44,7 +44,7 @@ function App() {
       setShowForm(false)
     } catch (err) {
       console.error('Erreur création groupe:', err)
-      alert('Erreur lors de la création du groupe')
+      // alert('Erreur lors de la création du groupe')
     }
   }
 

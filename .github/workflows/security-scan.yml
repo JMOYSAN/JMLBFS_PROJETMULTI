@@ -54,7 +54,20 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --json-file-output=reports/snyk-report.json
+          args: --json-file-output=controle1/reports/snyk-report.json
+
+      - name: Debug - List files
+        if: always()
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo ""
+          echo "=== Reports directory contents ==="
+          ls -la reports/ || echo "reports/ does not exist in working-directory"
+          echo ""
+          echo "=== Root controle1/reports/ contents ==="
+          ls -la ../controle1/reports/ 2>/dev/null || echo "../controle1/reports/ does not exist"
+        working-directory: ./controle1
 
       - name: Upload security reports
         uses: actions/upload-artifact@v4
@@ -63,6 +76,7 @@ jobs:
           name: security-reports
           path: controle1/reports/
           retention-days: 30
+          if-no-files-found: warn
 
       - name: Comment PR with results
         if: github.event_name == 'pull_request'
@@ -70,10 +84,10 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let comment = '##Security Scan Results\n\n';
+            let comment = '## Security Scan Results\n\n';
             
             try {
-              const audit = JSON.parse(fs.readFileSync('reports/npm-audit.json', 'utf8'));
+              const audit = JSON.parse(fs.readFileSync('controle1/reports/npm-audit.json', 'utf8'));
               const vulnerabilities = audit.metadata.vulnerabilities;
               comment += `### npm audit\n`;
               comment += `- Critical: ${vulnerabilities.critical}\n`;

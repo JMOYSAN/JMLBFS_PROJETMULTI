@@ -11,6 +11,9 @@ on:
 jobs:
   security-analysis:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./controle1
 
     steps:
       - uses: actions/checkout@v4
@@ -20,6 +23,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
+          cache-dependency-path: './controle1/package-lock.json'
 
       - name: Install dependencies
         run: npm ci
@@ -61,7 +65,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let comment = '##  Security Scan Results\n\n';
+            let comment = '## Security Scan Results\n\n';
             
             try {
               const audit = JSON.parse(fs.readFileSync('reports/npm-audit.json', 'utf8'));

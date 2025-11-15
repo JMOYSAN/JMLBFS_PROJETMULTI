@@ -16,7 +16,6 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-
     "build:win": "npm run make -- --platform win32",
     "build:linux": "npm run make -- --platform linux",
     "build:mac": "npm run make -- --platform darwin",
@@ -30,6 +29,7 @@
     "security:open": "explorer reports\\security-report.html"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.44.0",
     "electron-squirrel-startup": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

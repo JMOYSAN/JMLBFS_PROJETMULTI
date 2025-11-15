@@ -1,27 +1,28 @@
-import { ipcRenderer, contextBridge } from 'electron'
+// preload.mjs
+import { contextBridge, ipcRenderer } from 'electron'
 
-// --------- Expose some API to the Renderer process ---------
-contextBridge.exposeInMainWorld('ipcRenderer', {
-  on(...args: Parameters<typeof ipcRenderer.on>) {
-    const [channel, listener] = args
-    return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args))
+const validSendChannels = ['notify']
+const validReceiveChannels = ['main-process-message']
+
+contextBridge.exposeInMainWorld('electronAPI', {
+  send: (channel: string, data?: any) => {
+    if (validSendChannels.includes(channel)) ipcRenderer.send(channel, data)
   },
-  off(...args: Parameters<typeof ipcRenderer.off>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.off(channel, ...omit)
+  invoke: (channel: string, data?: any) => {
+    if (validSendChannels.includes(channel))
+      return ipcRenderer.invoke(channel, data)
   },
-  send(...args: Parameters<typeof ipcRenderer.send>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.send(channel, ...omit)
+  on: (channel: string, listener: (...args: any[]) => void) => {
+    if (validReceiveChannels.includes(channel)) {
+      ipcRenderer.on(channel, (_event, ...args) => listener(...args))
+    }
   },
-  invoke(...args: Parameters<typeof ipcRenderer.invoke>) {
-    const [channel, ...omit] = args
-    return ipcRenderer.invoke(channel, ...omit)
+  off: (channel: string, listener: (...args: any[]) => void) => {
+    if (validReceiveChannels.includes(channel))
+      ipcRenderer.off(channel, listener)
   },
 })
 
-contextBridge.exposeInMainWorld(
-  'notify',
-  (title: string, body: string, options = {}) =>
-    ipcRenderer.invoke('notify', { title, body, ...options })
-)
+contextBridge.exposeInMainWorld('notify', (title: string, body: string) => {
+  return ipcRenderer.invoke('notify', { title, body })
+})

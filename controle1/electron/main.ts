@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron'
+import { app, BrowserWindow, ipcMain, Notification, Menu } from 'electron'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
@@ -9,10 +9,29 @@ export const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
 
-import { Menu } from 'electron'
+let win: BrowserWindow | null = null
 
-// @ts-ignore
-const template: Electron.MenuItemConstructorOptions = [
+function createWindow() {
+  win = new BrowserWindow({
+    icon: path.join(process.env.VITE_PUBLIC!, 'RogueRatIcone.png'),
+    show: false,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.mjs'),
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+    },
+  })
+
+  win.once('ready-to-show', () => win?.show())
+
+  if (VITE_DEV_SERVER_URL) win.loadURL(VITE_DEV_SERVER_URL)
+  else win.loadFile(path.join(RENDERER_DIST, 'index.html'))
+
+  if (VITE_DEV_SERVER_URL) win.webContents.openDevTools()
+}
+
+const template: Electron.MenuItemConstructorOptions[] = [
   {
     label: 'Application',
     submenu: [
@@ -21,52 +40,28 @@ const template: Electron.MenuItemConstructorOptions = [
       {
         label: 'Open DevTools',
         click: () => {
-          if (win?.webContents.isDevToolsOpened()) {
+          if (win?.webContents.isDevToolsOpened())
             win.webContents.closeDevTools()
-          } else {
-            win?.webContents.openDevTools()
-          }
+          else win?.webContents.openDevTools()
         },
       },
     ],
   },
 ]
+Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 
-// @ts-ignore
-const menu = Menu.buildFromTemplate(template)
-Menu.setApplicationMenu(menu)
-
-let win: BrowserWindow | null = null
-
-function createWindow() {
-  win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC!, 'RogueRatIcone.png'),
-    webPreferences: { preload: path.join(__dirname, 'preload.mjs') },
-    show: false,
-  })
-
-
-  win.webContents.openDevTools()
-
-  win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', new Date().toLocaleString())
-  })
-  win.once('ready-to-show', () => win?.show())
-  if (VITE_DEV_SERVER_URL) win.loadURL(VITE_DEV_SERVER_URL)
-  else win.loadFile(path.join(RENDERER_DIST, 'index.html'))
-}
+ipcMain.handle('notify', (_event, { title, body }) => {
+  const n = new Notification({ title, body })
+  n.show()
+})
 
 app.whenReady().then(() => {
   app.setAppUserModelId('Rogue Rats Chat')
   process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
     ? path.join(process.env.APP_ROOT!, 'public')
     : RENDERER_DIST
-  createWindow()
 
-  ipcMain.handle('notify', (_e, { title, body }) => {
-    const n = new Notification({ title, body })
-    n.show()
-  })
+  createWindow()
 })
 
 app.on('activate', () => {

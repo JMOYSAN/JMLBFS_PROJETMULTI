@@ -48,6 +48,10 @@ jobs:
         run: npm run security:audit-html
         continue-on-error: true
 
+      - name: Generate security report
+        run: npm run security:report
+        continue-on-error: true
+
       - name: Run Snyk Security Scan
         uses: snyk/actions/node@master
         continue-on-error: true

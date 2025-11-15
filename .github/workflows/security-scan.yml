@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '0 0 * * 1'
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   security-analysis:
     runs-on: ubuntu-latest
@@ -65,7 +70,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            let comment = '## Security Scan Results\n\n';
+            let comment = '##Security Scan Results\n\n';
             
             try {
               const audit = JSON.parse(fs.readFileSync('reports/npm-audit.json', 'utf8'));
@@ -76,7 +81,7 @@ jobs:
               comment += `- Moderate: ${vulnerabilities.moderate}\n`;
               comment += `- Low: ${vulnerabilities.low}\n\n`;
             } catch (e) {
-              comment += '### npm audit\n Failed to parse results\n\n';
+              comment += '### npm audit\nFailed to parse results\n\n';
             }
             
             comment += `[Download full reports](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n`;

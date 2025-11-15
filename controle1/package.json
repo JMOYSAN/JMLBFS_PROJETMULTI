@@ -6,6 +6,7 @@
   "author": "Joaquim Moysan, Lyam Bathalon, François Santerre",
   "license": "MIT",
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "preview": "vite preview",

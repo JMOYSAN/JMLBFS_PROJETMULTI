@@ -12,6 +12,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 )
 //test
 // Use contextBridge
-window.ipcRenderer.on('main-process-message', () => {
+window.electronAPI.on('main-process-message', () => {
   window.notify('Build finished', 'All tasks completed')
 })
